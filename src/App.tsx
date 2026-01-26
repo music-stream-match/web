@@ -27,7 +27,7 @@ function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/playlists" element={<PlaylistsPage />} />
         <Route path="/import" element={<ImportPage />} />
-        <Route path="/callback/:provider" element={<CallbackPage />} />
+        <Route path="/auth/:provider" element={<CallbackPage />} />
       </Routes>
     </BrowserRouter>
   );

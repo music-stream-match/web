@@ -30,8 +30,8 @@ export const TIDAL_CONFIG = {
   clientId: 'ZlAcmYg4dODn9GP8',
   clientSecret: 'mIDPPmhQAMwFfmydCKsvnyyk1TWmWp0JjdLuElMmmCM=',
   redirectUri: import.meta.env.PROD
-    ? 'https://music-stream-match.github.io/callback/tidal'
-    : 'http://localhost:5173/callback/tidal',
+    ? 'https://music-stream-match.github.io/auth/tidal'
+    : 'http://localhost:5173/auth/tidal',
   authUrl: 'https://login.tidal.com/authorize',
   tokenUrl: 'https://auth.tidal.com/v1/oauth2/token',
   apiUrl: 'https://openapi.tidal.com',
