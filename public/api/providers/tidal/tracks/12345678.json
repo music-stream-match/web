@@ -1,0 +1,22 @@
+{
+  "_id": 12345678,
+  "title": "Bohemian Rhapsody",
+  "artist": {
+    "id": 123,
+    "name": "Queen"
+  },
+  "album": {
+    "id": 456,
+    "title": "A Night at the Opera"
+  },
+  "providers": [
+    {
+      "provider": "deezer",
+      "providerId": "7296350"
+    },
+    {
+      "provider": "tidal",
+      "providerId": "12345678"
+    }
+  ]
+}

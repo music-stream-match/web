@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="pl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Music Stream Match</title>
+    <script>
+      // SPA redirect for GitHub Pages
+      // This script handles routing for single-page applications on GitHub Pages
+      const path = window.location.pathname;
+      const search = window.location.search;
+      const hash = window.location.hash;
+      
+      // Redirect to index.html with the path as a query parameter
+      // The main app will then handle the routing
+      if (path !== '/') {
+        sessionStorage.setItem('redirect_path', path + search + hash);
+        window.location.replace('/');
+      }
+    </script>
+  </head>
+  <body>
+    <p>Redirecting...</p>
+  </body>
+</html>

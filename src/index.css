@@ -1,0 +1,66 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: oklch(0.7 0.15 280);
+  --color-primary-dark: oklch(0.6 0.15 280);
+  --color-secondary: oklch(0.75 0.12 180);
+  --color-accent: oklch(0.85 0.15 80);
+  --color-background: oklch(0.15 0.02 280);
+  --color-surface: oklch(0.2 0.02 280);
+  --color-surface-hover: oklch(0.25 0.02 280);
+  --color-text: oklch(0.95 0 0);
+  --color-text-muted: oklch(0.7 0 0);
+  --color-border: oklch(0.3 0.02 280);
+  --color-success: oklch(0.7 0.15 140);
+  --color-error: oklch(0.65 0.2 25);
+  --color-warning: oklch(0.8 0.15 80);
+  
+  --color-tidal: oklch(0.5 0.15 200);
+  --color-deezer: oklch(0.55 0.2 350);
+  
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --radius-lg: 1rem;
+  --radius-md: 0.5rem;
+  --radius-sm: 0.25rem;
+}
+
+@layer base {
+  html {
+    @apply bg-background text-text antialiased;
+  }
+  
+  body {
+    @apply min-h-screen font-sans;
+    margin: 0;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer;
+  }
+  
+  .btn-primary {
+    @apply bg-primary text-white hover:bg-primary-dark;
+  }
+  
+  .btn-secondary {
+    @apply bg-surface text-text border border-border hover:bg-surface-hover;
+  }
+  
+  .btn-tidal {
+    @apply bg-tidal text-white hover:opacity-90;
+  }
+  
+  .btn-deezer {
+    @apply bg-deezer text-white hover:opacity-90;
+  }
+  
+  .card {
+    @apply bg-surface rounded-lg border border-border p-4;
+  }
+  
+  .input {
+    @apply w-full rounded-md border border-border bg-background px-3 py-2 text-text placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent;
+  }
+}
