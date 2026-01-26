@@ -19,9 +19,12 @@ function RedirectHandler() {
   return null;
 }
 
+// Base path for GitHub Pages deployment
+const basename = import.meta.env.BASE_URL || '/';
+
 function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename={basename}>
       <RedirectHandler />
       <Routes>
         <Route path="/" element={<HomePage />} />
