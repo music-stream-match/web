@@ -22,7 +22,7 @@ export const DEEZER_CONFIG = {
 // 1. Go to https://developer.tidal.com/
 // 2. Create a developer account
 // 3. Create a new application in the dashboard
-// 4. Set the redirect URI to: https://localhost-vite.mobulum.xyz/auth/tidal
+// 4. Set the redirect URI to: https://localhost-vite.mobulum.xyz/callback/tidal
 // 5. Copy the Client ID and Client Secret
 // Note: TIDAL's API access may require approval for certain endpoints
 
@@ -30,11 +30,11 @@ export const TIDAL_CONFIG = {
   clientId: 'ZlAcmYg4dODn9GP8',
   clientSecret: 'mIDPPmhQAMwFfmydCKsvnyyk1TWmWp0JjdLuElMmmCM=',
   redirectUri: import.meta.env.PROD
-    ? 'https://localhost-vite.mobulum.xyz/auth/tidal'
-    : 'https://localhost-vite.mobulum.xyz/auth/tidal',
+    ? 'https://localhost-vite.mobulum.xyz/callback/tidal'
+    : 'https://localhost-vite.mobulum.xyz/callback/tidal',
   authUrl: 'https://login.tidal.com/authorize',
   tokenUrl: 'https://auth.tidal.com/v1/oauth2/token',
-  apiUrl: 'https://openapi.tidal.com',
+  apiUrl: 'https://openapi.tidal.com/v2',
   scopes: ['user.read', 'playlists.read', 'playlists.write'],
 };
 

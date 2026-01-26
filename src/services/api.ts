@@ -209,8 +209,8 @@ export const tidalService = {
 
     sessionStorage.removeItem('tidal_code_verifier');
 
-    // Fetch user info
-    const user = await this.getUser(tokens.accessToken);
+    // Extract user info from the token response or JWT
+    const user = this.extractUserFromToken(data.access_token, data.user);
 
     const auth: ProviderAuth = {
       provider: 'tidal',
@@ -222,52 +222,83 @@ export const tidalService = {
     return auth;
   },
 
-  async getUser(accessToken: string): Promise<User> {
-    console.log('[TIDAL] Fetching user info...');
-    const response = await fetch(`${TIDAL_CONFIG.apiUrl}/users/me`, {
-      headers: {
-        'Authorization': `Bearer ${accessToken}`,
-        'Content-Type': 'application/json',
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to fetch TIDAL user');
+  extractUserFromToken(accessToken: string, userData?: any): User {
+    console.log('[TIDAL] Extracting user info from token...');
+    
+    // Try to get user data from token response
+    if (userData) {
+      return {
+        id: userData.userId?.toString() || userData.id?.toString() || 'unknown',
+        name: userData.username || userData.fullName || 'TIDAL User',
+        email: userData.email,
+        picture: userData.picture,
+      };
     }
 
-    const data = await response.json();
+    // Try to decode JWT to get user info
+    try {
+      const parts = accessToken.split('.');
+      if (parts.length === 3) {
+        const payload = JSON.parse(atob(parts[1]));
+        console.log('[TIDAL] Token payload:', payload);
+        return {
+          id: payload.uid?.toString() || payload.sub || 'unknown',
+          name: payload.username || payload.name || 'TIDAL User',
+          email: payload.email,
+          picture: undefined,
+        };
+      }
+    } catch (e) {
+      console.log('[TIDAL] Could not decode JWT:', e);
+    }
 
+    // Fallback
     return {
-      id: data.userId,
-      name: data.username || data.firstName || 'TIDAL User',
-      email: data.email,
-      picture: data.picture,
+      id: 'tidal-user',
+      name: 'TIDAL User',
     };
   },
 
+  async getUser(accessToken: string): Promise<User> {
+    // This method is kept for compatibility but we now extract from token
+    return this.extractUserFromToken(accessToken);
+  },
+
   async getPlaylists(accessToken: string, userId: string): Promise<Playlist[]> {
-    console.log('[TIDAL] Fetching playlists...');
-    const response = await fetch(`${TIDAL_CONFIG.apiUrl}/users/${userId}/playlists?limit=100`, {
-      headers: {
-        'Authorization': `Bearer ${accessToken}`,
-        'Content-Type': 'application/json',
-      },
-    });
+    console.log('[TIDAL] Fetching playlists for user:', userId);
+    
+    // Use GET /playlists?filter[owners.id]={userId} to get user's playlists
+    // This is simpler and only requires playlists.read scope
+    const response = await fetch(
+      `${TIDAL_CONFIG.apiUrl}/playlists?countryCode=US&filter[owners.id]=${userId}&include=coverArt`,
+      {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': 'application/vnd.api+json',
+          'Accept': 'application/vnd.api+json',
+        },
+      }
+    );
 
     if (!response.ok) {
-      throw new Error('Failed to fetch TIDAL playlists');
+      const errorText = await response.text();
+      console.error('[TIDAL] Failed to fetch playlists:', response.status, errorText);
+      throw new Error(`Failed to fetch TIDAL playlists: ${response.status}`);
     }
 
     const data = await response.json();
+    console.log('[TIDAL] Playlists response:', data);
 
-    const playlists: Playlist[] = data.items.map((p: any) => ({
-      id: p.uuid,
-      name: p.title,
-      description: p.description,
-      imageUrl: p.image ? `https://resources.tidal.com/images/${p.image.replace(/-/g, '/')}/320x320.jpg` : undefined,
-      trackCount: p.numberOfTracks,
-      createdAt: p.created,
-      owner: p.creator?.name,
+    const playlists: Playlist[] = (data.data || []).map((p: any) => ({
+      id: p.id,
+      name: p.attributes?.name || p.attributes?.title || 'Unknown Playlist',
+      description: p.attributes?.description,
+      imageUrl: p.attributes?.squareImage ? 
+        `https://resources.tidal.com/images/${p.attributes.squareImage.replace(/-/g, '/')}/320x320.jpg` : 
+        undefined,
+      trackCount: p.attributes?.numberOfItems || 0,
+      createdAt: p.attributes?.createdAt,
+      owner: p.attributes?.owner?.name,
     }));
 
     console.log(`[TIDAL] Found ${playlists.length} playlists`);
@@ -277,34 +308,42 @@ export const tidalService = {
   async getPlaylistTracks(playlistId: string, accessToken: string): Promise<string[]> {
     console.log(`[TIDAL] Fetching tracks for playlist ${playlistId}...`);
     const trackIds: string[] = [];
-    let offset = 0;
+    let cursor: string | null = null;
     const limit = 100;
 
     while (true) {
-      const response = await fetch(
-        `${TIDAL_CONFIG.apiUrl}/playlists/${playlistId}/items?offset=${offset}&limit=${limit}`,
-        {
-          headers: {
-            'Authorization': `Bearer ${accessToken}`,
-            'Content-Type': 'application/json',
-          },
-        }
-      );
+      // TIDAL OpenAPI uses /playlists/{id}/relationships/items
+      const url = cursor 
+        ? `${TIDAL_CONFIG.apiUrl}/playlists/${playlistId}/relationships/items?countryCode=US&limit=${limit}&cursor=${cursor}`
+        : `${TIDAL_CONFIG.apiUrl}/playlists/${playlistId}/relationships/items?countryCode=US&limit=${limit}`;
+      
+      const response = await fetch(url, {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': 'application/vnd.api+json',
+          'Accept': 'application/vnd.api+json',
+        },
+      });
 
       if (!response.ok) {
-        throw new Error('Failed to fetch TIDAL playlist tracks');
+        const errorText = await response.text();
+        console.error('[TIDAL] Failed to fetch playlist tracks:', response.status, errorText);
+        throw new Error(`Failed to fetch TIDAL playlist tracks: ${response.status}`);
       }
 
       const data = await response.json();
+      console.log('[TIDAL] Playlist items response:', data);
 
-      for (const item of data.items) {
-        if (item.type === 'track') {
-          trackIds.push(item.item.id.toString());
+      // JSON:API format - data contains array of resource identifiers
+      for (const item of (data.data || [])) {
+        if (item.type === 'tracks') {
+          trackIds.push(item.id.toString());
         }
       }
 
-      if (data.items.length < limit) break;
-      offset += limit;
+      // Check for pagination
+      cursor = data.links?.next ? new URL(data.links.next).searchParams.get('cursor') : null;
+      if (!cursor || (data.data || []).length < limit) break;
     }
 
     console.log(`[TIDAL] Found ${trackIds.length} tracks in playlist`);
@@ -316,24 +355,40 @@ export const tidalService = {
     return playlists.find(p => p.name.toLowerCase() === name.toLowerCase()) || null;
   },
 
-  async createPlaylist(name: string, accessToken: string, userId: string): Promise<string> {
+  async createPlaylist(name: string, accessToken: string, _userId: string): Promise<string> {
     console.log(`[TIDAL] Creating playlist: ${name}`);
-    const response = await fetch(`${TIDAL_CONFIG.apiUrl}/users/${userId}/playlists`, {
+    
+    // TIDAL OpenAPI uses POST /playlists with JSON:API format
+    const response = await fetch(`${TIDAL_CONFIG.apiUrl}/playlists?countryCode=US`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${accessToken}`,
-        'Content-Type': 'application/json',
+        'Content-Type': 'application/vnd.api+json',
+        'Accept': 'application/vnd.api+json',
       },
-      body: JSON.stringify({ title: name }),
+      body: JSON.stringify({
+        data: {
+          type: 'playlists',
+          attributes: {
+            name: name,
+            description: 'Created by Music Stream Match',
+            privacy: 'PUBLIC',
+          },
+        },
+      }),
     });
 
     if (!response.ok) {
-      throw new Error('Failed to create TIDAL playlist');
+      const errorText = await response.text();
+      console.error('[TIDAL] Failed to create playlist:', response.status, errorText);
+      throw new Error(`Failed to create TIDAL playlist: ${response.status}`);
     }
 
     const data = await response.json();
-    console.log(`[TIDAL] Created playlist with ID: ${data.uuid}`);
-    return data.uuid;
+    console.log('[TIDAL] Create playlist response:', data);
+    const playlistId = data.data?.id;
+    console.log(`[TIDAL] Created playlist with ID: ${playlistId}`);
+    return playlistId;
   },
 
   async addTracksToPlaylist(playlistId: string, trackIds: string[], accessToken: string): Promise<void> {
@@ -344,19 +399,29 @@ export const tidalService = {
     for (let i = 0; i < trackIds.length; i += batchSize) {
       const batch = trackIds.slice(i, i + batchSize);
       
-      const response = await fetch(`${TIDAL_CONFIG.apiUrl}/playlists/${playlistId}/items`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${accessToken}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          trackIds: batch.map(id => parseInt(id)),
-        }),
-      });
+      // TIDAL OpenAPI uses POST /playlists/{id}/relationships/items with JSON:API format
+      const response = await fetch(
+        `${TIDAL_CONFIG.apiUrl}/playlists/${playlistId}/relationships/items?countryCode=US`,
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+            'Content-Type': 'application/vnd.api+json',
+            'Accept': 'application/vnd.api+json',
+          },
+          body: JSON.stringify({
+            data: batch.map(id => ({
+              type: 'tracks',
+              id: id,
+            })),
+          }),
+        }
+      );
 
       if (!response.ok) {
-        throw new Error('Failed to add tracks to TIDAL playlist');
+        const errorText = await response.text();
+        console.error('[TIDAL] Failed to add tracks:', response.status, errorText);
+        throw new Error(`Failed to add tracks to TIDAL playlist: ${response.status}`);
       }
     }
 
