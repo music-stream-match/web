@@ -17,6 +17,10 @@
     {
       "provider": "tidal",
       "providerId": "67706195"
+    },
+    {
+      "provider": "spotify",
+      "providerId": "3Zlj4Y25OmNaOo6lKFa1O2"
     }
   ]
 }
