@@ -38,7 +38,9 @@ export function ProviderCard({ provider, mode, disabled, selected, onClick }: Pr
       <div
         className={cn(
           'absolute inset-0 opacity-10',
-          provider === 'tidal' ? 'bg-gradient-to-br from-tidal to-transparent' : 'bg-gradient-to-br from-deezer to-transparent'
+          provider === 'tidal' && 'bg-gradient-to-br from-tidal to-transparent',
+          provider === 'deezer' && 'bg-gradient-to-br from-deezer to-transparent',
+          provider === 'spotify' && 'bg-gradient-to-br from-spotify to-transparent'
         )}
       />
 
@@ -49,7 +51,9 @@ export function ProviderCard({ provider, mode, disabled, selected, onClick }: Pr
             <div
               className={cn(
                 'w-12 h-12 rounded-lg flex items-center justify-center',
-                provider === 'tidal' ? 'bg-tidal' : 'bg-deezer'
+                provider === 'tidal' && 'bg-tidal',
+                provider === 'deezer' && 'bg-deezer',
+                provider === 'spotify' && 'bg-spotify'
               )}
             >
               <Music className="w-6 h-6 text-white" />

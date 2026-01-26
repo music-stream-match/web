@@ -64,7 +64,7 @@ export function HomePage() {
     setStep('source');
   };
 
-  const providers: Provider[] = ['tidal', 'deezer'];
+  const providers: Provider[] = ['tidal', 'spotify', 'deezer'];
 
   return (
     <div className="min-h-screen p-6">
@@ -112,7 +112,7 @@ export function HomePage() {
             <h2 className="text-xl font-semibold text-center mb-6">
               Wybierz serwis źródłowy
             </h2>
-            <div className="grid gap-4 md:grid-cols-2">
+            <div className="grid gap-4 md:grid-cols-3">
               {providers.map(provider => (
                 <ProviderCard
                   key={provider}
@@ -137,7 +137,7 @@ export function HomePage() {
                 Wybrana playlista: <strong>{selectedPlaylist.name}</strong> z {getProviderName(sourceProvider!)}
               </p>
             )}
-            <div className="grid gap-4 md:grid-cols-2">
+            <div className="grid gap-4 md:grid-cols-3">
               {providers.map(provider => (
                 <ProviderCard
                   key={provider}

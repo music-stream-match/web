@@ -22,7 +22,7 @@ export function CallbackPage() {
     console.log(`[Callback] URL hash: ${window.location.hash}`);
     console.log(`[Callback] URL search: ${window.location.search}`);
 
-    if (provider !== 'tidal' && provider !== 'deezer') {
+    if (provider !== 'tidal' && provider !== 'deezer' && provider !== 'spotify') {
       setError('Invalid provider');
       setStatus('error');
       return;
@@ -39,7 +39,7 @@ export function CallbackPage() {
         }
         auth = await providerService.handleCallback(provider, fragment);
       } else {
-        // TIDAL uses query params
+        // TIDAL and Spotify use query params (authorization code)
         const code = searchParams.get('code');
         if (!code) {
           const errorDesc = searchParams.get('error_description');

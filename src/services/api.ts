@@ -1,5 +1,5 @@
 import type { Provider, Playlist, Track, ProviderAuth, User, AuthTokens } from '@/types';
-import { DEEZER_CONFIG, TIDAL_CONFIG } from '@/config/api';
+import { DEEZER_CONFIG, TIDAL_CONFIG, SPOTIFY_CONFIG } from '@/config/api';
 
 // ============================================
 // DEEZER SERVICE
@@ -365,6 +365,217 @@ export const tidalService = {
 };
 
 // ============================================
+// SPOTIFY SERVICE
+// ============================================
+
+export const spotifyService = {
+  getAuthUrl(): string {
+    const state = generateCodeVerifier();
+    sessionStorage.setItem('spotify_state', state);
+    
+    const params = new URLSearchParams({
+      response_type: 'code',
+      client_id: SPOTIFY_CONFIG.clientId,
+      redirect_uri: SPOTIFY_CONFIG.redirectUri,
+      scope: SPOTIFY_CONFIG.scopes.join(' '),
+      state,
+    });
+    
+    const url = `${SPOTIFY_CONFIG.authUrl}?${params.toString()}`;
+    console.log('[Spotify] Auth URL:', url);
+    return url;
+  },
+
+  async handleCallback(code: string): Promise<ProviderAuth> {
+    console.log('[Spotify] Handling callback with code');
+    
+    // Exchange code for tokens
+    const response = await fetch(SPOTIFY_CONFIG.tokenUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Authorization': 'Basic ' + btoa(`${SPOTIFY_CONFIG.clientId}:${SPOTIFY_CONFIG.clientSecret}`),
+      },
+      body: new URLSearchParams({
+        grant_type: 'authorization_code',
+        code,
+        redirect_uri: SPOTIFY_CONFIG.redirectUri,
+      }),
+    });
+
+    const data = await response.json();
+
+    if (data.error) {
+      throw new Error(data.error_description || data.error);
+    }
+
+    const tokens: AuthTokens = {
+      accessToken: data.access_token,
+      refreshToken: data.refresh_token,
+      expiresAt: Date.now() + (data.expires_in * 1000),
+    };
+
+    sessionStorage.removeItem('spotify_state');
+
+    // Fetch user info
+    const user = await this.getUser(tokens.accessToken);
+
+    const auth: ProviderAuth = {
+      provider: 'spotify',
+      user,
+      tokens,
+    };
+
+    console.log('[Spotify] Auth successful:', auth.user.name);
+    return auth;
+  },
+
+  async getUser(accessToken: string): Promise<User> {
+    console.log('[Spotify] Fetching user info...');
+    const response = await fetch(`${SPOTIFY_CONFIG.apiUrl}/me`, {
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch Spotify user');
+    }
+
+    const data = await response.json();
+
+    return {
+      id: data.id,
+      name: data.display_name || data.id,
+      email: data.email,
+      picture: data.images?.[0]?.url,
+    };
+  },
+
+  async getPlaylists(accessToken: string): Promise<Playlist[]> {
+    console.log('[Spotify] Fetching playlists...');
+    const playlists: Playlist[] = [];
+    let url: string | null = `${SPOTIFY_CONFIG.apiUrl}/me/playlists?limit=50`;
+
+    while (url) {
+      const response = await fetch(url, {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch Spotify playlists');
+      }
+
+      const data = await response.json();
+
+      for (const p of data.items) {
+        playlists.push({
+          id: p.id,
+          name: p.name,
+          description: p.description,
+          imageUrl: p.images?.[0]?.url,
+          trackCount: p.tracks?.total || 0,
+          createdAt: '', // Spotify doesn't provide creation date
+          owner: p.owner?.display_name,
+        });
+      }
+
+      url = data.next;
+    }
+
+    console.log(`[Spotify] Found ${playlists.length} playlists`);
+    return playlists;
+  },
+
+  async getPlaylistTracks(playlistId: string, accessToken: string): Promise<string[]> {
+    console.log(`[Spotify] Fetching tracks for playlist ${playlistId}...`);
+    const trackIds: string[] = [];
+    let url: string | null = `${SPOTIFY_CONFIG.apiUrl}/playlists/${playlistId}/tracks?limit=100`;
+
+    while (url) {
+      const response = await fetch(url, {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch Spotify playlist tracks');
+      }
+
+      const data = await response.json();
+
+      for (const item of data.items) {
+        if (item.track?.id) {
+          trackIds.push(item.track.id);
+        }
+      }
+
+      url = data.next;
+    }
+
+    console.log(`[Spotify] Found ${trackIds.length} tracks in playlist`);
+    return trackIds;
+  },
+
+  async checkPlaylistExists(name: string, accessToken: string): Promise<Playlist | null> {
+    const playlists = await this.getPlaylists(accessToken);
+    return playlists.find(p => p.name.toLowerCase() === name.toLowerCase()) || null;
+  },
+
+  async createPlaylist(name: string, accessToken: string, userId: string): Promise<string> {
+    console.log(`[Spotify] Creating playlist: ${name}`);
+    const response = await fetch(`${SPOTIFY_CONFIG.apiUrl}/users/${userId}/playlists`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        name,
+        public: false,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to create Spotify playlist');
+    }
+
+    const data = await response.json();
+    console.log(`[Spotify] Created playlist with ID: ${data.id}`);
+    return data.id;
+  },
+
+  async addTracksToPlaylist(playlistId: string, trackIds: string[], accessToken: string): Promise<void> {
+    console.log(`[Spotify] Adding ${trackIds.length} tracks to playlist ${playlistId}...`);
+    
+    // Spotify accepts max 100 tracks per request
+    const batchSize = 100;
+    for (let i = 0; i < trackIds.length; i += batchSize) {
+      const batch = trackIds.slice(i, i + batchSize);
+      const uris = batch.map(id => `spotify:track:${id}`);
+      
+      const response = await fetch(`${SPOTIFY_CONFIG.apiUrl}/playlists/${playlistId}/tracks`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ uris }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to add tracks to Spotify playlist');
+      }
+    }
+
+    console.log('[Spotify] Tracks added successfully');
+  },
+};
+
+// ============================================
 // TRACK MAPPING SERVICE (Local JSON files)
 // ============================================
 
@@ -406,12 +617,18 @@ export const trackMappingService = {
 
 export const providerService = {
   getAuthUrl(provider: Provider): string {
-    return provider === 'deezer' ? deezerService.getAuthUrl() : tidalService.getAuthUrl();
+    if (provider === 'deezer') return deezerService.getAuthUrl();
+    if (provider === 'spotify') return spotifyService.getAuthUrl();
+    return tidalService.getAuthUrl();
   },
 
   async handleCallback(provider: Provider, params: URLSearchParams | string): Promise<ProviderAuth> {
     if (provider === 'deezer') {
       return deezerService.handleCallback(params as string);
+    } else if (provider === 'spotify') {
+      const code = (params as URLSearchParams).get('code');
+      if (!code) throw new Error('No code in Spotify callback');
+      return spotifyService.handleCallback(code);
     } else {
       const code = (params as URLSearchParams).get('code');
       if (!code) throw new Error('No code in TIDAL callback');
@@ -422,6 +639,8 @@ export const providerService = {
   async getPlaylists(provider: Provider, auth: ProviderAuth): Promise<Playlist[]> {
     if (provider === 'deezer') {
       return deezerService.getPlaylists(auth.tokens.accessToken);
+    } else if (provider === 'spotify') {
+      return spotifyService.getPlaylists(auth.tokens.accessToken);
     } else {
       return tidalService.getPlaylists(auth.tokens.accessToken, auth.user.id);
     }
@@ -430,6 +649,8 @@ export const providerService = {
   async getPlaylistTracks(provider: Provider, playlistId: string, auth: ProviderAuth): Promise<string[]> {
     if (provider === 'deezer') {
       return deezerService.getPlaylistTracks(playlistId, auth.tokens.accessToken);
+    } else if (provider === 'spotify') {
+      return spotifyService.getPlaylistTracks(playlistId, auth.tokens.accessToken);
     } else {
       return tidalService.getPlaylistTracks(playlistId, auth.tokens.accessToken);
     }
@@ -438,6 +659,8 @@ export const providerService = {
   async checkPlaylistExists(provider: Provider, name: string, auth: ProviderAuth): Promise<Playlist | null> {
     if (provider === 'deezer') {
       return deezerService.checkPlaylistExists(name, auth.tokens.accessToken);
+    } else if (provider === 'spotify') {
+      return spotifyService.checkPlaylistExists(name, auth.tokens.accessToken);
     } else {
       return tidalService.checkPlaylistExists(name, auth.tokens.accessToken, auth.user.id);
     }
@@ -446,6 +669,8 @@ export const providerService = {
   async createPlaylist(provider: Provider, name: string, auth: ProviderAuth): Promise<string> {
     if (provider === 'deezer') {
       return deezerService.createPlaylist(name, auth.tokens.accessToken);
+    } else if (provider === 'spotify') {
+      return spotifyService.createPlaylist(name, auth.tokens.accessToken, auth.user.id);
     } else {
       return tidalService.createPlaylist(name, auth.tokens.accessToken, auth.user.id);
     }
@@ -454,6 +679,8 @@ export const providerService = {
   async addTracksToPlaylist(provider: Provider, playlistId: string, trackIds: string[], auth: ProviderAuth): Promise<void> {
     if (provider === 'deezer') {
       return deezerService.addTracksToPlaylist(playlistId, trackIds, auth.tokens.accessToken);
+    } else if (provider === 'spotify') {
+      return spotifyService.addTracksToPlaylist(playlistId, trackIds, auth.tokens.accessToken);
     } else {
       return tidalService.addTracksToPlaylist(playlistId, trackIds, auth.tokens.accessToken);
     }
@@ -462,6 +689,8 @@ export const providerService = {
   getPlaylistUrl(provider: Provider, playlistId: string): string {
     if (provider === 'deezer') {
       return `https://www.deezer.com/playlist/${playlistId}`;
+    } else if (provider === 'spotify') {
+      return `https://open.spotify.com/playlist/${playlistId}`;
     } else {
       return `https://listen.tidal.com/playlist/${playlistId}`;
     }

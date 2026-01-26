@@ -8,6 +8,7 @@ export const useAppStore = create<AppState>()(
       // Initial state
       tidalAuth: null,
       deezerAuth: null,
+      spotifyAuth: null,
       sourceProvider: null,
       targetProvider: null,
       selectedPlaylist: null,
@@ -19,6 +20,8 @@ export const useAppStore = create<AppState>()(
         console.log(`[Store] Setting auth for ${provider}:`, auth ? `User: ${auth.user.name}` : 'null');
         if (provider === 'tidal') {
           set({ tidalAuth: auth });
+        } else if (provider === 'spotify') {
+          set({ spotifyAuth: auth });
         } else {
           set({ deezerAuth: auth });
         }
@@ -66,7 +69,9 @@ export const useAppStore = create<AppState>()(
 
       getAuth: (provider: Provider) => {
         const state = get();
-        return provider === 'tidal' ? state.tidalAuth : state.deezerAuth;
+        if (provider === 'tidal') return state.tidalAuth;
+        if (provider === 'spotify') return state.spotifyAuth;
+        return state.deezerAuth;
       },
 
       isLoggedIn: (provider: Provider) => {
@@ -81,6 +86,7 @@ export const useAppStore = create<AppState>()(
       partialize: (state) => ({
         tidalAuth: state.tidalAuth,
         deezerAuth: state.deezerAuth,
+        spotifyAuth: state.spotifyAuth,
       }),
     }
   )

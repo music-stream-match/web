@@ -1,4 +1,4 @@
-export type Provider = 'tidal' | 'deezer';
+export type Provider = 'tidal' | 'deezer' | 'spotify';
 
 export interface User {
   id: string;
@@ -77,6 +77,7 @@ export interface AppState {
   // Auth state
   tidalAuth: ProviderAuth | null;
   deezerAuth: ProviderAuth | null;
+  spotifyAuth: ProviderAuth | null;
   
   // Selection state
   sourceProvider: Provider | null;

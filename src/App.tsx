@@ -28,6 +28,7 @@ function App() {
         <Route path="/playlists" element={<PlaylistsPage />} />
         <Route path="/import" element={<ImportPage />} />
         <Route path="/auth/:provider" element={<CallbackPage />} />
+        <Route path="/callback/:provider" element={<CallbackPage />} />
       </Routes>
     </BrowserRouter>
   );
