@@ -17,6 +17,7 @@ export function ImportPage() {
     targetProvider,
     selectedPlaylist,
     getAuth,
+    isLoggedIn,
     importProgress,
     setImportProgress,
     importResult,
@@ -43,8 +44,9 @@ export function ImportPage() {
   const checkExistingPlaylist = async (name: string) => {
     if (!targetProvider) return;
 
+    // For non-Deezer providers, check auth
     const auth = getAuth(targetProvider);
-    if (!auth) return;
+    if (targetProvider !== 'deezer' && !auth) return;
 
     try {
       setCheckingExisting(true);
@@ -78,8 +80,9 @@ export function ImportPage() {
     const sourceAuth = getAuth(sourceProvider);
     const targetAuth = getAuth(targetProvider);
 
-    if (!sourceAuth || !targetAuth) {
-      console.error('[ImportPage] Missing auth for providers');
+    // For Deezer, auth might be null but isLoggedIn should be true
+    if (!isLoggedIn(sourceProvider) || !isLoggedIn(targetProvider)) {
+      console.error('[ImportPage] Not logged in to providers');
       return;
     }
 

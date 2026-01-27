@@ -14,13 +14,18 @@ interface ProviderCardProps {
 
 export function ProviderCard({ provider, mode, disabled, selected, onClick }: ProviderCardProps) {
   const auth = useAppStore(state => state.getAuth(provider));
+  const isLoggedIn = useAppStore(state => state.isLoggedIn(provider));
   const setAuth = useAppStore(state => state.setAuth);
-  const isLoggedIn = auth !== null;
+  const setDeezerArl = useAppStore(state => state.setDeezerArl);
 
   const handleLogout = (e: React.MouseEvent) => {
     e.stopPropagation();
     console.log(`[ProviderCard] Logging out from ${provider}`);
     setAuth(provider, null);
+    // Also clear Deezer ARL if logging out from Deezer
+    if (provider === 'deezer') {
+      setDeezerArl(null);
+    }
   };
 
   return (
@@ -85,10 +90,14 @@ export function ProviderCard({ provider, mode, disabled, selected, onClick }: Pr
                 />
               ) : (
                 <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
-                  <span className="text-sm font-medium">{auth?.user.name[0]}</span>
+                  <span className="text-sm font-medium">
+                    {auth?.user.name?.[0] || (provider === 'deezer' ? 'D' : '?')}
+                  </span>
                 </div>
               )}
-              <span className="text-sm font-medium">{auth?.user.name}</span>
+              <span className="text-sm font-medium">
+                {auth?.user.name || (provider === 'deezer' ? 'Deezer (ARL)' : 'Zalogowany')}
+              </span>
             </div>
             <button
               onClick={handleLogout}

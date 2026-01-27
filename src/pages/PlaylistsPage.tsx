@@ -10,7 +10,7 @@ import { getProviderName } from '@/lib/utils';
 
 export function PlaylistsPage() {
   const navigate = useNavigate();
-  const { sourceProvider, getAuth, setSelectedPlaylist, selectedPlaylist } = useAppStore();
+  const { sourceProvider, getAuth, setSelectedPlaylist, selectedPlaylist, isLoggedIn } = useAppStore();
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -23,8 +23,8 @@ export function PlaylistsPage() {
       return;
     }
 
-    const auth = getAuth(sourceProvider);
-    if (!auth) {
+    // Check if logged in (for Deezer, this checks ARL)
+    if (!isLoggedIn(sourceProvider)) {
       console.log('[PlaylistsPage] Not logged in, redirecting to home');
       navigate('/');
       return;
@@ -36,8 +36,9 @@ export function PlaylistsPage() {
   const fetchPlaylists = async () => {
     if (!sourceProvider) return;
 
+    // For non-Deezer providers, we need the auth object
     const auth = getAuth(sourceProvider);
-    if (!auth) return;
+    if (sourceProvider !== 'deezer' && !auth) return;
 
     try {
       setLoading(true);

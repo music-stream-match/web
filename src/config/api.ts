@@ -1,34 +1,13 @@
 import { useAppStore } from '@/store/useAppStore';
 
 // Deezer API Configuration
-// To get these credentials:
-// 1. Go to https://developers.deezer.com/
-// 2. Create an account or log in
-// 3. Go to "My Apps" and create a new application
-// 4. Set the redirect URI to: https://localhost-vite.mobulum.xyz/callback/deezer
-// 5. Copy the Application ID and Secret Key
+// Uses ARL (Authentication Reference Link) cookie for auth
+// User provides ARL which is converted to JWT via renew endpoint
 
-const DEEZER_DEFAULTS = {
-  clientId: 'YOUR_DEEZER_APP_ID', // Replace with your Deezer App ID
-  // Note: Deezer uses implicit grant, so no client secret needed on frontend
-  redirectUri: import.meta.env.MODE === 'production'
-    ? 'https://music-stream-match.space/callback/deezer'
-    : 'https://localhost-vite.mobulum.xyz/callback/deezer',
-  authUrl: 'https://connect.deezer.com/oauth/auth.php',
-  apiUrl: 'https://api.deezer.com',
-  scopes: ['basic_access', 'manage_library', 'offline_access'],
+export const DEEZER_CONFIG = {
+  authRenewUrl: 'https://auth.deezer.com/login/renew?jo=p&rto=c&i=c',
+  graphqlUrl: 'https://pipe.deezer.com/api',
 };
-
-export const getDeezerConfig = () => {
-  const credentials = useAppStore.getState().getProviderCredentials('deezer');
-  return {
-    ...DEEZER_DEFAULTS,
-    clientId: credentials?.clientId || DEEZER_DEFAULTS.clientId,
-  };
-};
-
-// Legacy export for compatibility
-export const DEEZER_CONFIG = DEEZER_DEFAULTS;
 
 // TIDAL API Configuration
 // To get these credentials:

@@ -6,8 +6,8 @@ export async function importPlaylist(
   targetProvider: Provider,
   sourcePlaylist: Playlist,
   targetPlaylistName: string,
-  sourceAuth: ProviderAuth,
-  targetAuth: ProviderAuth,
+  sourceAuth: ProviderAuth | null,
+  targetAuth: ProviderAuth | null,
   onProgress: (progress: ImportProgress) => void
 ): Promise<ImportResult> {
   const startTime = Date.now();

@@ -11,6 +11,7 @@ export const useAppStore = create<AppState>()(
       tidalAuth: null,
       deezerAuth: null,
       spotifyAuth: null,
+      deezerArl: null,
       sourceProvider: null,
       targetProvider: null,
       selectedPlaylist: null,
@@ -31,6 +32,7 @@ export const useAppStore = create<AppState>()(
           tidalAuth: null,
           deezerAuth: null,
           spotifyAuth: null,
+          deezerArl: null,
           sourceProvider: null,
           targetProvider: null,
           selectedPlaylist: null,
@@ -48,6 +50,11 @@ export const useAppStore = create<AppState>()(
         } else {
           set({ deezerAuth: auth });
         }
+      },
+
+      setDeezerArl: (arl: string | null) => {
+        console.log(`[Store] Setting Deezer ARL:`, arl ? 'provided' : 'null');
+        set({ deezerArl: arl });
       },
 
       setSourceProvider: (provider: Provider | null) => {
@@ -98,10 +105,18 @@ export const useAppStore = create<AppState>()(
       },
 
       isLoggedIn: (provider: Provider) => {
+        // For Deezer, check if we have ARL stored
+        if (provider === 'deezer') {
+          return !!get().deezerArl;
+        }
         const auth = get().getAuth(provider);
         if (!auth) return false;
         // Check if token is still valid (with 5 min buffer)
         return auth.tokens.expiresAt > Date.now() + 5 * 60 * 1000;
+      },
+
+      getDeezerArl: () => {
+        return get().deezerArl;
       },
 
       getProviderCredentials: (provider: Provider): ProviderCredentials | null => {
@@ -121,6 +136,7 @@ export const useAppStore = create<AppState>()(
         tidalAuth: state.tidalAuth,
         deezerAuth: state.deezerAuth,
         spotifyAuth: state.spotifyAuth,
+        deezerArl: state.deezerArl,
       }),
     }
   )

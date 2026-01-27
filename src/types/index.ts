@@ -95,6 +95,9 @@ export interface AppState {
   deezerAuth: ProviderAuth | null;
   spotifyAuth: ProviderAuth | null;
   
+  // Deezer ARL state
+  deezerArl: string | null;
+  
   // Selection state
   sourceProvider: Provider | null;
   targetProvider: Provider | null;
@@ -108,6 +111,7 @@ export interface AppState {
   setInvitation: (code: string, config: InvitationConfig) => void;
   clearInvitation: () => void;
   setAuth: (provider: Provider, auth: ProviderAuth | null) => void;
+  setDeezerArl: (arl: string | null) => void;
   setSourceProvider: (provider: Provider | null) => void;
   setTargetProvider: (provider: Provider | null) => void;
   setSelectedPlaylist: (playlist: Playlist | null) => void;
@@ -116,5 +120,6 @@ export interface AppState {
   reset: () => void;
   getAuth: (provider: Provider) => ProviderAuth | null;
   isLoggedIn: (provider: Provider) => boolean;
+  getDeezerArl: () => string | null;
   getProviderCredentials: (provider: Provider) => ProviderCredentials | null;
 }

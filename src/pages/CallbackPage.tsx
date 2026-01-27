@@ -28,25 +28,23 @@ export function CallbackPage() {
       return;
     }
 
+    // Deezer now uses ARL-based auth, not OAuth callbacks
+    if (provider === 'deezer') {
+      console.log('[Callback] Deezer uses ARL-based auth, redirecting to home');
+      navigate('/');
+      return;
+    }
+
     try {
       let auth;
 
-      if (provider === 'deezer') {
-        // Deezer uses fragment (hash) for token
-        const fragment = window.location.hash;
-        if (!fragment) {
-          throw new Error('No authentication data received');
-        }
-        auth = await providerService.handleCallback(provider, fragment);
-      } else {
-        // TIDAL and Spotify use query params (authorization code)
-        const code = searchParams.get('code');
-        if (!code) {
-          const errorDesc = searchParams.get('error_description');
-          throw new Error(errorDesc || 'No authorization code received');
-        }
-        auth = await providerService.handleCallback(provider, searchParams);
+      // TIDAL and Spotify use query params (authorization code)
+      const code = searchParams.get('code');
+      if (!code) {
+        const errorDesc = searchParams.get('error_description');
+        throw new Error(errorDesc || 'No authorization code received');
       }
+      auth = await providerService.handleCallback(provider, searchParams);
 
       // Save auth
       setAuth(provider as Provider, auth);

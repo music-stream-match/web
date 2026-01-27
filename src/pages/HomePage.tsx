@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import type { Provider } from '@/types';
 import { useAppStore } from '@/store/useAppStore';
 import { ProviderCard } from '@/components/ProviderCard';
+import { DeezerArlModal } from '@/components/DeezerArlModal';
 import { Button } from '@/components/ui';
 import { providerService } from '@/services/api';
 import { ArrowRight, Music2, RefreshCw } from 'lucide-react';
@@ -28,10 +29,22 @@ export function HomePage() {
       : 'source'
   );
 
+  // Deezer ARL modal state
+  const [showDeezerArlModal, setShowDeezerArlModal] = useState(false);
+  const [pendingDeezerMode, setPendingDeezerMode] = useState<'source' | 'target' | null>(null);
+
   const handleProviderClick = (provider: Provider, mode: 'source' | 'target') => {
     console.log(`[HomePage] Provider ${provider} clicked for ${mode}`);
 
     if (!isLoggedIn(provider)) {
+      // Deezer uses ARL-based auth, not OAuth
+      if (provider === 'deezer') {
+        console.log('[HomePage] Showing Deezer ARL modal');
+        setPendingDeezerMode(mode);
+        setShowDeezerArlModal(true);
+        return;
+      }
+
       // Store what we're trying to do
       sessionStorage.setItem('auth_mode', mode);
       sessionStorage.setItem('auth_provider', provider);
@@ -51,6 +64,26 @@ export function HomePage() {
       setTargetProvider(provider);
       setStep('ready');
     }
+  };
+
+  const handleDeezerArlSuccess = () => {
+    console.log('[HomePage] Deezer ARL auth successful');
+    setShowDeezerArlModal(false);
+    
+    if (pendingDeezerMode === 'source') {
+      setSourceProvider('deezer');
+      navigate('/playlists');
+    } else if (pendingDeezerMode === 'target') {
+      setTargetProvider('deezer');
+      setStep('ready');
+    }
+    
+    setPendingDeezerMode(null);
+  };
+
+  const handleDeezerArlClose = () => {
+    setShowDeezerArlModal(false);
+    setPendingDeezerMode(null);
   };
 
   const handleStartImport = () => {
@@ -198,6 +231,13 @@ export function HomePage() {
           </div>
         )}
       </div>
+
+      {/* Deezer ARL Modal */}
+      <DeezerArlModal
+        isOpen={showDeezerArlModal}
+        onClose={handleDeezerArlClose}
+        onSuccess={handleDeezerArlSuccess}
+      />
     </div>
   );
 }
