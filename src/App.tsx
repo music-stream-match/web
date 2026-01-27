@@ -21,6 +21,8 @@ function RedirectHandler() {
 
 // Base path for GitHub Pages deployment
 const basename = import.meta.env.BASE_URL || '/';
+console.log('[App] Using basename:', basename);
+console.dir( {meta: import.meta.env})
 
 function App() {
   return (
