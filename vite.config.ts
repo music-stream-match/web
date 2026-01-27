@@ -6,13 +6,13 @@ import path from 'path'
 // https://vite.dev/config/
 export default defineConfig(({}) => ({
     plugins: [react(), tailwindcss()],
-    base: '/web/',
+    base: '/',
     resolve: {
         alias: {
             '@': path.resolve(__dirname, './src'),
         },
     },
     server: {
-        allowedHosts: ['localhost-vite.mobulum.xyz', 'music-stream-match.github.io'],
+        allowedHosts: ['localhost-vite.mobulum.xyz', 'music-stream-match.github.io', 'music-stream-match.space'],
     },
 }))
