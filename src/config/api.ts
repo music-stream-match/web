@@ -2,11 +2,11 @@ import { useAppStore } from '@/store/useAppStore';
 
 // Deezer API Configuration
 // Uses ARL (Authentication Reference Link) cookie for auth
-// User provides ARL which is converted to JWT via renew endpoint
+// Requests go through Cloudflare Worker proxy to bypass CORS
 
 export const DEEZER_CONFIG = {
-  authRenewUrl: 'https://auth.deezer.com/login/renew?jo=p&rto=c&i=c',
-  graphqlUrl: 'https://pipe.deezer.com/api',
+  // Proxy URL - Cloudflare Worker that forwards requests to Deezer gw-light.php
+  proxyUrl: 'https://deezer.music-stream-match.space',
 };
 
 // TIDAL API Configuration

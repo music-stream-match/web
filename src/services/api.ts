@@ -3,200 +3,151 @@ import { DEEZER_CONFIG, getTidalConfig, getSpotifyConfig } from '@/config/api';
 import { useAppStore } from '@/store/useAppStore';
 
 // ============================================
-// DEEZER SERVICE (ARL-based authentication)
+// DEEZER SERVICE (ARL-based authentication via Cloudflare Worker proxy)
 // ============================================
 
-// Cache for JWT token
-let deezerJwtCache: { jwt: string; expiresAt: number } | null = null;
+// Types for Deezer API responses
+interface DeezerPlaylistData {
+  PLAYLIST_ID: string;
+  TITLE: string;
+  DESCRIPTION?: string;
+  PLAYLIST_PICTURE?: string;
+  NB_SONG?: number;
+  DATE_ADD?: string;
+  PARENT_USERNAME?: string;
+}
+
+interface DeezerTrackData {
+  SNG_ID: string;
+  SNG_TITLE: string;
+  ART_ID: string;
+  ART_NAME: string;
+  ALB_ID: string;
+  ALB_TITLE: string;
+  ALB_PICTURE?: string;
+  ISRC?: string;
+}
+
+interface DeezerApiResponse<T = unknown> {
+  results?: T;
+  error?: Record<string, string> | unknown[];
+}
+
+interface DeezerInitResponse {
+  success: boolean;
+  apiToken: string;
+  user: {
+    id: string;
+    name: string;
+    picture?: string;
+  };
+}
+
+interface DeezerPlaylistsResponse {
+  TAB?: {
+    playlists?: {
+      data?: DeezerPlaylistData[];
+    };
+  };
+}
+
+interface DeezerPagePlaylistResponse {
+  DATA?: DeezerPlaylistData;
+  SONGS?: {
+    data?: DeezerTrackData[];
+  };
+}
+
+// Helper to make requests to the proxy
+async function deezerProxyRequest<T>(
+  endpoint: string,
+  arl: string,
+  options: RequestInit = {}
+): Promise<T> {
+  const url = `${DEEZER_CONFIG.proxyUrl}${endpoint}`;
+  
+  const response = await fetch(url, {
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Deezer-ARL': arl,
+      ...options.headers,
+    },
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.error('[Deezer] Proxy error:', response.status, errorText);
+    throw new Error(`Deezer API error: ${response.status}`);
+  }
+
+  return response.json();
+}
 
 export const deezerService = {
-  // Convert ARL to JWT token
-  // Note: This function is for future use when we implement proper JWT token exchange
-  // Currently, we use the ARL directly in the Authorization header
-  async getJwtFromArl(_arl: string): Promise<string> {
-    // Check cache first
-    if (deezerJwtCache && deezerJwtCache.expiresAt > Date.now() + 60 * 1000) {
-      console.log('[Deezer] Using cached JWT');
-      return deezerJwtCache.jwt;
-    }
-
-    console.log('[Deezer] Converting ARL to JWT...');
-    
-    // Note: This requires a CORS proxy or backend server to work properly
-    // The ARL needs to be sent as a cookie to the renew endpoint
-    const response = await fetch(DEEZER_CONFIG.authRenewUrl, {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Origin': 'https://www.deezer.com',
-        'Referer': 'https://www.deezer.com/',
-        'Content-Length': '0',
-      },
-      credentials: 'include',
-    });
-
-    if (!response.ok) {
-      throw new Error(`Failed to convert ARL to JWT: ${response.status}`);
-    }
-
-    const data = await response.json();
-    
-    if (!data.jwt) {
-      throw new Error('No JWT in response');
-    }
-
-    // Cache the JWT (typically expires in 6 minutes, but we'll use 5 for safety)
-    deezerJwtCache = {
-      jwt: data.jwt,
-      expiresAt: Date.now() + 5 * 60 * 1000,
-    };
-
-    console.log('[Deezer] Got JWT successfully');
-    return data.jwt;
-  },
-
-  // Direct JWT fetch with ARL cookie - for browser environments where we need the ARL
+  // Authenticate with ARL via proxy
   async authenticateWithArl(arl: string): Promise<ProviderAuth> {
-    console.log('[Deezer] Authenticating with ARL...');
+    console.log('[Deezer] Authenticating with ARL via proxy...');
     
-    // Store ARL for later use
-    useAppStore.getState().setDeezerArl(arl);
-    
-    // For the initial auth, we'll extract user info from the JWT we'll get during playlist fetch
-    // For now, create a placeholder auth
-    const auth: ProviderAuth = {
-      provider: 'deezer',
-      user: {
-        id: 'deezer-user',
-        name: 'Deezer User',
-      },
-      tokens: {
-        accessToken: arl, // Store ARL as the token for now
-        expiresAt: Date.now() + 365 * 24 * 60 * 60 * 1000, // ARL doesn't expire like OAuth tokens
-      },
-    };
+    try {
+      // Call proxy /init endpoint to validate ARL and get user data
+      const data = await deezerProxyRequest<DeezerInitResponse>('/init', arl);
+      
+      if (!data.success) {
+        throw new Error('Failed to authenticate with ARL');
+      }
 
-    console.log('[Deezer] ARL auth stored successfully');
-    return auth;
+      // Store ARL for later use
+      useAppStore.getState().setDeezerArl(arl);
+
+      const auth: ProviderAuth = {
+        provider: 'deezer',
+        user: {
+          id: data.user.id,
+          name: data.user.name,
+          picture: data.user.picture,
+        },
+        tokens: {
+          accessToken: arl,
+          expiresAt: Date.now() + 365 * 24 * 60 * 60 * 1000, // ARL doesn't expire like OAuth tokens
+        },
+      };
+
+      console.log('[Deezer] Auth successful:', auth.user.name);
+      return auth;
+    } catch (error) {
+      console.error('[Deezer] Auth error:', error);
+      throw new Error(
+        error instanceof Error 
+          ? `Nie udało się zalogować: ${error.message}` 
+          : 'Nieprawidłowy ARL lub problem z połączeniem'
+      );
+    }
   },
 
   async getPlaylists(arl: string): Promise<Playlist[]> {
-    console.log('[Deezer] Fetching playlists with GraphQL...');
+    console.log('[Deezer] Fetching playlists via proxy...');
     
-    // For now, we'll use a proxy approach or direct fetch
-    // The ARL needs to be sent as a cookie to the renew endpoint first to get JWT
-    
-    // Since browsers block setting cookies for different domains,
-    // we'll need to implement a workaround
-    
-    // Option 1: Use the stored ARL to make a direct GraphQL request
-    // This requires the JWT from the renew endpoint
-    
-    const query = `query SidebarPlaylistsInfo($first: Int!) {
-  me {
-    id
-    playlists(sort: {by: LAST_MODIFICATION_DATE, order: DESC}) {
-      edges {
-        node {
-          lastModificationDate
-          ...SidebarPlaylistsInfo
-          __typename
-        }
-        __typename
-      }
-      __typename
-    }
-    userFavorites {
-      playlists(first: $first) {
-        edges {
-          favoritedAt
-          node {
-            ...SidebarPlaylistsInfo
-            __typename
-          }
-          __typename
-        }
-        __typename
-      }
-      __typename
-    }
-    __typename
-  }
-}
-
-fragment SidebarPlaylistsInfo on Playlist {
-  isFromFavoriteTracks
-  isCollaborative
-  id
-  title
-  owner {
-    id
-    name
-    __typename
-  }
-  picture {
-    ...PictureSmall
-    __typename
-  }
-  __typename
-}
-
-fragment PictureSmall on Picture {
-  id
-  small: urls(pictureRequest: {height: 100, width: 100})
-  explicitStatus
-  __typename
-}`;
-
-    // Try to get JWT using ARL
-    // Note: This requires a proxy server to handle CORS and cookie forwarding
-    // For local development, you may need to use a browser extension or proxy
-    
-    const response = await fetch(DEEZER_CONFIG.graphqlUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': '*/*',
-        'Authorization': `Bearer ${arl}`, // This won't work directly - needs JWT
-        'Origin': 'https://www.deezer.com',
-        'Referer': 'https://www.deezer.com/',
-      },
-      body: JSON.stringify({
-        operationName: 'SidebarPlaylistsInfo',
-        variables: { first: 50 },
-        query,
-      }),
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('[Deezer] GraphQL error:', response.status, errorText);
-      throw new Error(`Failed to fetch playlists: ${response.status}`);
-    }
-
-    const data = await response.json();
-    console.log('[Deezer] GraphQL response:', data);
-
-    if (data.errors) {
-      throw new Error(data.errors[0]?.message || 'GraphQL error');
-    }
+    const data = await deezerProxyRequest<DeezerApiResponse<DeezerPlaylistsResponse>>(
+      '/api/playlists',
+      arl
+    );
 
     const playlists: Playlist[] = [];
+    const playlistsData = data.results?.TAB?.playlists?.data || [];
     
-    // Parse user's own playlists
-    const userPlaylists = data.data?.me?.playlists?.edges || [];
-    for (const edge of userPlaylists) {
-      const p = edge.node;
-      if (p) {
-        playlists.push({
-          id: p.id,
-          name: p.title,
-          imageUrl: p.picture?.small?.[0] || undefined,
-          trackCount: 0, // Not available in this query
-          createdAt: p.lastModificationDate || '',
-          owner: p.owner?.name,
-        });
-      }
+    for (const p of playlistsData) {
+      playlists.push({
+        id: p.PLAYLIST_ID,
+        name: p.TITLE,
+        description: p.DESCRIPTION,
+        imageUrl: p.PLAYLIST_PICTURE 
+          ? `https://e-cdns-images.dzcdn.net/images/playlist/${p.PLAYLIST_PICTURE}/100x100-000000-80-0-0.jpg`
+          : undefined,
+        trackCount: p.NB_SONG || 0,
+        createdAt: p.DATE_ADD || '',
+        owner: p.PARENT_USERNAME,
+      });
     }
 
     console.log(`[Deezer] Found ${playlists.length} playlists`);
@@ -206,72 +157,18 @@ fragment PictureSmall on Picture {
   async getPlaylistTracks(playlistId: string, arl: string): Promise<string[]> {
     console.log(`[Deezer] Fetching tracks for playlist ${playlistId}...`);
     
-    const query = `query PlaylistTracks($playlistId: String!, $first: Int!, $after: String) {
-  playlist(playlistId: $playlistId) {
-    id
-    tracks(first: $first, after: $after) {
-      edges {
-        node {
-          id
-          __typename
-        }
-        __typename
-      }
-      pageInfo {
-        hasNextPage
-        endCursor
-        __typename
-      }
-      __typename
-    }
-    __typename
-  }
-}`;
+    const data = await deezerProxyRequest<DeezerApiResponse<DeezerPagePlaylistResponse>>(
+      `/api/playlist/${playlistId}`,
+      arl
+    );
 
     const trackIds: string[] = [];
-    let hasNextPage = true;
-    let cursor: string | null = null;
-
-    while (hasNextPage) {
-      const response = await fetch(DEEZER_CONFIG.graphqlUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': '*/*',
-          'Authorization': `Bearer ${arl}`,
-          'Origin': 'https://www.deezer.com',
-          'Referer': 'https://www.deezer.com/',
-        },
-        body: JSON.stringify({
-          operationName: 'PlaylistTracks',
-          variables: { 
-            playlistId,
-            first: 100,
-            after: cursor,
-          },
-          query,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`Failed to fetch playlist tracks: ${response.status}`);
+    const songs = data.results?.SONGS?.data || [];
+    
+    for (const song of songs) {
+      if (song.SNG_ID) {
+        trackIds.push(song.SNG_ID);
       }
-
-      const data = await response.json();
-      
-      if (data.errors) {
-        throw new Error(data.errors[0]?.message || 'GraphQL error');
-      }
-
-      const edges = data.data?.playlist?.tracks?.edges || [];
-      for (const edge of edges) {
-        if (edge.node?.id) {
-          trackIds.push(edge.node.id.toString());
-        }
-      }
-
-      hasNextPage = data.data?.playlist?.tracks?.pageInfo?.hasNextPage || false;
-      cursor = data.data?.playlist?.tracks?.pageInfo?.endCursor || null;
     }
 
     console.log(`[Deezer] Found ${trackIds.length} tracks in playlist`);
@@ -286,44 +183,20 @@ fragment PictureSmall on Picture {
   async createPlaylist(name: string, arl: string): Promise<string> {
     console.log(`[Deezer] Creating playlist: ${name}`);
     
-    const query = `mutation CreatePlaylist($title: String!, $description: String, $isPublic: Boolean) {
-  createPlaylist(title: $title, description: $description, isPublic: $isPublic) {
-    id
-    __typename
-  }
-}`;
-
-    const response = await fetch(DEEZER_CONFIG.graphqlUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': '*/*',
-        'Authorization': `Bearer ${arl}`,
-        'Origin': 'https://www.deezer.com',
-        'Referer': 'https://www.deezer.com/',
-      },
-      body: JSON.stringify({
-        operationName: 'CreatePlaylist',
-        variables: { 
+    const data = await deezerProxyRequest<DeezerApiResponse<string>>(
+      '/api/playlist/create',
+      arl,
+      {
+        method: 'POST',
+        body: JSON.stringify({
           title: name,
           description: 'Created by Music Stream Match',
-          isPublic: false,
-        },
-        query,
-      }),
-    });
+          status: 'private',
+        }),
+      }
+    );
 
-    if (!response.ok) {
-      throw new Error(`Failed to create playlist: ${response.status}`);
-    }
-
-    const data = await response.json();
-    
-    if (data.errors) {
-      throw new Error(data.errors[0]?.message || 'GraphQL error');
-    }
-
-    const playlistId = data.data?.createPlaylist?.id;
+    const playlistId = data.results;
     if (!playlistId) {
       throw new Error('No playlist ID in response');
     }
@@ -335,43 +208,60 @@ fragment PictureSmall on Picture {
   async addTracksToPlaylist(playlistId: string, trackIds: string[], arl: string): Promise<void> {
     console.log(`[Deezer] Adding ${trackIds.length} tracks to playlist ${playlistId}...`);
     
-    const query = `mutation AddTracksToPlaylist($playlistId: String!, $trackIds: [String!]!) {
-  addTracksToPlaylist(playlistId: $playlistId, trackIds: $trackIds) {
-    id
-    __typename
-  }
-}`;
-
-    const response = await fetch(DEEZER_CONFIG.graphqlUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': '*/*',
-        'Authorization': `Bearer ${arl}`,
-        'Origin': 'https://www.deezer.com',
-        'Referer': 'https://www.deezer.com/',
-      },
-      body: JSON.stringify({
-        operationName: 'AddTracksToPlaylist',
-        variables: { 
-          playlistId,
-          trackIds,
-        },
-        query,
-      }),
-    });
-
-    if (!response.ok) {
-      throw new Error(`Failed to add tracks: ${response.status}`);
-    }
-
-    const data = await response.json();
+    // Deezer has a limit on how many tracks can be added at once
+    // Split into chunks of 50
+    const chunkSize = 50;
     
-    if (data.errors) {
-      throw new Error(data.errors[0]?.message || 'GraphQL error');
+    for (let i = 0; i < trackIds.length; i += chunkSize) {
+      const chunk = trackIds.slice(i, i + chunkSize);
+      
+      await deezerProxyRequest<DeezerApiResponse<boolean>>(
+        '/api/playlist/addSongs',
+        arl,
+        {
+          method: 'POST',
+          body: JSON.stringify({
+            playlistId,
+            songs: chunk,
+          }),
+        }
+      );
+      
+      console.log(`[Deezer] Added tracks ${i + 1}-${Math.min(i + chunkSize, trackIds.length)} of ${trackIds.length}`);
     }
 
-    console.log('[Deezer] Tracks added successfully');
+    console.log('[Deezer] All tracks added successfully');
+  },
+
+  // Search for a track by query
+  async searchTrack(query: string, arl: string): Promise<DeezerTrackData | null> {
+    console.log(`[Deezer] Searching for track: ${query}`);
+    
+    interface SearchResults {
+      TRACK?: {
+        data?: DeezerTrackData[];
+      };
+    }
+    
+    const data = await deezerProxyRequest<DeezerApiResponse<SearchResults>>(
+      `/api/search?q=${encodeURIComponent(query)}&type=TRACK&limit=1`,
+      arl
+    );
+
+    const tracks = data.results?.TRACK?.data || [];
+    return tracks[0] || null;
+  },
+
+  // Get track details by ID
+  async getTrack(trackId: string, arl: string): Promise<DeezerTrackData | null> {
+    console.log(`[Deezer] Getting track: ${trackId}`);
+    
+    const data = await deezerProxyRequest<DeezerApiResponse<DeezerTrackData>>(
+      `/api/track?id=${trackId}`,
+      arl
+    );
+
+    return data.results || null;
   },
 };
 
