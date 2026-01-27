@@ -2,6 +2,9 @@ import { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import { HomePage, PlaylistsPage, ImportPage, CallbackPage } from '@/pages';
 
+// Base path for GitHub Pages deployment
+const basename = import.meta.env.BASE_URL || '/';
+
 // Handle SPA redirect from 404.html on GitHub Pages
 function RedirectHandler() {
   const navigate = useNavigate();
@@ -12,15 +15,13 @@ function RedirectHandler() {
     if (redirectPath && location.pathname === '/') {
       sessionStorage.removeItem('redirect_path');
       console.log('[App] Handling SPA redirect to:', redirectPath);
-      navigate(redirectPath, { replace: true });
+      navigate(redirectPath.replace(basename, "/"), { replace: true });
     }
   }, [navigate, location]);
 
   return null;
 }
 
-// Base path for GitHub Pages deployment
-const basename = import.meta.env.BASE_URL || '/';
 console.log('[App] Using basename:', basename);
 console.dir( {meta: import.meta.env})
 
