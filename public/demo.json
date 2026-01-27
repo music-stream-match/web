@@ -1,0 +1,14 @@
+{
+  "name": "Demo Invitation",
+  "deezer": {
+    "clientId": "YOUR_DEEZER_APP_ID"
+  },
+  "tidal": {
+    "clientId": "ZlAcmYg4dODn9GP8",
+    "clientSecret": "mIDPPmhQAMwFfmydCKsvnyyk1TWmWp0JjdLuElMmmCM="
+  },
+  "spotify": {
+    "clientId": "0e76963b0dce4667b238dd0dbb20b4e3",
+    "clientSecret": "dc1aa409c33e41c7bbf0656fa78aa7d2"
+  }
+}

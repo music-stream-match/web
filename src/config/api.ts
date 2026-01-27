@@ -1,3 +1,5 @@
+import { useAppStore } from '@/store/useAppStore';
+
 // Deezer API Configuration
 // To get these credentials:
 // 1. Go to https://developers.deezer.com/
@@ -6,7 +8,7 @@
 // 4. Set the redirect URI to: https://localhost-vite.mobulum.xyz/callback/deezer
 // 5. Copy the Application ID and Secret Key
 
-export const DEEZER_CONFIG = {
+const DEEZER_DEFAULTS = {
   clientId: 'YOUR_DEEZER_APP_ID', // Replace with your Deezer App ID
   // Note: Deezer uses implicit grant, so no client secret needed on frontend
   redirectUri: import.meta.env.MODE === 'production'
@@ -17,6 +19,17 @@ export const DEEZER_CONFIG = {
   scopes: ['basic_access', 'manage_library', 'offline_access'],
 };
 
+export const getDeezerConfig = () => {
+  const credentials = useAppStore.getState().getProviderCredentials('deezer');
+  return {
+    ...DEEZER_DEFAULTS,
+    clientId: credentials?.clientId || DEEZER_DEFAULTS.clientId,
+  };
+};
+
+// Legacy export for compatibility
+export const DEEZER_CONFIG = DEEZER_DEFAULTS;
+
 // TIDAL API Configuration
 // To get these credentials:
 // 1. Go to https://developer.tidal.com/
@@ -26,9 +39,9 @@ export const DEEZER_CONFIG = {
 // 5. Copy the Client ID and Client Secret
 // Note: TIDAL's API access may require approval for certain endpoints
 
-export const TIDAL_CONFIG = {
-  clientId: 'ZlAcmYg4dODn9GP8',
-  clientSecret: 'mIDPPmhQAMwFfmydCKsvnyyk1TWmWp0JjdLuElMmmCM=',
+const TIDAL_DEFAULTS = {
+  clientId: 'TIDAL_CLIENT_ID',
+  clientSecret: 'TIDAL_CLIENT_SECRET',
   redirectUri: import.meta.env.MODE === 'production'
     ? 'https://music-stream-match.space/callback/tidal'
     : 'https://localhost-vite.mobulum.xyz/callback/tidal',
@@ -38,6 +51,18 @@ export const TIDAL_CONFIG = {
   scopes: ['user.read', 'playlists.read', 'playlists.write'],
 };
 
+export const getTidalConfig = () => {
+  const credentials = useAppStore.getState().getProviderCredentials('tidal');
+  return {
+    ...TIDAL_DEFAULTS,
+    clientId: credentials?.clientId || TIDAL_DEFAULTS.clientId,
+    clientSecret: credentials?.clientSecret || TIDAL_DEFAULTS.clientSecret,
+  };
+};
+
+// Legacy export for compatibility
+export const TIDAL_CONFIG = TIDAL_DEFAULTS;
+
 // Spotify API Configuration
 // To get these credentials:
 // 1. Go to https://developer.spotify.com/dashboard
@@ -46,9 +71,9 @@ export const TIDAL_CONFIG = {
 // 4. Set the redirect URI in app settings
 // 5. Copy the Client ID and Client Secret
 
-export const SPOTIFY_CONFIG = {
-  clientId: '0e76963b0dce4667b238dd0dbb20b4e3',
-  clientSecret: 'dc1aa409c33e41c7bbf0656fa78aa7d2',
+const SPOTIFY_DEFAULTS = {
+  clientId: 'SPOTIFY_CLIENT_ID',
+  clientSecret: 'SPOTIFY_CLIENT_SECRET',
   redirectUri: import.meta.env.MODE === 'production'
     ? 'https://music-stream-match.space/callback/spotify'
     : 'https://localhost-vite.mobulum.xyz/callback/spotify',
@@ -57,3 +82,16 @@ export const SPOTIFY_CONFIG = {
   apiUrl: 'https://api.spotify.com/v1',
   scopes: ['user-read-private', 'user-read-email', 'playlist-read-private', 'playlist-modify-public', 'playlist-modify-private'],
 };
+
+export const getSpotifyConfig = () => {
+  const credentials = useAppStore.getState().getProviderCredentials('spotify');
+
+  return {
+    ...SPOTIFY_DEFAULTS,
+    clientId: credentials?.clientId || SPOTIFY_DEFAULTS.clientId,
+    clientSecret: credentials?.clientSecret || SPOTIFY_DEFAULTS.clientSecret,
+  };
+};
+
+// Legacy export for compatibility
+export const SPOTIFY_CONFIG = SPOTIFY_DEFAULTS;

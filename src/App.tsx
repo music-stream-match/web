@@ -1,9 +1,27 @@
 import { useEffect } from 'react';
-import { BrowserRouter, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
-import { HomePage, PlaylistsPage, ImportPage, CallbackPage } from '@/pages';
+import { BrowserRouter, Routes, Route, useNavigate, useLocation, Navigate } from 'react-router-dom';
+import { HomePage, PlaylistsPage, ImportPage, CallbackPage, InvitationPage } from '@/pages';
+import { useAppStore } from '@/store/useAppStore';
 
 // Base path for GitHub Pages deployment
 const basename = import.meta.env.BASE_URL || '/';
+
+// Guard component to check invitation code
+function InvitationGuard({ children }: { children: React.ReactNode }) {
+  const { invitationCode } = useAppStore();
+  const location = useLocation();
+
+  // Allow callback routes to work without invitation (needed for OAuth)
+  const isCallbackRoute = location.pathname.startsWith('/callback/') || location.pathname.startsWith('/auth/');
+  const isInvitationRoute = location.pathname === '/invitation';
+
+  if (!invitationCode && !isCallbackRoute && !isInvitationRoute) {
+    console.log('[App] No invitation code, redirecting to invitation page');
+    return <Navigate to="/invitation" replace />;
+  }
+
+  return <>{children}</>;
+}
 
 // Handle SPA redirect from 404.html on GitHub Pages
 function RedirectHandler() {
@@ -30,11 +48,21 @@ function App() {
     <BrowserRouter basename={basename}>
       <RedirectHandler />
       <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/playlists" element={<PlaylistsPage />} />
-        <Route path="/import" element={<ImportPage />} />
+        <Route path="/invitation" element={<InvitationPage />} />
         <Route path="/auth/:provider" element={<CallbackPage />} />
         <Route path="/callback/:provider" element={<CallbackPage />} />
+        <Route
+          path="/*"
+          element={
+            <InvitationGuard>
+              <Routes>
+                <Route path="/" element={<HomePage />} />
+                <Route path="/playlists" element={<PlaylistsPage />} />
+                <Route path="/import" element={<ImportPage />} />
+              </Routes>
+            </InvitationGuard>
+          }
+        />
       </Routes>
     </BrowserRouter>
   );

@@ -1,5 +1,5 @@
 import type { Provider, Playlist, Track, ProviderAuth, User, AuthTokens } from '@/types';
-import { DEEZER_CONFIG, TIDAL_CONFIG, SPOTIFY_CONFIG } from '@/config/api';
+import { getDeezerConfig, getTidalConfig, getSpotifyConfig } from '@/config/api';
 
 // ============================================
 // DEEZER SERVICE
@@ -7,12 +7,13 @@ import { DEEZER_CONFIG, TIDAL_CONFIG, SPOTIFY_CONFIG } from '@/config/api';
 
 export const deezerService = {
   getAuthUrl(): string {
+    const config = getDeezerConfig();
     const params = new URLSearchParams({
-      app_id: DEEZER_CONFIG.clientId,
-      redirect_uri: DEEZER_CONFIG.redirectUri,
-      perms: DEEZER_CONFIG.scopes.join(','),
+      app_id: config.clientId,
+      redirect_uri: config.redirectUri,
+      perms: config.scopes.join(','),
     });
-    const url = `${DEEZER_CONFIG.authUrl}?${params.toString()}`;
+    const url = `${config.authUrl}?${params.toString()}`;
     console.log('[Deezer] Auth URL:', url);
     return url;
   },
@@ -49,7 +50,8 @@ export const deezerService = {
 
   async getUser(accessToken: string): Promise<User> {
     console.log('[Deezer] Fetching user info...');
-    const response = await fetch(`${DEEZER_CONFIG.apiUrl}/user/me?access_token=${accessToken}`);
+    const config = getDeezerConfig();
+    const response = await fetch(`${config.apiUrl}/user/me?access_token=${accessToken}`);
     const data = await response.json();
     
     if (data.error) {
@@ -66,7 +68,8 @@ export const deezerService = {
 
   async getPlaylists(accessToken: string): Promise<Playlist[]> {
     console.log('[Deezer] Fetching playlists...');
-    const response = await fetch(`${DEEZER_CONFIG.apiUrl}/user/me/playlists?access_token=${accessToken}`);
+    const config = getDeezerConfig();
+    const response = await fetch(`${config.apiUrl}/user/me/playlists?access_token=${accessToken}`);
     const data = await response.json();
 
     if (data.error) {
@@ -88,8 +91,9 @@ export const deezerService = {
 
   async getPlaylistTracks(playlistId: string, accessToken: string): Promise<string[]> {
     console.log(`[Deezer] Fetching tracks for playlist ${playlistId}...`);
+    const config = getDeezerConfig();
     const trackIds: string[] = [];
-    let url = `${DEEZER_CONFIG.apiUrl}/playlist/${playlistId}/tracks?access_token=${accessToken}&limit=100`;
+    let url = `${config.apiUrl}/playlist/${playlistId}/tracks?access_token=${accessToken}&limit=100`;
 
     while (url) {
       const response = await fetch(url);
@@ -117,8 +121,9 @@ export const deezerService = {
 
   async createPlaylist(name: string, accessToken: string): Promise<string> {
     console.log(`[Deezer] Creating playlist: ${name}`);
+    const config = getDeezerConfig();
     const response = await fetch(
-      `${DEEZER_CONFIG.apiUrl}/user/me/playlists?access_token=${accessToken}&title=${encodeURIComponent(name)}`,
+      `${config.apiUrl}/user/me/playlists?access_token=${accessToken}&title=${encodeURIComponent(name)}`,
       { method: 'POST' }
     );
     const data = await response.json();
@@ -133,10 +138,11 @@ export const deezerService = {
 
   async addTracksToPlaylist(playlistId: string, trackIds: string[], accessToken: string): Promise<void> {
     console.log(`[Deezer] Adding ${trackIds.length} tracks to playlist ${playlistId}...`);
+    const config = getDeezerConfig();
     
     // Deezer accepts comma-separated track IDs
     const response = await fetch(
-      `${DEEZER_CONFIG.apiUrl}/playlist/${playlistId}/tracks?access_token=${accessToken}&songs=${trackIds.join(',')}`,
+      `${config.apiUrl}/playlist/${playlistId}/tracks?access_token=${accessToken}&songs=${trackIds.join(',')}`,
       { method: 'POST' }
     );
     const data = await response.json();
@@ -155,25 +161,27 @@ export const deezerService = {
 
 export const tidalService = {
   getAuthUrl(): string {
+    const config = getTidalConfig();
     const codeVerifier = generateCodeVerifier();
     sessionStorage.setItem('tidal_code_verifier', codeVerifier);
     
     const params = new URLSearchParams({
       response_type: 'code',
-      client_id: TIDAL_CONFIG.clientId,
-      redirect_uri: TIDAL_CONFIG.redirectUri,
-      scope: TIDAL_CONFIG.scopes.join(' '),
+      client_id: config.clientId,
+      redirect_uri: config.redirectUri,
+      scope: config.scopes.join(' '),
       code_challenge: codeVerifier, // Using plain for simplicity
       code_challenge_method: 'plain',
     });
     
-    const url = `${TIDAL_CONFIG.authUrl}?${params.toString()}`;
+    const url = `${config.authUrl}?${params.toString()}`;
     console.log('[TIDAL] Auth URL:', url);
     return url;
   },
 
   async handleCallback(code: string): Promise<ProviderAuth> {
     console.log('[TIDAL] Handling callback with code');
+    const config = getTidalConfig();
     
     const codeVerifier = sessionStorage.getItem('tidal_code_verifier');
     if (!codeVerifier) {
@@ -181,16 +189,16 @@ export const tidalService = {
     }
 
     // Exchange code for tokens
-    const response = await fetch(TIDAL_CONFIG.tokenUrl, {
+    const response = await fetch(config.tokenUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
       body: new URLSearchParams({
         grant_type: 'authorization_code',
-        client_id: TIDAL_CONFIG.clientId,
+        client_id: config.clientId,
         code,
-        redirect_uri: TIDAL_CONFIG.redirectUri,
+        redirect_uri: config.redirectUri,
         code_verifier: codeVerifier,
       }),
     });
@@ -266,11 +274,12 @@ export const tidalService = {
 
   async getPlaylists(accessToken: string, userId: string): Promise<Playlist[]> {
     console.log('[TIDAL] Fetching playlists for user:', userId);
+    const config = getTidalConfig();
     
     // Use GET /playlists?filter[owners.id]={userId} to get user's playlists
     // This is simpler and only requires playlists.read scope
     const response = await fetch(
-      `${TIDAL_CONFIG.apiUrl}/playlists?countryCode=US&filter[owners.id]=${userId}&include=coverArt`,
+      `${config.apiUrl}/playlists?countryCode=US&filter[owners.id]=${userId}&include=coverArt`,
       {
         headers: {
           'Authorization': `Bearer ${accessToken}`,
@@ -307,6 +316,7 @@ export const tidalService = {
 
   async getPlaylistTracks(playlistId: string, accessToken: string): Promise<string[]> {
     console.log(`[TIDAL] Fetching tracks for playlist ${playlistId}...`);
+    const config = getTidalConfig();
     const trackIds: string[] = [];
     let cursor: string | null = null;
     const limit = 100;
@@ -314,8 +324,8 @@ export const tidalService = {
     while (true) {
       // TIDAL OpenAPI uses /playlists/{id}/relationships/items
       const url = cursor 
-        ? `${TIDAL_CONFIG.apiUrl}/playlists/${playlistId}/relationships/items?countryCode=US&limit=${limit}&cursor=${cursor}`
-        : `${TIDAL_CONFIG.apiUrl}/playlists/${playlistId}/relationships/items?countryCode=US&limit=${limit}`;
+        ? `${config.apiUrl}/playlists/${playlistId}/relationships/items?countryCode=US&limit=${limit}&cursor=${cursor}`
+        : `${config.apiUrl}/playlists/${playlistId}/relationships/items?countryCode=US&limit=${limit}`;
       
       const response = await fetch(url, {
         headers: {
@@ -357,9 +367,10 @@ export const tidalService = {
 
   async createPlaylist(name: string, accessToken: string, _userId: string): Promise<string> {
     console.log(`[TIDAL] Creating playlist: ${name}`);
+    const config = getTidalConfig();
     
     // TIDAL OpenAPI uses POST /playlists with JSON:API format
-    const response = await fetch(`${TIDAL_CONFIG.apiUrl}/playlists?countryCode=US`, {
+    const response = await fetch(`${config.apiUrl}/playlists?countryCode=US`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${accessToken}`,
@@ -393,6 +404,7 @@ export const tidalService = {
 
   async addTracksToPlaylist(playlistId: string, trackIds: string[], accessToken: string): Promise<void> {
     console.log(`[TIDAL] Adding ${trackIds.length} tracks to playlist ${playlistId}...`);
+    const config = getTidalConfig();
     
     // TIDAL might have limits on batch size
     const batchSize = 50;
@@ -401,7 +413,7 @@ export const tidalService = {
       
       // TIDAL OpenAPI uses POST /playlists/{id}/relationships/items with JSON:API format
       const response = await fetch(
-        `${TIDAL_CONFIG.apiUrl}/playlists/${playlistId}/relationships/items?countryCode=US`,
+        `${config.apiUrl}/playlists/${playlistId}/relationships/items?countryCode=US`,
         {
           method: 'POST',
           headers: {
@@ -435,36 +447,38 @@ export const tidalService = {
 
 export const spotifyService = {
   getAuthUrl(): string {
+    const config = getSpotifyConfig();
     const state = generateCodeVerifier();
     sessionStorage.setItem('spotify_state', state);
     
     const params = new URLSearchParams({
       response_type: 'code',
-      client_id: SPOTIFY_CONFIG.clientId,
-      redirect_uri: SPOTIFY_CONFIG.redirectUri,
-      scope: SPOTIFY_CONFIG.scopes.join(' '),
+      client_id: config.clientId,
+      redirect_uri: config.redirectUri,
+      scope: config.scopes.join(' '),
       state,
     });
     
-    const url = `${SPOTIFY_CONFIG.authUrl}?${params.toString()}`;
+    const url = `${config.authUrl}?${params.toString()}`;
     console.log('[Spotify] Auth URL:', url);
     return url;
   },
 
   async handleCallback(code: string): Promise<ProviderAuth> {
     console.log('[Spotify] Handling callback with code');
+    const config = getSpotifyConfig();
     
     // Exchange code for tokens
-    const response = await fetch(SPOTIFY_CONFIG.tokenUrl, {
+    const response = await fetch(config.tokenUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
-        'Authorization': 'Basic ' + btoa(`${SPOTIFY_CONFIG.clientId}:${SPOTIFY_CONFIG.clientSecret}`),
+        'Authorization': 'Basic ' + btoa(`${config.clientId}:${config.clientSecret}`),
       },
       body: new URLSearchParams({
         grant_type: 'authorization_code',
         code,
-        redirect_uri: SPOTIFY_CONFIG.redirectUri,
+        redirect_uri: config.redirectUri,
       }),
     });
 
@@ -497,7 +511,8 @@ export const spotifyService = {
 
   async getUser(accessToken: string): Promise<User> {
     console.log('[Spotify] Fetching user info...');
-    const response = await fetch(`${SPOTIFY_CONFIG.apiUrl}/me`, {
+    const config = getSpotifyConfig();
+    const response = await fetch(`${config.apiUrl}/me`, {
       headers: {
         'Authorization': `Bearer ${accessToken}`,
       },
@@ -519,8 +534,9 @@ export const spotifyService = {
 
   async getPlaylists(accessToken: string): Promise<Playlist[]> {
     console.log('[Spotify] Fetching playlists...');
+    const config = getSpotifyConfig();
     const playlists: Playlist[] = [];
-    let url: string | null = `${SPOTIFY_CONFIG.apiUrl}/me/playlists?limit=50`;
+    let url: string | null = `${config.apiUrl}/me/playlists?limit=50`;
 
     while (url) {
       const response = await fetch(url, {
@@ -556,8 +572,9 @@ export const spotifyService = {
 
   async getPlaylistTracks(playlistId: string, accessToken: string): Promise<string[]> {
     console.log(`[Spotify] Fetching tracks for playlist ${playlistId}...`);
+    const config = getSpotifyConfig();
     const trackIds: string[] = [];
-    let url: string | null = `${SPOTIFY_CONFIG.apiUrl}/playlists/${playlistId}/tracks?limit=100`;
+    let url: string | null = `${config.apiUrl}/playlists/${playlistId}/tracks?limit=100`;
 
     while (url) {
       const response = await fetch(url, {
@@ -592,7 +609,8 @@ export const spotifyService = {
 
   async createPlaylist(name: string, accessToken: string, userId: string): Promise<string> {
     console.log(`[Spotify] Creating playlist: ${name}`);
-    const response = await fetch(`${SPOTIFY_CONFIG.apiUrl}/users/${userId}/playlists`, {
+    const config = getSpotifyConfig();
+    const response = await fetch(`${config.apiUrl}/users/${userId}/playlists`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${accessToken}`,
@@ -615,6 +633,7 @@ export const spotifyService = {
 
   async addTracksToPlaylist(playlistId: string, trackIds: string[], accessToken: string): Promise<void> {
     console.log(`[Spotify] Adding ${trackIds.length} tracks to playlist ${playlistId}...`);
+    const config = getSpotifyConfig();
     
     // Spotify accepts max 100 tracks per request
     const batchSize = 100;
@@ -622,7 +641,7 @@ export const spotifyService = {
       const batch = trackIds.slice(i, i + batchSize);
       const uris = batch.map(id => `spotify:track:${id}`);
       
-      const response = await fetch(`${SPOTIFY_CONFIG.apiUrl}/playlists/${playlistId}/tracks`, {
+      const response = await fetch(`${config.apiUrl}/playlists/${playlistId}/tracks`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${accessToken}`,

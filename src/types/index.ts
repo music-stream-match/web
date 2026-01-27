@@ -73,7 +73,23 @@ export interface ImportResult {
   targetProvider: Provider;
 }
 
+export interface ProviderCredentials {
+  clientId: string;
+  clientSecret?: string;
+}
+
+export interface InvitationConfig {
+  name: string;
+  deezer?: ProviderCredentials;
+  tidal?: ProviderCredentials;
+  spotify?: ProviderCredentials;
+}
+
 export interface AppState {
+  // Invitation state
+  invitationCode: string | null;
+  invitationConfig: InvitationConfig | null;
+  
   // Auth state
   tidalAuth: ProviderAuth | null;
   deezerAuth: ProviderAuth | null;
@@ -89,6 +105,8 @@ export interface AppState {
   importResult: ImportResult | null;
   
   // Actions
+  setInvitation: (code: string, config: InvitationConfig) => void;
+  clearInvitation: () => void;
   setAuth: (provider: Provider, auth: ProviderAuth | null) => void;
   setSourceProvider: (provider: Provider | null) => void;
   setTargetProvider: (provider: Provider | null) => void;
@@ -98,4 +116,5 @@ export interface AppState {
   reset: () => void;
   getAuth: (provider: Provider) => ProviderAuth | null;
   isLoggedIn: (provider: Provider) => boolean;
+  getProviderCredentials: (provider: Provider) => ProviderCredentials | null;
 }
