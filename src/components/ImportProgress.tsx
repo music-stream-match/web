@@ -1,6 +1,6 @@
 import type { ImportProgress as ImportProgressType } from '@/types';
 import { ProgressBar, Card } from '@/components/ui';
-import { Music, SkipForward, CheckCircle } from 'lucide-react';
+import { Music, SkipForward, CheckCircle, Copy } from 'lucide-react';
 
 interface ImportProgressProps {
   progress: ImportProgressType;
@@ -33,7 +33,7 @@ export function ImportProgress({ progress }: ImportProgressProps) {
       )}
 
       {/* Stats */}
-      <div className="grid grid-cols-2 gap-4">
+      <div className={`grid gap-4 ${progress.duplicatesSkipped ? 'grid-cols-3' : 'grid-cols-2'}`}>
         <div className="flex items-center gap-2 p-3 bg-success/10 rounded-md">
           <CheckCircle className="w-5 h-5 text-success" />
           <div>
@@ -49,6 +49,16 @@ export function ImportProgress({ progress }: ImportProgressProps) {
             <p className="font-bold text-warning">{progress.skipped}</p>
           </div>
         </div>
+
+        {progress.duplicatesSkipped ? (
+          <div className="flex items-center gap-2 p-3 bg-text-muted/10 rounded-md">
+            <Copy className="w-5 h-5 text-text-muted" />
+            <div>
+              <p className="text-sm text-text-muted">Duplikaty</p>
+              <p className="font-bold text-text-muted">{progress.duplicatesSkipped}</p>
+            </div>
+          </div>
+        ) : null}
       </div>
     </Card>
   );

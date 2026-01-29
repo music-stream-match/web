@@ -8,7 +8,8 @@ export async function importPlaylist(
   targetPlaylistName: string,
   sourceAuth: ProviderAuth | null,
   targetAuth: ProviderAuth | null,
-  onProgress: (progress: ImportProgress) => void
+  onProgress: (progress: ImportProgress) => void,
+  allowDuplicates: boolean = false
 ): Promise<ImportResult> {
   const startTime = Date.now();
   
@@ -16,6 +17,7 @@ export async function importPlaylist(
   console.log('[Import] Starting playlist import');
   console.log(`[Import] Source: ${sourceProvider} - "${sourcePlaylist.name}"`);
   console.log(`[Import] Target: ${targetProvider} - "${targetPlaylistName}"`);
+  console.log(`[Import] Allow duplicates: ${allowDuplicates}`);
   console.log('='.repeat(60));
 
   // Step 1: Get source playlist tracks
@@ -36,9 +38,23 @@ export async function importPlaylist(
     targetAuth
   );
 
+  let existingTrackIds: Set<string> = new Set();
+  
   if (existingPlaylist) {
     console.log(`[Import] Using existing playlist: ${existingPlaylist.id}`);
     targetPlaylistId = existingPlaylist.id;
+    
+    // If duplicates are not allowed, fetch existing tracks from target playlist
+    if (!allowDuplicates) {
+      console.log('[Import] Fetching existing tracks from target playlist to check for duplicates...');
+      const existingTracks = await providerService.getPlaylistTracks(
+        targetProvider,
+        targetPlaylistId,
+        targetAuth
+      );
+      existingTrackIds = new Set(existingTracks);
+      console.log(`[Import] Found ${existingTrackIds.size} existing tracks in target playlist`);
+    }
   } else {
     targetPlaylistId = await providerService.createPlaylist(
       targetProvider,
@@ -56,6 +72,7 @@ export async function importPlaylist(
     imported: 0,
     skipped: 0,
     skippedTracks: [],
+    duplicatesSkipped: 0,
   };
 
   const tracksToAdd: string[] = [];
@@ -92,6 +109,9 @@ export async function importPlaylist(
       console.log(`[Import] ⚠ No ${targetProvider} mapping for: ${track.title} - ${track.artist.name}`);
       progress.skipped++;
       progress.skippedTracks.push(track);
+    } else if (!allowDuplicates && existingTrackIds.has(targetTrackId)) {
+      console.log(`[Import] ⏭ Duplicate skipped: ${track.title} - ${track.artist.name}`);
+      progress.duplicatesSkipped = (progress.duplicatesSkipped || 0) + 1;
     } else {
       console.log(`[Import] ✓ Mapped: ${track.title} -> ${targetTrackId}`);
       tracksToAdd.push(targetTrackId);
@@ -124,6 +144,7 @@ export async function importPlaylist(
     imported: progress.imported,
     skipped: progress.skipped,
     skippedTracks: progress.skippedTracks,
+    duplicatesSkipped: progress.duplicatesSkipped,
     duration,
     sourceProvider,
     targetProvider,
@@ -133,6 +154,7 @@ export async function importPlaylist(
   console.log('[Import] Import complete!');
   console.log(`[Import] Imported: ${result.imported}`);
   console.log(`[Import] Skipped: ${result.skipped}`);
+  console.log(`[Import] Duplicates skipped: ${result.duplicatesSkipped || 0}`);
   console.log(`[Import] Duration: ${duration}ms`);
   console.log('='.repeat(60));
 

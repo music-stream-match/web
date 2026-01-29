@@ -29,6 +29,7 @@ export function ImportPage() {
   const [existingPlaylist, setExistingPlaylist] = useState<Playlist | null>(null);
   const [checkingExisting, setCheckingExisting] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
+  const [allowDuplicates, setAllowDuplicates] = useState(false);
 
   useEffect(() => {
     if (!sourceProvider || !targetProvider || !selectedPlaylist) {
@@ -97,7 +98,8 @@ export function ImportPage() {
         targetPlaylistName,
         sourceAuth,
         targetAuth,
-        (progress) => setImportProgress(progress)
+        (progress) => setImportProgress(progress),
+        allowDuplicates
       );
 
       setImportResult(result);
@@ -195,6 +197,17 @@ export function ImportPage() {
                   </div>
                 </div>
               )}
+
+              {/* Allow duplicates checkbox */}
+              <label className="mt-4 flex items-center gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={allowDuplicates}
+                  onChange={e => setAllowDuplicates(e.target.checked)}
+                  className="w-4 h-4 rounded border-border text-primary focus:ring-primary focus:ring-offset-0"
+                />
+                <span className="text-sm">Pozwól na duplikaty utworów</span>
+              </label>
             </Card>
 
             {/* Start button */}

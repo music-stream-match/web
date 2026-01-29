@@ -1,6 +1,6 @@
 import type { ImportResult } from '@/types';
 import { Modal, Button } from '@/components/ui';
-import { CheckCircle, SkipForward, Clock, ExternalLink, Music } from 'lucide-react';
+import { CheckCircle, SkipForward, Clock, ExternalLink, Music, Copy } from 'lucide-react';
 import { formatDuration, getProviderName } from '@/lib/utils';
 import { providerService } from '@/services/api';
 
@@ -59,7 +59,7 @@ export function ImportResultModal({ result, onClose }: ImportResultModalProps) {
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-3 gap-3">
+        <div className={`grid gap-3 ${result.duplicatesSkipped ? 'grid-cols-4' : 'grid-cols-3'}`}>
           <div className="text-center p-3 bg-success/10 rounded-md">
             <CheckCircle className="w-5 h-5 text-success mx-auto mb-1" />
             <p className="text-2xl font-bold text-success">{result.imported}</p>
@@ -71,6 +71,14 @@ export function ImportResultModal({ result, onClose }: ImportResultModalProps) {
             <p className="text-2xl font-bold text-warning">{result.skipped}</p>
             <p className="text-xs text-text-muted">Pominięte</p>
           </div>
+
+          {result.duplicatesSkipped ? (
+            <div className="text-center p-3 bg-text-muted/10 rounded-md">
+              <Copy className="w-5 h-5 text-text-muted mx-auto mb-1" />
+              <p className="text-2xl font-bold text-text-muted">{result.duplicatesSkipped}</p>
+              <p className="text-xs text-text-muted">Duplikaty</p>
+            </div>
+          ) : null}
 
           <div className="text-center p-3 bg-primary/10 rounded-md">
             <Clock className="w-5 h-5 text-primary mx-auto mb-1" />
