@@ -3,6 +3,55 @@ import { DEEZER_CONFIG, getTidalConfig, getSpotifyConfig } from '@/config/api';
 import { useAppStore } from '@/store/useAppStore';
 
 // ============================================
+// RETRY HELPER WITH EXPONENTIAL BACKOFF
+// ============================================
+
+interface RetryOptions {
+  maxRetries?: number;
+  baseDelay?: number;
+  maxDelay?: number;
+}
+
+async function fetchWithRetry(
+  url: string,
+  options: RequestInit = {},
+  retryOptions: RetryOptions = {}
+): Promise<Response> {
+  const { maxRetries = 3, baseDelay = 1000, maxDelay = 10000 } = retryOptions;
+  let lastError: Error | null = null;
+
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      const response = await fetch(url, options);
+      
+      // Handle rate limiting (429) and server errors (5xx)
+      if (response.status === 429 || (response.status >= 500 && response.status < 600)) {
+        const retryAfter = response.headers.get('Retry-After');
+        const delay = retryAfter 
+          ? parseInt(retryAfter, 10) * 1000 
+          : Math.min(baseDelay * Math.pow(2, attempt), maxDelay);
+        
+        console.log(`[RetryHelper] Rate limited or server error (${response.status}), retrying in ${delay}ms (attempt ${attempt + 1}/${maxRetries})`);
+        await new Promise(resolve => setTimeout(resolve, delay));
+        continue;
+      }
+      
+      return response;
+    } catch (error) {
+      lastError = error instanceof Error ? error : new Error(String(error));
+      
+      if (attempt < maxRetries) {
+        const delay = Math.min(baseDelay * Math.pow(2, attempt), maxDelay);
+        console.log(`[RetryHelper] Network error, retrying in ${delay}ms (attempt ${attempt + 1}/${maxRetries}):`, lastError.message);
+        await new Promise(resolve => setTimeout(resolve, delay));
+      }
+    }
+  }
+
+  throw lastError || new Error('Request failed after retries');
+}
+
+// ============================================
 // DEEZER SERVICE (ARL-based authentication via Cloudflare Worker proxy)
 // ============================================
 
@@ -58,7 +107,7 @@ interface DeezerPagePlaylistResponse {
   };
 }
 
-// Helper to make requests to the proxy
+// Helper to make requests to the proxy with retry support
 async function deezerProxyRequest<T>(
   endpoint: string,
   arl: string,
@@ -66,14 +115,14 @@ async function deezerProxyRequest<T>(
 ): Promise<T> {
   const url = `${DEEZER_CONFIG.proxyUrl}${endpoint}`;
   
-  const response = await fetch(url, {
+  const response = await fetchWithRetry(url, {
     ...options,
     headers: {
       'Content-Type': 'application/json',
       'X-Deezer-ARL': arl,
       ...options.headers,
     },
-  });
+  }, { maxRetries: 3, baseDelay: 1000, maxDelay: 10000 });
 
   if (!response.ok) {
     const errorText = await response.text();
@@ -157,22 +206,40 @@ export const deezerService = {
   async getPlaylistTracks(playlistId: string, arl: string): Promise<SourceTrack[]> {
     console.log(`[Deezer] Fetching tracks for playlist ${playlistId}...`);
     
-    const data = await deezerProxyRequest<DeezerApiResponse<DeezerPagePlaylistResponse>>(
-      `/api/playlist/${playlistId}`,
-      arl
-    );
-
     const tracks: SourceTrack[] = [];
-    const songs = data.results?.SONGS?.data || [];
+    let start = 0;
+    const limit = 500; // Deezer supports up to 2000 per request, but 500 is safer
+    let hasMore = true;
     
-    for (const song of songs) {
-      if (song.SNG_ID) {
-        tracks.push({
-          id: song.SNG_ID,
-          title: song.SNG_TITLE || `Unknown Track (${song.SNG_ID})`,
-          artistName: song.ART_NAME || 'Unknown Artist',
-          albumTitle: song.ALB_TITLE,
-        });
+    while (hasMore) {
+      console.log(`[Deezer] Fetching tracks ${start} to ${start + limit}...`);
+      
+      const data = await deezerProxyRequest<DeezerApiResponse<DeezerPagePlaylistResponse>>(
+        `/api/playlist/${playlistId}?start=${start}&nb=${limit}`,
+        arl
+      );
+
+      const songs = data.results?.SONGS?.data || [];
+      
+      for (const song of songs) {
+        if (song.SNG_ID) {
+          tracks.push({
+            id: song.SNG_ID,
+            title: song.SNG_TITLE || `Unknown Track (${song.SNG_ID})`,
+            artistName: song.ART_NAME || 'Unknown Artist',
+            albumTitle: song.ALB_TITLE,
+          });
+        }
+      }
+      
+      // Check if we got less than requested - means no more tracks
+      hasMore = songs.length >= limit;
+      start += limit;
+      
+      // Safety limit - max 10000 tracks
+      if (start >= 10000) {
+        console.log('[Deezer] Reached maximum track limit (10000)');
+        hasMore = false;
       }
     }
 
@@ -393,7 +460,7 @@ export const tidalService = {
     
     // Use GET /playlists?filter[owners.id]={userId} to get user's playlists
     // This is simpler and only requires playlists.read scope
-    const response = await fetch(
+    const response = await fetchWithRetry(
       `${config.apiUrl}/playlists?countryCode=US&filter[owners.id]=${userId}&include=coverArt`,
       {
         headers: {
@@ -401,7 +468,8 @@ export const tidalService = {
           'Content-Type': 'application/vnd.api+json',
           'Accept': 'application/vnd.api+json',
         },
-      }
+      },
+      { maxRetries: 3, baseDelay: 1000 }
     );
 
     if (!response.ok) {
@@ -442,13 +510,19 @@ export const tidalService = {
         ? `${config.apiUrl}/playlists/${playlistId}/items?countryCode=US&limit=${limit}&include=items&cursor=${cursor}`
         : `${config.apiUrl}/playlists/${playlistId}/items?countryCode=US&limit=${limit}&include=items`;
       
-      const response = await fetch(url, {
+      const response = await fetchWithRetry(url, {
         headers: {
           'Authorization': `Bearer ${accessToken}`,
           'Content-Type': 'application/vnd.api+json',
           'Accept': 'application/vnd.api+json',
         },
-      });
+      }, { maxRetries: 3, baseDelay: 1000 });
+
+      // TIDAL may return 404 for empty playlists or playlists with no items endpoint
+      if (response.status === 404) {
+        console.log('[TIDAL] Playlist items endpoint returned 404 - treating as empty playlist');
+        return [];
+      }
 
       if (!response.ok) {
         const errorText = await response.text();
@@ -517,7 +591,7 @@ export const tidalService = {
     const config = getTidalConfig();
     
     // TIDAL OpenAPI uses POST /playlists with JSON:API format
-    const response = await fetch(`${config.apiUrl}/playlists?countryCode=US`, {
+    const response = await fetchWithRetry(`${config.apiUrl}/playlists?countryCode=US`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${accessToken}`,
@@ -534,7 +608,7 @@ export const tidalService = {
           },
         },
       }),
-    });
+    }, { maxRetries: 3, baseDelay: 1000 });
 
     if (!response.ok) {
       const errorText = await response.text();
@@ -559,7 +633,7 @@ export const tidalService = {
       const batch = trackIds.slice(i, i + batchSize);
       
       // TIDAL OpenAPI uses POST /playlists/{id}/relationships/items with JSON:API format
-      const response = await fetch(
+      const response = await fetchWithRetry(
         `${config.apiUrl}/playlists/${playlistId}/relationships/items?countryCode=US`,
         {
           method: 'POST',
@@ -574,7 +648,8 @@ export const tidalService = {
               id: id,
             })),
           }),
-        }
+        },
+        { maxRetries: 3, baseDelay: 1000 }
       );
 
       if (!response.ok) {
@@ -686,11 +761,11 @@ export const spotifyService = {
     let url: string | null = `${config.apiUrl}/me/playlists?limit=50`;
 
     while (url) {
-      const response = await fetch(url, {
+      const response = await fetchWithRetry(url, {
         headers: {
           'Authorization': `Bearer ${accessToken}`,
         },
-      });
+      }, { maxRetries: 3, baseDelay: 1000 });
 
       if (!response.ok) {
         throw new Error('Failed to fetch Spotify playlists');
@@ -724,11 +799,11 @@ export const spotifyService = {
     let url: string | null = `${config.apiUrl}/playlists/${playlistId}/tracks?limit=100`;
 
     while (url) {
-      const response = await fetch(url, {
+      const response = await fetchWithRetry(url, {
         headers: {
           'Authorization': `Bearer ${accessToken}`,
         },
-      });
+      }, { maxRetries: 3, baseDelay: 1000 });
 
       if (!response.ok) {
         throw new Error('Failed to fetch Spotify playlist tracks');
@@ -767,7 +842,7 @@ export const spotifyService = {
   async createPlaylist(name: string, accessToken: string, userId: string): Promise<string> {
     console.log(`[Spotify] Creating playlist: ${name}`);
     const config = getSpotifyConfig();
-    const response = await fetch(`${config.apiUrl}/users/${userId}/playlists`, {
+    const response = await fetchWithRetry(`${config.apiUrl}/users/${userId}/playlists`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${accessToken}`,
@@ -777,7 +852,7 @@ export const spotifyService = {
         name,
         public: false,
       }),
-    });
+    }, { maxRetries: 3, baseDelay: 1000 });
 
     if (!response.ok) {
       throw new Error('Failed to create Spotify playlist');
@@ -798,14 +873,14 @@ export const spotifyService = {
       const batch = trackIds.slice(i, i + batchSize);
       const uris = batch.map(id => `spotify:track:${id}`);
       
-      const response = await fetch(`${config.apiUrl}/playlists/${playlistId}/tracks`, {
+      const response = await fetchWithRetry(`${config.apiUrl}/playlists/${playlistId}/tracks`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${accessToken}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ uris }),
-      });
+      }, { maxRetries: 3, baseDelay: 1000 });
 
       if (!response.ok) {
         throw new Error('Failed to add tracks to Spotify playlist');
@@ -817,28 +892,124 @@ export const spotifyService = {
 };
 
 // ============================================
-// TRACK MAPPING SERVICE (Local JSON files)
+// TRACK MAPPING SERVICE (Local JSON files with caching and batch support)
 // ============================================
 
+// In-memory cache for track mappings
+const trackMappingCache = new Map<string, Track | null>();
+
 export const trackMappingService = {
+  // Get cache key for a track
+  getCacheKey(provider: Provider, trackId: string): string {
+    return `${provider}:${trackId}`;
+  },
+
+  // Clear the cache (useful for testing or memory management)
+  clearCache(): void {
+    trackMappingCache.clear();
+    console.log('[TrackMapping] Cache cleared');
+  },
+
+  // Get cache stats
+  getCacheStats(): { size: number; hits: number } {
+    return {
+      size: trackMappingCache.size,
+      hits: 0, // Could track this if needed
+    };
+  },
+
   async getTrackDetails(provider: Provider, trackId: string): Promise<Track | null> {
+    const cacheKey = this.getCacheKey(provider, trackId);
+    
+    // Check cache first
+    if (trackMappingCache.has(cacheKey)) {
+      const cached = trackMappingCache.get(cacheKey);
+      console.log(`[TrackMapping] Cache hit for ${provider}/${trackId}`);
+      return cached ?? null;
+    }
+    
     console.log(`[TrackMapping] Fetching track details for ${provider}/${trackId}...`);
     
     try {
-      const response = await fetch(`/api/providers/${provider}/tracks/${trackId}.json`);
+      const response = await fetchWithRetry(
+        `/api/providers/${provider}/tracks/${trackId}.json`,
+        {},
+        { maxRetries: 2, baseDelay: 500 }
+      );
       
       if (!response.ok) {
         console.log(`[TrackMapping] Track not found: ${provider}/${trackId}`);
+        trackMappingCache.set(cacheKey, null);
         return null;
       }
 
       const track: Track = await response.json();
       console.log(`[TrackMapping] Found track: ${track.title} by ${track.artist.name}`);
+      trackMappingCache.set(cacheKey, track);
       return track;
     } catch (error) {
       console.error(`[TrackMapping] Error fetching track ${provider}/${trackId}:`, error);
+      trackMappingCache.set(cacheKey, null);
       return null;
     }
+  },
+
+  // Batch fetch multiple tracks in parallel with concurrency limit
+  async getTrackDetailsBatch(
+    provider: Provider, 
+    trackIds: string[],
+    concurrency: number = 10,
+    onProgress?: (completed: number, total: number) => void
+  ): Promise<Map<string, Track | null>> {
+    console.log(`[TrackMapping] Batch fetching ${trackIds.length} tracks with concurrency ${concurrency}...`);
+    const results = new Map<string, Track | null>();
+    
+    // Filter out already cached tracks
+    const uncachedIds: string[] = [];
+    for (const trackId of trackIds) {
+      const cacheKey = this.getCacheKey(provider, trackId);
+      if (trackMappingCache.has(cacheKey)) {
+        results.set(trackId, trackMappingCache.get(cacheKey) ?? null);
+      } else {
+        uncachedIds.push(trackId);
+      }
+    }
+    
+    console.log(`[TrackMapping] ${results.size} tracks from cache, ${uncachedIds.length} to fetch`);
+    
+    if (uncachedIds.length === 0) {
+      onProgress?.(trackIds.length, trackIds.length);
+      return results;
+    }
+    
+    // Process uncached tracks with concurrency limit
+    let completed = results.size;
+    const queue = [...uncachedIds];
+    const inFlight: Promise<void>[] = [];
+    
+    const processNext = async (): Promise<void> => {
+      while (queue.length > 0) {
+        const trackId = queue.shift()!;
+        try {
+          const track = await this.getTrackDetails(provider, trackId);
+          results.set(trackId, track);
+        } catch {
+          results.set(trackId, null);
+        }
+        completed++;
+        onProgress?.(completed, trackIds.length);
+      }
+    };
+    
+    // Start concurrent workers
+    for (let i = 0; i < Math.min(concurrency, uncachedIds.length); i++) {
+      inFlight.push(processNext());
+    }
+    
+    await Promise.all(inFlight);
+    
+    console.log(`[TrackMapping] Batch complete: ${results.size} tracks processed`);
+    return results;
   },
 
   findTargetProviderId(track: Track, targetProvider: Provider): string | null {
@@ -849,6 +1020,25 @@ export const trackMappingService = {
     }
     console.log(`[TrackMapping] No ${targetProvider} mapping found for track ${track.title}`);
     return null;
+  },
+
+  // Batch find target provider IDs
+  findTargetProviderIdsBatch(
+    tracks: Map<string, Track | null>, 
+    targetProvider: Provider
+  ): Map<string, string | null> {
+    const results = new Map<string, string | null>();
+    
+    for (const [sourceId, track] of tracks) {
+      if (track) {
+        const targetId = this.findTargetProviderId(track, targetProvider);
+        results.set(sourceId, targetId);
+      } else {
+        results.set(sourceId, null);
+      }
+    }
+    
+    return results;
   },
 };
 

@@ -1,5 +1,15 @@
-import type { Provider, Playlist, ImportProgress, ImportResult, ProviderAuth } from '@/types';
+import type { Provider, Playlist, ImportProgress, ImportResult, ProviderAuth, SourceTrack } from '@/types';
 import { providerService, trackMappingService } from './api';
+
+// Configuration for large playlist handling
+const IMPORT_CONFIG = {
+  // How many tracks to map in parallel
+  mappingConcurrency: 10,
+  // How many tracks to add to playlist at once (for progress updates)
+  addBatchSize: 100,
+  // How often to update progress during mapping phase (every N tracks)
+  mappingProgressInterval: 10,
+};
 
 export async function importPlaylist(
   sourceProvider: Provider,
@@ -18,6 +28,7 @@ export async function importPlaylist(
   console.log(`[Import] Source: ${sourceProvider} - "${sourcePlaylist.name}"`);
   console.log(`[Import] Target: ${targetProvider} - "${targetPlaylistName}"`);
   console.log(`[Import] Allow duplicates: ${allowDuplicates}`);
+  console.log(`[Import] Config: concurrency=${IMPORT_CONFIG.mappingConcurrency}, batchSize=${IMPORT_CONFIG.addBatchSize}`);
   console.log('='.repeat(60));
 
   // Step 1: Get source playlist tracks (now includes title/artist info)
@@ -47,13 +58,21 @@ export async function importPlaylist(
     // If duplicates are not allowed, fetch existing tracks from target playlist
     if (!allowDuplicates) {
       console.log('[Import] Fetching existing tracks from target playlist to check for duplicates...');
-      const existingTracks = await providerService.getPlaylistTracks(
-        targetProvider,
-        targetPlaylistId,
-        targetAuth
-      );
-      existingTrackIds = new Set(existingTracks.map(t => t.id));
-      console.log(`[Import] Found ${existingTrackIds.size} existing tracks in target playlist`);
+      try {
+        const existingTracks = await providerService.getPlaylistTracks(
+          targetProvider,
+          targetPlaylistId,
+          targetAuth
+        );
+        existingTrackIds = new Set(existingTracks.map(t => t.id));
+        console.log(`[Import] Found ${existingTrackIds.size} existing tracks in target playlist`);
+      } catch (error) {
+        // If we can't fetch existing tracks (e.g., empty playlist, permission issue),
+        // proceed without duplicate checking for existing tracks
+        console.warn('[Import] ⚠ Could not fetch existing tracks from target playlist:', error);
+        console.log('[Import] Proceeding without duplicate checking for existing tracks');
+        existingTrackIds = new Set();
+      }
     }
   } else {
     targetPlaylistId = await providerService.createPlaylist(
@@ -64,8 +83,8 @@ export async function importPlaylist(
     console.log(`[Import] Created new playlist: ${targetPlaylistId}`);
   }
 
-  // Step 3: Process tracks
-  console.log('[Import] Step 3: Processing tracks...');
+  // Step 3: Process tracks using batch mapping for better performance
+  console.log('[Import] Step 3: Mapping tracks (batch mode for large playlists)...');
   const progress: ImportProgress = {
     total: sourceTracks.length,
     current: 0,
@@ -75,28 +94,47 @@ export async function importPlaylist(
     duplicatesSkipped: 0,
   };
 
+  // Create a map for quick source track lookup
+  const sourceTrackMap = new Map<string, SourceTrack>();
+  const trackIds = sourceTracks.map(t => {
+    sourceTrackMap.set(t.id, t);
+    return t.id;
+  });
+
+  // Batch fetch all track mappings with progress
+  console.log(`[Import] Fetching mappings for ${trackIds.length} tracks...`);
+  const mappedTracks = await trackMappingService.getTrackDetailsBatch(
+    sourceProvider,
+    trackIds,
+    IMPORT_CONFIG.mappingConcurrency,
+    (completed, total) => {
+      progress.current = completed;
+      // Only update UI every N tracks to avoid excessive re-renders
+      if (completed % IMPORT_CONFIG.mappingProgressInterval === 0 || completed === total) {
+        onProgress({ ...progress });
+      }
+    }
+  );
+
+  // Get target provider IDs
+  const targetIdMap = trackMappingService.findTargetProviderIdsBatch(mappedTracks, targetProvider);
+
+  // Process results and collect tracks to add
+  console.log('[Import] Processing mapping results...');
   const tracksToAdd: string[] = [];
 
-  for (let i = 0; i < sourceTracks.length; i++) {
-    const sourceTrack = sourceTracks[i];
-    progress.current = i + 1;
+  for (const sourceTrack of sourceTracks) {
+    const mappedTrack = mappedTracks.get(sourceTrack.id);
     progress.currentTrack = sourceTrack;
-
-    console.log(`[Import] Processing track ${i + 1}/${sourceTracks.length}: ${sourceTrack.title} - ${sourceTrack.artistName}`);
-
-    // Fetch track mapping from local JSON
-    const mappedTrack = await trackMappingService.getTrackDetails(sourceProvider, sourceTrack.id);
 
     if (!mappedTrack) {
       console.log(`[Import] ⚠ Track ${sourceTrack.id} not found in local database: ${sourceTrack.title} - ${sourceTrack.artistName}`);
       progress.skipped++;
       progress.skippedTracks.push(sourceTrack);
-      onProgress({ ...progress });
       continue;
     }
 
-    // Find target provider ID
-    const targetTrackId = trackMappingService.findTargetProviderId(mappedTrack, targetProvider);
+    const targetTrackId = targetIdMap.get(sourceTrack.id);
 
     if (!targetTrackId) {
       console.log(`[Import] ⚠ No ${targetProvider} mapping for: ${sourceTrack.title} - ${sourceTrack.artistName}`);
@@ -110,16 +148,21 @@ export async function importPlaylist(
       tracksToAdd.push(targetTrackId);
       progress.imported++;
     }
-
-    onProgress({ ...progress });
-
-    // Small delay to prevent rate limiting
-    await new Promise(resolve => setTimeout(resolve, 50));
   }
 
-  // Step 4: Add tracks to target playlist
+  // Final progress update after mapping
+  progress.current = sourceTracks.length;
+  onProgress({ ...progress });
+
+  // Step 4: Add tracks to target playlist (in batches for large playlists)
   if (tracksToAdd.length > 0) {
     console.log(`[Import] Step 4: Adding ${tracksToAdd.length} tracks to target playlist...`);
+    
+    // For very large playlists, log progress
+    if (tracksToAdd.length > IMPORT_CONFIG.addBatchSize) {
+      console.log(`[Import] Large playlist detected, will add in batches...`);
+    }
+    
     await providerService.addTracksToPlaylist(
       targetProvider,
       targetPlaylistId,
