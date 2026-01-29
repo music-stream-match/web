@@ -44,6 +44,14 @@ export interface ProviderMapping {
   providerId: string;
 }
 
+// Track info from source playlist API (before mapping)
+export interface SourceTrack {
+  id: string;
+  title: string;
+  artistName: string;
+  albumTitle?: string;
+}
+
 export interface Track {
   _id: string | number;
   title: string;
@@ -55,10 +63,10 @@ export interface Track {
 export interface ImportProgress {
   total: number;
   current: number;
-  currentTrack?: Track;
+  currentTrack?: SourceTrack;
   imported: number;
   skipped: number;
-  skippedTracks: Track[];
+  skippedTracks: SourceTrack[];
   duplicatesSkipped?: number;
 }
 
@@ -68,7 +76,7 @@ export interface ImportResult {
   targetPlaylistId?: string;
   imported: number;
   skipped: number;
-  skippedTracks: Track[];
+  skippedTracks: SourceTrack[];
   duplicatesSkipped?: number;
   duration: number;
   sourceProvider: Provider;

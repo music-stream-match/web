@@ -94,11 +94,11 @@ export function ImportResultModal({ result, onClose }: ImportResultModalProps) {
             <div className="max-h-40 overflow-y-auto space-y-1">
               {result.skippedTracks.map((track, index) => (
                 <div
-                  key={`${track._id}-${index}`}
+                  key={`${track.id}-${index}`}
                   className="text-sm p-2 bg-surface-hover rounded-md"
                 >
                   <span className="font-medium">{track.title}</span>
-                  <span className="text-text-muted"> - {track.artist.name}</span>
+                  <span className="text-text-muted"> - {track.artistName}</span>
                 </div>
               ))}
             </div>

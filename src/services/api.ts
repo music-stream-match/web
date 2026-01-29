@@ -1,4 +1,4 @@
-import type { Provider, Playlist, Track, ProviderAuth, User, AuthTokens } from '@/types';
+import type { Provider, Playlist, Track, ProviderAuth, User, AuthTokens, SourceTrack } from '@/types';
 import { DEEZER_CONFIG, getTidalConfig, getSpotifyConfig } from '@/config/api';
 import { useAppStore } from '@/store/useAppStore';
 
@@ -154,7 +154,7 @@ export const deezerService = {
     return playlists;
   },
 
-  async getPlaylistTracks(playlistId: string, arl: string): Promise<string[]> {
+  async getPlaylistTracks(playlistId: string, arl: string): Promise<SourceTrack[]> {
     console.log(`[Deezer] Fetching tracks for playlist ${playlistId}...`);
     
     const data = await deezerProxyRequest<DeezerApiResponse<DeezerPagePlaylistResponse>>(
@@ -162,17 +162,22 @@ export const deezerService = {
       arl
     );
 
-    const trackIds: string[] = [];
+    const tracks: SourceTrack[] = [];
     const songs = data.results?.SONGS?.data || [];
     
     for (const song of songs) {
       if (song.SNG_ID) {
-        trackIds.push(song.SNG_ID);
+        tracks.push({
+          id: song.SNG_ID,
+          title: song.SNG_TITLE || `Unknown Track (${song.SNG_ID})`,
+          artistName: song.ART_NAME || 'Unknown Artist',
+          albumTitle: song.ALB_TITLE,
+        });
       }
     }
 
-    console.log(`[Deezer] Found ${trackIds.length} tracks in playlist`);
-    return trackIds;
+    console.log(`[Deezer] Found ${tracks.length} tracks in playlist`);
+    return tracks;
   },
 
   async checkPlaylistExists(name: string, arl: string): Promise<Playlist | null> {
@@ -424,18 +429,18 @@ export const tidalService = {
     return playlists;
   },
 
-  async getPlaylistTracks(playlistId: string, accessToken: string): Promise<string[]> {
+  async getPlaylistTracks(playlistId: string, accessToken: string): Promise<SourceTrack[]> {
     console.log(`[TIDAL] Fetching tracks for playlist ${playlistId}...`);
     const config = getTidalConfig();
-    const trackIds: string[] = [];
+    const tracks: SourceTrack[] = [];
     let cursor: string | null = null;
     const limit = 100;
 
     while (true) {
-      // TIDAL OpenAPI uses /playlists/{id}/relationships/items
+      // TIDAL OpenAPI uses /playlists/{id}/items with include=items to get track details
       const url = cursor 
-        ? `${config.apiUrl}/playlists/${playlistId}/relationships/items?countryCode=US&limit=${limit}&cursor=${cursor}`
-        : `${config.apiUrl}/playlists/${playlistId}/relationships/items?countryCode=US&limit=${limit}`;
+        ? `${config.apiUrl}/playlists/${playlistId}/items?countryCode=US&limit=${limit}&include=items&cursor=${cursor}`
+        : `${config.apiUrl}/playlists/${playlistId}/items?countryCode=US&limit=${limit}&include=items`;
       
       const response = await fetch(url, {
         headers: {
@@ -454,10 +459,42 @@ export const tidalService = {
       const data = await response.json();
       console.log('[TIDAL] Playlist items response:', data);
 
-      // JSON:API format - data contains array of resource identifiers
+      // JSON:API format - included contains full track details
+      const includedTracks = new Map<string, any>();
+      for (const included of (data.included || [])) {
+        if (included.type === 'tracks') {
+          includedTracks.set(included.id, included);
+        }
+      }
+
+      // data contains playlist items with relationships to tracks
       for (const item of (data.data || [])) {
-        if (item.type === 'tracks') {
-          trackIds.push(item.id.toString());
+        const trackRef = item.relationships?.item?.data;
+        if (trackRef?.type === 'tracks') {
+          const trackId = trackRef.id.toString();
+          const trackDetails = includedTracks.get(trackId);
+          
+          if (trackDetails) {
+            const attrs = trackDetails.attributes || {};
+            const artistNames = (attrs.artists || [])
+              .map((a: any) => a.name)
+              .filter(Boolean)
+              .join(', ');
+            
+            tracks.push({
+              id: trackId,
+              title: attrs.title || `Unknown Track (${trackId})`,
+              artistName: artistNames || 'Unknown Artist',
+              albumTitle: attrs.album?.title,
+            });
+          } else {
+            // Fallback if track details not included
+            tracks.push({
+              id: trackId,
+              title: `Unknown Track (${trackId})`,
+              artistName: 'Unknown Artist',
+            });
+          }
         }
       }
 
@@ -466,8 +503,8 @@ export const tidalService = {
       if (!cursor || (data.data || []).length < limit) break;
     }
 
-    console.log(`[TIDAL] Found ${trackIds.length} tracks in playlist`);
-    return trackIds;
+    console.log(`[TIDAL] Found ${tracks.length} tracks in playlist`);
+    return tracks;
   },
 
   async checkPlaylistExists(name: string, accessToken: string, userId: string): Promise<Playlist | null> {
@@ -680,10 +717,10 @@ export const spotifyService = {
     return playlists;
   },
 
-  async getPlaylistTracks(playlistId: string, accessToken: string): Promise<string[]> {
+  async getPlaylistTracks(playlistId: string, accessToken: string): Promise<SourceTrack[]> {
     console.log(`[Spotify] Fetching tracks for playlist ${playlistId}...`);
     const config = getSpotifyConfig();
-    const trackIds: string[] = [];
+    const tracks: SourceTrack[] = [];
     let url: string | null = `${config.apiUrl}/playlists/${playlistId}/tracks?limit=100`;
 
     while (url) {
@@ -701,15 +738,25 @@ export const spotifyService = {
 
       for (const item of data.items) {
         if (item.track?.id) {
-          trackIds.push(item.track.id);
+          const artistNames = (item.track.artists || [])
+            .map((a: any) => a.name)
+            .filter(Boolean)
+            .join(', ');
+          
+          tracks.push({
+            id: item.track.id,
+            title: item.track.name || `Unknown Track (${item.track.id})`,
+            artistName: artistNames || 'Unknown Artist',
+            albumTitle: item.track.album?.name,
+          });
         }
       }
 
       url = data.next;
     }
 
-    console.log(`[Spotify] Found ${trackIds.length} tracks in playlist`);
-    return trackIds;
+    console.log(`[Spotify] Found ${tracks.length} tracks in playlist`);
+    return tracks;
   },
 
   async checkPlaylistExists(name: string, accessToken: string): Promise<Playlist | null> {
@@ -848,7 +895,7 @@ export const providerService = {
     }
   },
 
-  async getPlaylistTracks(provider: Provider, playlistId: string, auth: ProviderAuth | null, arl?: string): Promise<string[]> {
+  async getPlaylistTracks(provider: Provider, playlistId: string, auth: ProviderAuth | null, arl?: string): Promise<SourceTrack[]> {
     if (provider === 'deezer') {
       const deezerArl = arl || useAppStore.getState().getDeezerArl();
       if (!deezerArl) throw new Error('No Deezer ARL available');

@@ -20,14 +20,14 @@ export async function importPlaylist(
   console.log(`[Import] Allow duplicates: ${allowDuplicates}`);
   console.log('='.repeat(60));
 
-  // Step 1: Get source playlist tracks
+  // Step 1: Get source playlist tracks (now includes title/artist info)
   console.log('[Import] Step 1: Fetching source playlist tracks...');
-  const sourceTrackIds = await providerService.getPlaylistTracks(
+  const sourceTracks = await providerService.getPlaylistTracks(
     sourceProvider,
     sourcePlaylist.id,
     sourceAuth
   );
-  console.log(`[Import] Found ${sourceTrackIds.length} tracks in source playlist`);
+  console.log(`[Import] Found ${sourceTracks.length} tracks in source playlist`);
 
   // Step 2: Check if target playlist exists or create new one
   console.log('[Import] Step 2: Checking/creating target playlist...');
@@ -52,7 +52,7 @@ export async function importPlaylist(
         targetPlaylistId,
         targetAuth
       );
-      existingTrackIds = new Set(existingTracks);
+      existingTrackIds = new Set(existingTracks.map(t => t.id));
       console.log(`[Import] Found ${existingTrackIds.size} existing tracks in target playlist`);
     }
   } else {
@@ -67,7 +67,7 @@ export async function importPlaylist(
   // Step 3: Process tracks
   console.log('[Import] Step 3: Processing tracks...');
   const progress: ImportProgress = {
-    total: sourceTrackIds.length,
+    total: sourceTracks.length,
     current: 0,
     imported: 0,
     skipped: 0,
@@ -77,43 +77,36 @@ export async function importPlaylist(
 
   const tracksToAdd: string[] = [];
 
-  for (let i = 0; i < sourceTrackIds.length; i++) {
-    const trackId = sourceTrackIds[i];
+  for (let i = 0; i < sourceTracks.length; i++) {
+    const sourceTrack = sourceTracks[i];
     progress.current = i + 1;
+    progress.currentTrack = sourceTrack;
 
-    console.log(`[Import] Processing track ${i + 1}/${sourceTrackIds.length}: ${trackId}`);
+    console.log(`[Import] Processing track ${i + 1}/${sourceTracks.length}: ${sourceTrack.title} - ${sourceTrack.artistName}`);
 
-    // Fetch track details from local JSON
-    const track = await trackMappingService.getTrackDetails(sourceProvider, trackId);
+    // Fetch track mapping from local JSON
+    const mappedTrack = await trackMappingService.getTrackDetails(sourceProvider, sourceTrack.id);
 
-    if (!track) {
-      console.log(`[Import] ⚠ Track ${trackId} not found in local database`);
+    if (!mappedTrack) {
+      console.log(`[Import] ⚠ Track ${sourceTrack.id} not found in local database: ${sourceTrack.title} - ${sourceTrack.artistName}`);
       progress.skipped++;
-      progress.skippedTracks.push({
-        _id: trackId,
-        title: `Unknown Track (${trackId})`,
-        artist: { id: 0, name: 'Unknown' },
-        album: { id: 0, title: 'Unknown' },
-        providers: [],
-      });
-      onProgress({ ...progress, currentTrack: undefined });
+      progress.skippedTracks.push(sourceTrack);
+      onProgress({ ...progress });
       continue;
     }
 
-    progress.currentTrack = track;
-
     // Find target provider ID
-    const targetTrackId = trackMappingService.findTargetProviderId(track, targetProvider);
+    const targetTrackId = trackMappingService.findTargetProviderId(mappedTrack, targetProvider);
 
     if (!targetTrackId) {
-      console.log(`[Import] ⚠ No ${targetProvider} mapping for: ${track.title} - ${track.artist.name}`);
+      console.log(`[Import] ⚠ No ${targetProvider} mapping for: ${sourceTrack.title} - ${sourceTrack.artistName}`);
       progress.skipped++;
-      progress.skippedTracks.push(track);
+      progress.skippedTracks.push(sourceTrack);
     } else if (!allowDuplicates && existingTrackIds.has(targetTrackId)) {
-      console.log(`[Import] ⏭ Duplicate skipped: ${track.title} - ${track.artist.name}`);
+      console.log(`[Import] ⏭ Duplicate skipped: ${sourceTrack.title} - ${sourceTrack.artistName}`);
       progress.duplicatesSkipped = (progress.duplicatesSkipped || 0) + 1;
     } else {
-      console.log(`[Import] ✓ Mapped: ${track.title} -> ${targetTrackId}`);
+      console.log(`[Import] ✓ Mapped: ${sourceTrack.title} -> ${targetTrackId}`);
       tracksToAdd.push(targetTrackId);
       progress.imported++;
     }

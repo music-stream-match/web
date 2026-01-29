@@ -26,7 +26,7 @@ export function ImportProgress({ progress }: ImportProgressProps) {
           <div className="min-w-0">
             <p className="font-medium truncate">{progress.currentTrack.title}</p>
             <p className="text-sm text-text-muted truncate">
-              {progress.currentTrack.artist.name} • {progress.currentTrack.album.title}
+              {progress.currentTrack.artistName}{progress.currentTrack.albumTitle ? ` • ${progress.currentTrack.albumTitle}` : ''}
             </p>
           </div>
         </div>
