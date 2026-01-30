@@ -53,10 +53,7 @@ export interface SourceTrack {
 }
 
 export interface Track {
-  _id: string | number;
-  title: string;
-  artist: Artist;
-  album: Album;
+  _id: string;
   providers: ProviderMapping[];
 }
 
