@@ -39,11 +39,6 @@ export interface Album {
   title: string;
 }
 
-export interface ProviderMapping {
-  provider: Provider;
-  providerId: string;
-}
-
 // Track info from source playlist API (before mapping)
 export interface SourceTrack {
   id: string;
@@ -52,9 +47,15 @@ export interface SourceTrack {
   albumTitle?: string;
 }
 
+export interface TrackProviders {
+  deezerTrackId?: string;
+  tidalTrackId?: string;
+  spotifyTrackId?: string;
+}
+
 export interface Track {
-  _id: string;
-  providers: ProviderMapping[];
+  id: string;
+  providers: TrackProviders;
 }
 
 export interface ImportProgress {

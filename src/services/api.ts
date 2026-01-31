@@ -944,7 +944,7 @@ export const trackMappingService = {
       }
 
       const track: Track = await response.json();
-      console.log(`[TrackMapping] Found track: ${track._id}`);
+      console.log(`[TrackMapping] Found track: ${track.id}`);
       trackMappingCache.set(cacheKey, track);
       return track;
     } catch (error) {
@@ -1013,12 +1013,12 @@ export const trackMappingService = {
   },
 
   findTargetProviderId(track: Track, targetProvider: Provider): string | null {
-    const mapping = track.providers.find(p => p.provider === targetProvider);
-    if (mapping) {
-      console.log(`[TrackMapping] Found ${targetProvider} ID: ${mapping.providerId} for track ${track._id}`);
-      return mapping.providerId;
+    const providerId = track.providers[`${targetProvider}TrackId` as keyof typeof track.providers] as string | undefined;
+    if (providerId) {
+      console.log(`[TrackMapping] Found ${targetProvider} ID: ${providerId} for track ${track.id}`);
+      return providerId;
     }
-    console.log(`[TrackMapping] No ${targetProvider} mapping found for track ${track._id}`);
+    console.log(`[TrackMapping] No ${targetProvider} mapping found for track ${track.id}`);
     return null;
   },
 
