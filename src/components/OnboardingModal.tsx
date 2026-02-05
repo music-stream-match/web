@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Modal, Button } from '@/components/ui';
 import { useTranslation } from '@/i18n/useTranslation';
 import { 
@@ -14,26 +14,6 @@ import { cn } from '@/lib/utils';
 interface OnboardingModalProps {
   isOpen: boolean;
   onClose: () => void;
-}
-
-const ONBOARDING_SEEN_KEY = 'msm_onboarding_seen';
-
-export function useOnboarding() {
-  const [showOnboarding, setShowOnboarding] = useState(false);
-
-  useEffect(() => {
-    const seen = localStorage.getItem(ONBOARDING_SEEN_KEY);
-    if (!seen) {
-      setShowOnboarding(true);
-    }
-  }, []);
-
-  const completeOnboarding = () => {
-    localStorage.setItem(ONBOARDING_SEEN_KEY, 'true');
-    setShowOnboarding(false);
-  };
-
-  return { showOnboarding, completeOnboarding };
 }
 
 export function OnboardingModal({ isOpen, onClose }: OnboardingModalProps) {

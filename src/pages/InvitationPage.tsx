@@ -6,7 +6,8 @@ import { Button, Input } from '@/components/ui';
 import { Music2, KeyRound, AlertCircle } from 'lucide-react';
 import { useTranslation } from '@/i18n/useTranslation';
 import { LanguageSelector } from '@/components/LanguageSelector';
-import { OnboardingModal, useOnboarding } from '@/components/OnboardingModal';
+import { OnboardingModal } from '@/components/OnboardingModal';
+import { useOnboarding } from '@/hooks/useOnboarding';
 import type { InvitationConfig } from '@/types';
 
 export function InvitationPage() {
