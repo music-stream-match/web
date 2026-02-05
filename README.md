@@ -1,78 +1,85 @@
 # Music Stream Match
 
-Aplikacja do przenoszenia playlist między serwisami streamingowymi TIDAL i Deezer.
+Application for transferring playlists between TIDAL, Spotify, and Deezer streaming services.
 
-## 🎵 Funkcjonalności
+## 🎵 Features
 
-- Logowanie OAuth do TIDAL i Deezer
-- Przeglądanie playlist z wybranego serwisu
-- Przenoszenie utworów między serwisami
-- Mapowanie utworów za pomocą lokalnej bazy danych
-- Podgląd postępu importu w czasie rzeczywistym
-- Podsumowanie importu z listą pominiętych utworów
+- **OAuth authentication** for TIDAL and Spotify
+- **Deezer ARL Cookie** authentication
+- **Playlist transfer** between supported streaming services
+- **Real-time progress tracking** during import
+- **Import summary** with skipped tracks list and duration
+- **Multi-language support** - 16 languages with automatic browser detection
+- **Onboarding wizard** for new users
+- **Persistent settings** - language preference saved locally
 
-## 🚀 Szybki start
+## 🌍 Supported Languages
 
-### Wymagania
+English, Spanish, Chinese, Hindi, Arabic, Portuguese, Bengali, Russian, Japanese, German, Korean, French, Vietnamese, Italian, Turkish, Polish
+
+## 🚀 Quick Start
+
+### Requirements
 
 - Node.js 18+
 - npm 9+
 
-### Instalacja
+### Installation
 
 ```bash
 npm install
 ```
 
-### Uruchomienie (dev)
+### Development
 
 ```bash
 npm run dev
 ```
 
-Aplikacja będzie dostępna pod adresem `http://localhost:5173`
+The application will be available at `http://localhost:5173`
 
-### Build produkcyjny
+### Demo
+
+The application currently requires invitations - if you want to try the service, you can use the invitation code "demo".
+
+### Production Build
 
 ```bash
 npm run build
 ```
 
-## 📁 Struktura projektu
+## 📁 Project Structure
 
 ```
 src/
-├── components/       # Komponenty React
-│   ├── ui/          # Bazowe komponenty UI
-│   └── ...          # Feature components
-├── config/          # Konfiguracja API
+├── components/       # React components
+│   ├── ui/          # Base UI components (Button, Card, Modal, Input, ProgressBar)
+│   └── ...          # Feature components (ProviderCard, PlaylistCard, etc.)
+├── config/          # API configuration (OAuth settings)
+├── hooks/           # Custom React hooks
+├── i18n/            # Internationalization
+│   └── translations/  # 16 language JSON files
 ├── lib/             # Utility functions
-├── pages/           # Strony aplikacji
-├── services/        # Serwisy API
+├── pages/           # Application pages
+├── services/        # API services
 ├── store/           # Zustand store
 └── types/           # TypeScript types
 ```
 
-## 🗂️ Baza mapowań utworów
+## 🌐 Deployment
 
-Mapowania utworów są przechowywane lokalnie w plikach JSON:
+The project is automatically deployed to GitHub Pages via GitHub Actions.
 
-```
-public/api/providers/{provider}/tracks/{trackId}.json
-```
+Live: [music-stream-match.space](https://music-stream-match.space)
 
-## 🌐 Deploy
-
-Projekt jest automatycznie deployowany na GitHub Pages przez GitHub Actions.
-
-## 🛠️ Technologie
+## 🛠️ Technologies
 
 - React 19 + TypeScript
 - Vite 7
 - Tailwind CSS 4
 - React Router 7
-- Zustand
+- Zustand (state management)
 
-## 📝 Licencja
+## 📝 License
 
 MIT
