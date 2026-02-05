@@ -94,5 +94,35 @@
       "step4": "Tìm cookie có tên \"arl\"",
       "step5": "Sao chép giá trị của nó"
     }
+  },
+  "onboarding": {
+    "skip": "Bỏ qua",
+    "next": "Tiếp",
+    "previous": "Quay lại",
+    "start": "Bắt đầu",
+    "welcome": {
+      "title": "Chào mừng đến với Music Stream Match!",
+      "description": "Cách dễ dàng nhất để chuyển playlist yêu thích giữa các dịch vụ streaming nhạc."
+    },
+    "transfer": {
+      "title": "Cách hoạt động",
+      "description": "Chuyển playlist đơn giản và nhanh chóng:",
+      "feature1": "Chọn dịch vụ nguồn và playlist",
+      "feature2": "Chọn dịch vụ streaming đích",
+      "feature3": "Bắt đầu chuyển và chờ hoàn thành"
+    },
+    "providers": {
+      "title": "Dịch vụ hỗ trợ",
+      "description": "Chuyển playlist giữa các nền tảng phổ biến này:"
+    },
+    "invitation": {
+      "title": "Cần mã mời",
+      "description": "Để sử dụng ứng dụng, bạn cần mã mời. Bạn có thể nhận từ quản trị viên hoặc sử dụng mã demo.",
+      "demo": "Thử với mã demo:"
+    },
+    "ready": {
+      "title": "Sẵn sàng bắt đầu!",
+      "description": "Nhập mã mời của bạn và bắt đầu chuyển bộ sưu tập nhạc."
+    }
   }
 }

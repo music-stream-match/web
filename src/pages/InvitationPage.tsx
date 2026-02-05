@@ -6,12 +6,14 @@ import { Button, Input } from '@/components/ui';
 import { Music2, KeyRound, AlertCircle } from 'lucide-react';
 import { useTranslation } from '@/i18n/useTranslation';
 import { LanguageSelector } from '@/components/LanguageSelector';
+import { OnboardingModal, useOnboarding } from '@/components/OnboardingModal';
 import type { InvitationConfig } from '@/types';
 
 export function InvitationPage() {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { setInvitation } = useAppStore();
+  const { showOnboarding, completeOnboarding } = useOnboarding();
 
   const [code, setCode] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -126,6 +128,12 @@ export function InvitationPage() {
           {t('invitation.noCode')}
         </p>
       </div>
+
+      {/* Onboarding Modal */}
+      <OnboardingModal 
+        isOpen={showOnboarding} 
+        onClose={completeOnboarding} 
+      />
     </div>
   );
 }

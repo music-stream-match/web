@@ -94,5 +94,35 @@
       "step4": "Finden Sie das Cookie namens \"arl\"",
       "step5": "Kopieren Sie dessen Wert"
     }
+  },
+  "onboarding": {
+    "skip": "Überspringen",
+    "next": "Weiter",
+    "previous": "Zurück",
+    "start": "Loslegen",
+    "welcome": {
+      "title": "Willkommen bei Music Stream Match!",
+      "description": "Der einfachste Weg, Ihre Lieblings-Playlists zwischen Musik-Streaming-Diensten zu übertragen."
+    },
+    "transfer": {
+      "title": "So funktioniert es",
+      "description": "Playlists übertragen ist einfach und schnell:",
+      "feature1": "Wählen Sie den Quelldienst und die Playlist",
+      "feature2": "Wählen Sie den Ziel-Streaming-Dienst",
+      "feature3": "Starten Sie die Übertragung und warten Sie auf den Abschluss"
+    },
+    "providers": {
+      "title": "Unterstützte Dienste",
+      "description": "Übertragen Sie Playlists zwischen diesen beliebten Plattformen:"
+    },
+    "invitation": {
+      "title": "Einladungscode erforderlich",
+      "description": "Um die App zu nutzen, benötigen Sie einen Einladungscode. Sie können ihn vom Administrator erhalten oder einen Demo-Code verwenden.",
+      "demo": "Probieren Sie es mit dem Demo-Code:"
+    },
+    "ready": {
+      "title": "Bereit zum Start!",
+      "description": "Geben Sie Ihren Einladungscode ein und beginnen Sie mit der Übertragung Ihrer Musiksammlungen."
+    }
   }
 }

@@ -94,5 +94,35 @@
       "step4": "Encontre o cookie chamado \"arl\"",
       "step5": "Copie seu valor"
     }
+  },
+  "onboarding": {
+    "skip": "Pular",
+    "next": "Próximo",
+    "previous": "Anterior",
+    "start": "Começar",
+    "welcome": {
+      "title": "Bem-vindo ao Music Stream Match!",
+      "description": "A maneira mais fácil de transferir suas playlists favoritas entre serviços de streaming."
+    },
+    "transfer": {
+      "title": "Como funciona",
+      "description": "Transferir playlists é simples e rápido:",
+      "feature1": "Selecione o serviço de origem e a playlist",
+      "feature2": "Escolha o serviço de streaming de destino",
+      "feature3": "Inicie a transferência e aguarde a conclusão"
+    },
+    "providers": {
+      "title": "Serviços suportados",
+      "description": "Transfira playlists entre estas plataformas populares:"
+    },
+    "invitation": {
+      "title": "Código de convite necessário",
+      "description": "Para usar o aplicativo, você precisa de um código de convite. Você pode obtê-lo de um administrador ou usar um código de demonstração.",
+      "demo": "Experimente com o código de demonstração:"
+    },
+    "ready": {
+      "title": "Pronto para começar!",
+      "description": "Insira seu código de convite e comece a transferir suas coleções musicais."
+    }
   }
 }

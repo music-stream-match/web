@@ -94,5 +94,35 @@
       "step4": "Busca la cookie llamada \"arl\"",
       "step5": "Copia su valor"
     }
+  },
+  "onboarding": {
+    "skip": "Omitir",
+    "next": "Siguiente",
+    "previous": "Anterior",
+    "start": "Comenzar",
+    "welcome": {
+      "title": "¡Bienvenido a Music Stream Match!",
+      "description": "La forma más fácil de transferir tus listas de reproducción favoritas entre servicios de streaming."
+    },
+    "transfer": {
+      "title": "Cómo funciona",
+      "description": "Transferir listas de reproducción es simple y rápido:",
+      "feature1": "Selecciona el servicio de origen y la lista",
+      "feature2": "Elige el servicio de destino",
+      "feature3": "Inicia la transferencia y espera a que termine"
+    },
+    "providers": {
+      "title": "Servicios compatibles",
+      "description": "Transfiere listas entre estas plataformas populares:"
+    },
+    "invitation": {
+      "title": "Se requiere código de invitación",
+      "description": "Para usar la aplicación, necesitas un código de invitación. Puedes obtenerlo de un administrador o usar un código demo.",
+      "demo": "Pruébalo con el código demo:"
+    },
+    "ready": {
+      "title": "¡Listo para empezar!",
+      "description": "Introduce tu código de invitación y comienza a transferir tus colecciones musicales."
+    }
   }
 }

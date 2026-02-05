@@ -94,5 +94,35 @@
       "step4": "Find the cookie named \"arl\"",
       "step5": "Copy its value"
     }
+  },
+  "onboarding": {
+    "skip": "Skip",
+    "next": "Next",
+    "previous": "Back",
+    "start": "Get started",
+    "welcome": {
+      "title": "Welcome to Music Stream Match!",
+      "description": "The easiest way to transfer your favorite playlists between music streaming services."
+    },
+    "transfer": {
+      "title": "How it works",
+      "description": "Transferring playlists is simple and fast:",
+      "feature1": "Select the source service and playlist",
+      "feature2": "Choose the target streaming service",
+      "feature3": "Start the transfer and wait for completion"
+    },
+    "providers": {
+      "title": "Supported services",
+      "description": "Transfer playlists between these popular streaming platforms:"
+    },
+    "invitation": {
+      "title": "Invitation code required",
+      "description": "To use the app, you need an invitation code. You can get it from an administrator or use a demo code.",
+      "demo": "Try it out with the demo code:"
+    },
+    "ready": {
+      "title": "Ready to start!",
+      "description": "Enter your invitation code and start transferring your music collections."
+    }
   }
 }

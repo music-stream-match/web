@@ -93,6 +93,34 @@
       "step3": "Application → Cookies sekmesine gidin",
       "step4": "\"arl\" adlı çerezi bulun",
       "step5": "Değerini kopyalayın"
-    }
-  }
+    }  },
+  "onboarding": {
+    "skip": "Atla",
+    "next": "Sonraki",
+    "previous": "Geri",
+    "start": "Başla",
+    "welcome": {
+      "title": "Music Stream Match'e Hoş Geldiniz!",
+      "description": "Favori çalma listelerinizi müzik streaming servisleri arasında aktarmanın en kolay yolu."
+    },
+    "transfer": {
+      "title": "Nasıl çalışır",
+      "description": "Çalma listesi aktarmak basit ve hızlıdır:",
+      "feature1": "Kaynak servisi ve çalma listesini seçin",
+      "feature2": "Hedef streaming servisini seçin",
+      "feature3": "Aktarmayı başlatın ve tamamlanmasını bekleyin"
+    },
+    "providers": {
+      "title": "Desteklenen servisler",
+      "description": "Bu popüler platformlar arasında çalma listesi aktarın:"
+    },
+    "invitation": {
+      "title": "Davet kodu gerekli",
+      "description": "Uygulamayı kullanmak için bir davet koduna ihtiyacınız var. Yöneticiden alabilir veya demo kodunu kullanabilirsiniz.",
+      "demo": "Demo kodu ile deneyin:"
+    },
+    "ready": {
+      "title": "Başlamaya hazır!",
+      "description": "Davet kodunuzu girin ve müzik koleksiyonlarınızı aktarmaya başlayın."
+    }  }
 }
