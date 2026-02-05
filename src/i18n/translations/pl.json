@@ -124,5 +124,11 @@
       "title": "Gotowy do startu!",
       "description": "Wprowadź kod zaproszenia i zacznij przenosić swoje kolekcje muzyczne."
     }
+  },
+  "support": {
+    "button": "Wesprzyj",
+    "title": "Wesprzyj autora",
+    "description": "Jeśli podoba Ci się ta aplikacja i chcesz wesprzeć jej rozwój, możesz to zrobić przez następujące platformy:",
+    "thanks": "Dziękuję za wsparcie! ❤️"
   }
 }

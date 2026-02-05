@@ -124,5 +124,11 @@
       "title": "Pronto para começar!",
       "description": "Insira seu código de convite e comece a transferir suas coleções musicais."
     }
+  },
+  "support": {
+    "button": "Apoiar",
+    "title": "Apoie o autor",
+    "description": "Se você gosta deste aplicativo e quer apoiar seu desenvolvimento, pode fazê-lo através das seguintes plataformas:",
+    "thanks": "Obrigado pelo seu apoio! ❤️"
   }
 }

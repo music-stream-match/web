@@ -122,5 +122,12 @@
     "ready": {
       "title": "Başlamaya hazır!",
       "description": "Davet kodunuzu girin ve müzik koleksiyonlarınızı aktarmaya başlayın."
-    }  }
+    }
+  },
+  "support": {
+    "button": "Destek",
+    "title": "Yazarı destekle",
+    "description": "Bu uygulamayı beğendiyseniz ve geliştirilmesini desteklemek istiyorsanız, aşağıdaki platformlar aracılığıyla yapabilirsiniz:",
+    "thanks": "Desteğiniz için teşekkürler! ❤️"
+  }
 }

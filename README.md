@@ -80,6 +80,15 @@ Live: [music-stream-match.space](https://music-stream-match.space)
 - React Router 7
 - Zustand (state management)
 
+# Free, forever
+
+Feel free to use however you like but please do not sell it. It is FREE for everyone! FOREVER. You can buy me a coffee
+if you like to thank me.
+
+- [PayPal](https://paypal.me/zenedithPL)
+- [Ko-Fi](https://ko-fi.com/K3K11ABGW5)
+- [Patreon](https://patreon.com/Zenedith)
+
 ## 📝 License
 
 MIT

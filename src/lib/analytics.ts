@@ -100,4 +100,15 @@ export const analytics = {
       duration_ms: durationMs,
     });
   },
+
+  // Support events
+  supportModalOpened: () => {
+    trackEvent('support_modal_opened');
+  },
+
+  supportLinkClicked: (platform: string) => {
+    trackEvent('support_link_clicked', {
+      platform,
+    });
+  },
 };

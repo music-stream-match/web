@@ -11,6 +11,7 @@ import { ArrowRight, Music2, RefreshCw } from 'lucide-react';
 import { getProviderName } from '@/lib/utils';
 import { useTranslation } from '@/i18n/useTranslation';
 import { LanguageSelector } from '@/components/LanguageSelector';
+import { SupportButton } from '@/components/SupportModal';
 
 export function HomePage() {
   const navigate = useNavigate();
@@ -115,8 +116,9 @@ export function HomePage() {
 
   return (
     <div className="min-h-screen p-6 relative">
-      {/* Language selector */}
-      <div className="absolute top-4 right-4">
+      {/* Language selector & Support */}
+      <div className="absolute top-4 right-4 flex items-center gap-2">
+        <SupportButton />
         <LanguageSelector />
       </div>
 

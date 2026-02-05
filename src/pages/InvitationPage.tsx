@@ -6,6 +6,7 @@ import { Button, Input } from '@/components/ui';
 import { Music2, KeyRound, AlertCircle } from 'lucide-react';
 import { useTranslation } from '@/i18n/useTranslation';
 import { LanguageSelector } from '@/components/LanguageSelector';
+import { SupportButton } from '@/components/SupportModal';
 import { OnboardingModal } from '@/components/OnboardingModal';
 import { useOnboarding } from '@/hooks/useOnboarding';
 import type { InvitationConfig } from '@/types';
@@ -60,8 +61,9 @@ export function InvitationPage() {
 
   return (
     <div className="min-h-screen p-6 flex items-center justify-center relative">
-      {/* Language selector */}
-      <div className="absolute top-4 right-4">
+      {/* Language selector & Support */}
+      <div className="absolute top-4 right-4 flex items-center gap-2">
+        <SupportButton />
         <LanguageSelector />
       </div>
 

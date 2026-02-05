@@ -124,5 +124,11 @@
       "title": "Bereit zum Start!",
       "description": "Geben Sie Ihren Einladungscode ein und beginnen Sie mit der Übertragung Ihrer Musiksammlungen."
     }
+  },
+  "support": {
+    "button": "Unterstützen",
+    "title": "Unterstütze den Autor",
+    "description": "Wenn Ihnen diese App gefällt und Sie ihre Entwicklung unterstützen möchten, können Sie dies über folgende Plattformen tun:",
+    "thanks": "Vielen Dank für Ihre Unterstützung! ❤️"
   }
 }

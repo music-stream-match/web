@@ -11,6 +11,7 @@ import { ArrowLeft, AlertCircle, Play } from 'lucide-react';
 import { getProviderName } from '@/lib/utils';
 import { useTranslation } from '@/i18n/useTranslation';
 import { LanguageSelector } from '@/components/LanguageSelector';
+import { SupportButton } from '@/components/SupportModal';
 import type { Playlist } from '@/types';
 
 export function ImportPage() {
@@ -145,8 +146,9 @@ export function ImportPage() {
 
   return (
     <div className="min-h-screen p-6 relative">
-      {/* Language selector */}
-      <div className="absolute top-4 right-4">
+      {/* Language selector & Support */}
+      <div className="absolute top-4 right-4 flex items-center gap-2">
+        <SupportButton />
         <LanguageSelector />
       </div>
 

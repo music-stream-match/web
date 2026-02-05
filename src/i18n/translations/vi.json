@@ -124,5 +124,11 @@
       "title": "Sẵn sàng bắt đầu!",
       "description": "Nhập mã mời của bạn và bắt đầu chuyển bộ sưu tập nhạc."
     }
+  },
+  "support": {
+    "button": "Hỗ trợ",
+    "title": "Hỗ trợ tác giả",
+    "description": "Nếu bạn thích ứng dụng này và muốn hỗ trợ phát triển, bạn có thể thực hiện qua các nền tảng sau:",
+    "thanks": "Cảm ơn sự hỗ trợ của bạn! ❤️"
   }
 }

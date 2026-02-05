@@ -124,5 +124,11 @@
       "title": "Ready to start!",
       "description": "Enter your invitation code and start transferring your music collections."
     }
+  },
+  "support": {
+    "button": "Support",
+    "title": "Support the author",
+    "description": "If you like this app and want to support its development, you can do so through the following platforms:",
+    "thanks": "Thank you for your support! ❤️"
   }
 }
