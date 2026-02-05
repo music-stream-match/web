@@ -6,6 +6,7 @@ import { ProviderCard } from '@/components/ProviderCard';
 import { DeezerArlModal } from '@/components/DeezerArlModal';
 import { Button } from '@/components/ui';
 import { providerService } from '@/services/api';
+import { analytics } from '@/lib/analytics';
 import { ArrowRight, Music2, RefreshCw } from 'lucide-react';
 import { getProviderName } from '@/lib/utils';
 
@@ -52,15 +53,20 @@ export function HomePage() {
       // Redirect to provider auth
       const authUrl = providerService.getAuthUrl(provider);
       console.log(`[HomePage] Redirecting to auth: ${authUrl}`);
+      analytics.loginAttempted(provider);
       window.location.href = authUrl;
       return;
     }
 
     if (mode === 'source') {
+      console.log(`[HomePage] Source provider selected: ${provider}`);
+      analytics.sourceProviderSelected(provider);
       setSourceProvider(provider);
       // Navigate to playlist selection
       navigate('/playlists');
     } else {
+      console.log(`[HomePage] Target provider selected: ${provider}`);
+      analytics.targetProviderSelected(provider);
       setTargetProvider(provider);
       setStep('ready');
     }
@@ -68,12 +74,17 @@ export function HomePage() {
 
   const handleDeezerArlSuccess = () => {
     console.log('[HomePage] Deezer ARL auth successful');
+    analytics.loginSuccessful('deezer');
     setShowDeezerArlModal(false);
     
     if (pendingDeezerMode === 'source') {
+      console.log('[HomePage] Source provider selected: deezer');
+      analytics.sourceProviderSelected('deezer');
       setSourceProvider('deezer');
       navigate('/playlists');
     } else if (pendingDeezerMode === 'target') {
+      console.log('[HomePage] Target provider selected: deezer');
+      analytics.targetProviderSelected('deezer');
       setTargetProvider('deezer');
       setStep('ready');
     }

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Modal, Button, Input } from '@/components/ui';
 import { useAppStore } from '@/store/useAppStore';
 import { deezerService } from '@/services/api';
+import { analytics } from '@/lib/analytics';
 import { AlertCircle, HelpCircle } from 'lucide-react';
 
 interface DeezerArlModalProps {
@@ -32,6 +33,7 @@ export function DeezerArlModal({ isOpen, onClose, onSuccess }: DeezerArlModalPro
 
     try {
       console.log('[DeezerArlModal] Authenticating with ARL...');
+      analytics.loginAttempted('deezer');
       
       // Store the ARL
       setDeezerArl(arl.trim());
@@ -41,10 +43,13 @@ export function DeezerArlModal({ isOpen, onClose, onSuccess }: DeezerArlModalPro
       setAuth('deezer', auth);
       
       console.log('[DeezerArlModal] ARL saved successfully');
+      analytics.loginSuccessful('deezer');
       onSuccess();
     } catch (err) {
+      const errorMsg = err instanceof Error ? err.message : 'Nie udało się zalogować';
       console.error('[DeezerArlModal] Error:', err);
-      setError(err instanceof Error ? err.message : 'Nie udało się zalogować');
+      analytics.loginFailed('deezer', errorMsg);
+      setError(errorMsg);
     } finally {
       setIsLoading(false);
     }

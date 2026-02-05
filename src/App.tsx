@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, useNavigate, useLocation, Navigate } from 'react-router-dom';
 import { HomePage, PlaylistsPage, ImportPage, CallbackPage, InvitationPage } from '@/pages';
 import { useAppStore } from '@/store/useAppStore';
+import { trackPageView } from '@/lib/analytics';
 
 // Base path for GitHub Pages deployment
 const basename = import.meta.env.BASE_URL || '/';
@@ -40,6 +41,17 @@ function RedirectHandler() {
   return null;
 }
 
+// Track page views for Google Analytics
+function PageTracker() {
+  const location = useLocation();
+
+  useEffect(() => {
+    trackPageView(location.pathname);
+  }, [location.pathname]);
+
+  return null;
+}
+
 console.log('[App] Using basename:', basename);
 console.dir( {meta: import.meta.env})
 
@@ -47,6 +59,7 @@ function App() {
   return (
     <BrowserRouter basename={basename}>
       <RedirectHandler />
+      <PageTracker />
       <Routes>
         <Route path="/invitation" element={<InvitationPage />} />
         <Route path="/auth/:provider" element={<CallbackPage />} />

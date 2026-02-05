@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppStore } from '@/store/useAppStore';
+import { analytics } from '@/lib/analytics';
 import { Button, Input } from '@/components/ui';
 import { Music2, KeyRound, AlertCircle } from 'lucide-react';
 import type { InvitationConfig } from '@/types';
@@ -40,6 +41,7 @@ export function InvitationPage() {
       const config: InvitationConfig = await response.json();
       console.log(`[InvitationPage] Valid invitation code: ${trimmedCode}, config:`, config.name);
       
+      analytics.invitationCodeSaved(trimmedCode.length);
       setInvitation(trimmedCode, config);
       navigate('/');
     } catch (err) {

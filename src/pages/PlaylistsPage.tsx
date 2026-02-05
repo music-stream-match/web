@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import type { Playlist } from '@/types';
 import { useAppStore } from '@/store/useAppStore';
 import { providerService } from '@/services/api';
+import { analytics } from '@/lib/analytics';
 import { PlaylistCard } from '@/components/PlaylistCard';
 import { Button } from '@/components/ui';
 import { ArrowLeft, Loader2, Search } from 'lucide-react';
@@ -59,6 +60,7 @@ export function PlaylistsPage() {
 
   const handlePlaylistSelect = (playlist: Playlist) => {
     console.log(`[PlaylistsPage] Selected playlist: ${playlist.name}`);
+    analytics.playlistSelected(sourceProvider || '', playlist.id, playlist.trackCount);
     setSelectedPlaylist(playlist);
     navigate('/');
   };

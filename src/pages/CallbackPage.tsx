@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useAppStore } from '@/store/useAppStore';
 import { providerService } from '@/services/api';
+import { analytics } from '@/lib/analytics';
 import type { Provider } from '@/types';
 import { Loader2, CheckCircle, XCircle } from 'lucide-react';
 
@@ -48,6 +49,7 @@ export function CallbackPage() {
 
       // Save auth
       setAuth(provider as Provider, auth);
+      analytics.loginSuccessful(provider);
 
       // Check what we were doing
       const mode = sessionStorage.getItem('auth_mode') as 'source' | 'target' | null;
@@ -56,11 +58,13 @@ export function CallbackPage() {
 
       if (mode === 'source') {
         setSourceProvider(provider as Provider);
+        analytics.sourceProviderSelected(provider);
         setStatus('success');
         // Navigate to playlist selection
         setTimeout(() => navigate('/playlists'), 1500);
       } else if (mode === 'target') {
         setTargetProvider(provider as Provider);
+        analytics.targetProviderSelected(provider);
         setStatus('success');
         // Navigate back to home
         setTimeout(() => navigate('/'), 1500);
@@ -71,6 +75,7 @@ export function CallbackPage() {
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Authentication failed';
       console.error('[Callback] Error:', message);
+      analytics.loginFailed(provider || 'unknown', message);
       setError(message);
       setStatus('error');
     }

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAppStore } from '@/store/useAppStore';
 import { providerService } from '@/services/api';
 import { importPlaylist } from '@/services/import';
+import { analytics } from '@/lib/analytics';
 import { ImportProgress } from '@/components/ImportProgress';
 import { ImportResultModal } from '@/components/ImportResultModal';
 import { Button, Input, Card } from '@/components/ui';
@@ -90,6 +91,9 @@ export function ImportPage() {
     try {
       setIsImporting(true);
       console.log('[ImportPage] Starting import...');
+      
+      const startTime = Date.now();
+      analytics.importStarted(sourceProvider, targetProvider, selectedPlaylist.trackCount);
 
       const result = await importPlaylist(
         sourceProvider,
@@ -102,9 +106,22 @@ export function ImportPage() {
         allowDuplicates
       );
 
+      const durationMs = Date.now() - startTime;
+      analytics.importCompleted(
+        sourceProvider,
+        targetProvider,
+        result.imported,
+        result.skipped,
+        result.duplicatesSkipped || 0,
+        durationMs
+      );
+
       setImportResult(result);
     } catch (error) {
+      const durationMs = Date.now() - startTime;
+      const errorMsg = error instanceof Error ? error.message : 'Unknown error';
       console.error('[ImportPage] Import failed:', error);
+      analytics.importFailed(sourceProvider, targetProvider, errorMsg, durationMs);
       // TODO: Show error modal
     } finally {
       setIsImporting(false);
