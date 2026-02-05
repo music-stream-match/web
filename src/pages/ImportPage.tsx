@@ -88,11 +88,12 @@ export function ImportPage() {
       return;
     }
 
+    const startTime = Date.now();
+
     try {
       setIsImporting(true);
       console.log('[ImportPage] Starting import...');
       
-      const startTime = Date.now();
       analytics.importStarted(sourceProvider, targetProvider, selectedPlaylist.trackCount);
 
       const result = await importPlaylist(
