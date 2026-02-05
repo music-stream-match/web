@@ -58,7 +58,7 @@ export function ProviderCard({ provider, mode, disabled, selected, onClick }: Pr
             <div
               className={cn(
                 'w-12 h-12 rounded-lg flex items-center justify-center',
-                provider === 'tidal' && 'bg-tidal',
+                provider === 'tidal' && 'bg-tidal border border-white/30',
                 provider === 'deezer' && 'bg-deezer',
                 provider === 'spotify' && 'bg-spotify'
               )}

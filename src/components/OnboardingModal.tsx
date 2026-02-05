@@ -59,7 +59,7 @@ export function OnboardingModal({ isOpen, onClose }: OnboardingModalProps) {
     {
       icon: (
         <div className="flex gap-2">
-          <div className="w-10 h-10 rounded-lg bg-tidal flex items-center justify-center">
+          <div className="w-10 h-10 rounded-lg bg-tidal border border-white/30 flex items-center justify-center">
             <Music2 className="w-5 h-5 text-white" />
           </div>
           <div className="w-10 h-10 rounded-lg bg-spotify flex items-center justify-center">
@@ -168,7 +168,7 @@ export function OnboardingModal({ isOpen, onClose }: OnboardingModalProps) {
                 key={provider}
                 className={cn(
                   'px-4 py-2 rounded-lg font-medium',
-                  provider === 'TIDAL' && 'bg-tidal/20 text-tidal',
+                  provider === 'TIDAL' && 'bg-tidal border border-white/30 text-white',
                   provider === 'Spotify' && 'bg-spotify/20 text-spotify',
                   provider === 'Deezer' && 'bg-deezer/20 text-deezer'
                 )}
