@@ -1,0 +1,98 @@
+{
+  "app": {
+    "name": "Music Stream Match",
+    "tagline": "نقل قوائم التشغيل بين خدمات البث"
+  },
+  "common": {
+    "back": "رجوع",
+    "close": "إغلاق",
+    "cancel": "إلغاء",
+    "continue": "متابعة",
+    "loading": "جاري التحميل...",
+    "checking": "جاري التحقق...",
+    "tryAgain": "حاول مرة أخرى",
+    "from": "من",
+    "to": "إلى"
+  },
+  "home": {
+    "step": {
+      "source": "المصدر",
+      "target": "الهدف",
+      "import": "استيراد"
+    },
+    "selectSourceService": "اختر خدمة المصدر",
+    "selectTargetService": "اختر خدمة الهدف",
+    "selectedPlaylist": "قائمة التشغيل المحددة: <strong>{{name}}</strong> من {{provider}}",
+    "readyToImport": "جاهز للاستيراد",
+    "playlist": "قائمة التشغيل",
+    "tracks": "{{count}} أغنية",
+    "startOver": "البدء من جديد",
+    "startImport": "بدء الاستيراد"
+  },
+  "playlists": {
+    "title": "اختر قائمة تشغيل من {{provider}}",
+    "found": "تم العثور على {{count}} قائمة تشغيل",
+    "loading": "جاري تحميل قوائم التشغيل...",
+    "search": "البحث في قوائم التشغيل...",
+    "notFound": "لم يتم العثور على قوائم تشغيل",
+    "author": "المؤلف: {{name}}"
+  },
+  "import": {
+    "title": "استيراد قائمة التشغيل",
+    "sourcePlaylist": "قائمة التشغيل المصدر",
+    "targetPlaylist": "قائمة التشغيل الهدف",
+    "playlistName": "اسم قائمة التشغيل",
+    "enterPlaylistName": "أدخل اسم قائمة التشغيل...",
+    "playlistExists": "توجد قائمة تشغيل بهذا الاسم بالفعل",
+    "playlistExistsHint": "ستتم إضافة الأغاني إلى قائمة التشغيل الموجودة ({{count}} أغنية)",
+    "allowDuplicates": "السماح بالأغاني المكررة",
+    "startImport": "بدء الاستيراد",
+    "importing": "جاري استيراد قائمة التشغيل...",
+    "transferringTracks": "جاري نقل الأغاني إلى الخدمة الهدف",
+    "imported": "تم الاستيراد",
+    "skipped": "تم التخطي",
+    "duplicates": "مكررات",
+    "time": "الوقت"
+  },
+  "result": {
+    "title": "اكتمل الاستيراد!",
+    "sourcePlaylist": "قائمة التشغيل المصدر ({{provider}})",
+    "targetPlaylist": "قائمة التشغيل الهدف ({{provider}})",
+    "skippedTracks": "الأغاني المتخطاة:",
+    "openPlaylist": "فتح قائمة التشغيل"
+  },
+  "invitation": {
+    "tagline": "انقل قوائم التشغيل الخاصة بك بين خدمات البث",
+    "title": "رمز الدعوة",
+    "description": "أدخل الرمز للحصول على الوصول",
+    "placeholder": "أدخل الرمز الخاص بك",
+    "label": "رمز الدعوة",
+    "error": "يرجى إدخال رمز الدعوة",
+    "invalid": "رمز دعوة غير صالح. تحقق من الرمز وحاول مرة أخرى.",
+    "noCode": "ليس لديك رمز دعوة؟ اتصل بالمسؤول."
+  },
+  "provider": {
+    "sourceService": "خدمة المصدر",
+    "targetService": "خدمة الهدف",
+    "clickToLogin": "انقر لتسجيل الدخول",
+    "loggedIn": "تم تسجيل الدخول",
+    "logout": "تسجيل الخروج"
+  },
+  "deezer": {
+    "title": "تسجيل الدخول إلى Deezer",
+    "arlLabel": "ARL (رابط مرجع المصادقة)",
+    "arlPlaceholder": "أدخل قيمة ملف تعريف الارتباط ARL...",
+    "enterArl": "يرجى إدخال ARL",
+    "loginFailed": "فشل تسجيل الدخول",
+    "login": "تسجيل الدخول",
+    "loggingIn": "جاري تسجيل الدخول...",
+    "help": {
+      "title": "كيفية الحصول على ARL:",
+      "step1": "سجل الدخول إلى <link>deezer.com</link>",
+      "step2": "افتح أدوات المطور (F12)",
+      "step3": "انتقل إلى تبويب Application → Cookies",
+      "step4": "ابحث عن ملف تعريف الارتباط المسمى \"arl\"",
+      "step5": "انسخ قيمته"
+    }
+  }
+}

@@ -3,6 +3,7 @@ import { useAppStore } from '@/store/useAppStore';
 import { Card } from '@/components/ui';
 import { Music, Check, LogOut } from 'lucide-react';
 import { cn, getProviderName } from '@/lib/utils';
+import { useTranslation } from '@/i18n/useTranslation';
 
 interface ProviderCardProps {
   provider: Provider;
@@ -13,6 +14,7 @@ interface ProviderCardProps {
 }
 
 export function ProviderCard({ provider, mode, disabled, selected, onClick }: ProviderCardProps) {
+  const { t } = useTranslation();
   const auth = useAppStore(state => state.getAuth(provider));
   const isLoggedIn = useAppStore(state => state.isLoggedIn(provider));
   const setAuth = useAppStore(state => state.setAuth);
@@ -66,7 +68,7 @@ export function ProviderCard({ provider, mode, disabled, selected, onClick }: Pr
             <div>
               <h3 className="font-bold text-lg">{getProviderName(provider)}</h3>
               <p className="text-sm text-text-muted">
-                {mode === 'source' ? 'Serwis źródłowy' : 'Serwis docelowy'}
+                {mode === 'source' ? t('provider.sourceService') : t('provider.targetService')}
               </p>
             </div>
           </div>
@@ -96,13 +98,13 @@ export function ProviderCard({ provider, mode, disabled, selected, onClick }: Pr
                 </div>
               )}
               <span className="text-sm font-medium">
-                {auth?.user.name || (provider === 'deezer' ? 'Deezer (ARL)' : 'Zalogowany')}
+                {auth?.user.name || (provider === 'deezer' ? 'Deezer (ARL)' : t('provider.loggedIn'))}
               </span>
             </div>
             <button
               onClick={handleLogout}
               className="p-1.5 rounded-md hover:bg-surface transition-colors text-text-muted hover:text-error"
-              title="Wyloguj"
+              title={t('provider.logout')}
             >
               <LogOut className="w-4 h-4" />
             </button>
@@ -110,7 +112,7 @@ export function ProviderCard({ provider, mode, disabled, selected, onClick }: Pr
         ) : (
           <div className="p-3 bg-surface-hover rounded-md text-center">
             <p className="text-sm text-text-muted">
-              Kliknij aby się zalogować
+              {t('provider.clickToLogin')}
             </p>
           </div>
         )}

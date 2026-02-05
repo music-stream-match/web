@@ -1,0 +1,98 @@
+{
+  "app": {
+    "name": "Music Stream Match",
+    "tagline": "Übertragen Sie Playlists zwischen Streaming-Diensten"
+  },
+  "common": {
+    "back": "Zurück",
+    "close": "Schließen",
+    "cancel": "Abbrechen",
+    "continue": "Weiter",
+    "loading": "Laden...",
+    "checking": "Prüfen...",
+    "tryAgain": "Erneut versuchen",
+    "from": "Von",
+    "to": "Nach"
+  },
+  "home": {
+    "step": {
+      "source": "Quelle",
+      "target": "Ziel",
+      "import": "Import"
+    },
+    "selectSourceService": "Quelldienst auswählen",
+    "selectTargetService": "Zieldienst auswählen",
+    "selectedPlaylist": "Ausgewählte Playlist: <strong>{{name}}</strong> von {{provider}}",
+    "readyToImport": "Bereit zum Import",
+    "playlist": "Playlist",
+    "tracks": "{{count}} Songs",
+    "startOver": "Neu starten",
+    "startImport": "Import starten"
+  },
+  "playlists": {
+    "title": "Wählen Sie eine Playlist von {{provider}}",
+    "found": "{{count}} Playlists gefunden",
+    "loading": "Playlists werden geladen...",
+    "search": "Playlists suchen...",
+    "notFound": "Keine Playlists gefunden",
+    "author": "Autor: {{name}}"
+  },
+  "import": {
+    "title": "Playlist importieren",
+    "sourcePlaylist": "Quell-Playlist",
+    "targetPlaylist": "Ziel-Playlist",
+    "playlistName": "Playlist-Name",
+    "enterPlaylistName": "Playlist-Namen eingeben...",
+    "playlistExists": "Eine Playlist mit diesem Namen existiert bereits",
+    "playlistExistsHint": "Songs werden zur bestehenden Playlist hinzugefügt ({{count}} Songs)",
+    "allowDuplicates": "Duplikate erlauben",
+    "startImport": "Import starten",
+    "importing": "Playlist wird importiert...",
+    "transferringTracks": "Songs werden zum Zieldienst übertragen",
+    "imported": "Importiert",
+    "skipped": "Übersprungen",
+    "duplicates": "Duplikate",
+    "time": "Zeit"
+  },
+  "result": {
+    "title": "Import abgeschlossen!",
+    "sourcePlaylist": "Quell-Playlist ({{provider}})",
+    "targetPlaylist": "Ziel-Playlist ({{provider}})",
+    "skippedTracks": "Übersprungene Songs:",
+    "openPlaylist": "Playlist öffnen"
+  },
+  "invitation": {
+    "tagline": "Übertragen Sie Ihre Playlists zwischen Streaming-Diensten",
+    "title": "Einladungscode",
+    "description": "Geben Sie den Code ein, um Zugang zu erhalten",
+    "placeholder": "Geben Sie Ihren Code ein",
+    "label": "Einladungscode",
+    "error": "Bitte geben Sie einen Einladungscode ein",
+    "invalid": "Ungültiger Einladungscode. Überprüfen Sie den Code und versuchen Sie es erneut.",
+    "noCode": "Kein Einladungscode? Kontaktieren Sie den Administrator."
+  },
+  "provider": {
+    "sourceService": "Quelldienst",
+    "targetService": "Zieldienst",
+    "clickToLogin": "Klicken Sie zum Anmelden",
+    "loggedIn": "Angemeldet",
+    "logout": "Abmelden"
+  },
+  "deezer": {
+    "title": "Bei Deezer anmelden",
+    "arlLabel": "ARL (Authentication Reference Link)",
+    "arlPlaceholder": "ARL-Cookie-Wert eingeben...",
+    "enterArl": "Bitte ARL eingeben",
+    "loginFailed": "Anmeldung fehlgeschlagen",
+    "login": "Anmelden",
+    "loggingIn": "Anmeldung...",
+    "help": {
+      "title": "So erhalten Sie den ARL:",
+      "step1": "Melden Sie sich bei <link>deezer.com</link> an",
+      "step2": "Öffnen Sie die Entwicklertools (F12)",
+      "step3": "Gehen Sie zu Application → Cookies",
+      "step4": "Finden Sie das Cookie namens \"arl\"",
+      "step5": "Kopieren Sie dessen Wert"
+    }
+  }
+}

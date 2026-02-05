@@ -3,6 +3,7 @@ import { Modal, Button } from '@/components/ui';
 import { CheckCircle, SkipForward, Clock, ExternalLink, Music, Copy } from 'lucide-react';
 import { formatDuration, getProviderName } from '@/lib/utils';
 import { providerService } from '@/services/api';
+import { useTranslation } from '@/i18n/useTranslation';
 
 interface ImportResultModalProps {
   result: ImportResult | null;
@@ -10,6 +11,8 @@ interface ImportResultModalProps {
 }
 
 export function ImportResultModal({ result, onClose }: ImportResultModalProps) {
+  const { t } = useTranslation();
+
   if (!result) return null;
 
   const sourceUrl = providerService.getPlaylistUrl(result.sourceProvider, result.sourcePlaylist.id);
@@ -18,7 +21,7 @@ export function ImportResultModal({ result, onClose }: ImportResultModalProps) {
     : '#';
 
   return (
-    <Modal isOpen={!!result} onClose={onClose} title="Import zakończony!">
+    <Modal isOpen={!!result} onClose={onClose} title={t('result.title')}>
       <div className="space-y-6">
         {/* Success icon */}
         <div className="flex justify-center">
@@ -30,7 +33,7 @@ export function ImportResultModal({ result, onClose }: ImportResultModalProps) {
         {/* Playlists info */}
         <div className="space-y-3">
           <div className="p-3 bg-surface-hover rounded-md">
-            <p className="text-xs text-text-muted mb-1">Playlista źródłowa ({getProviderName(result.sourceProvider)})</p>
+            <p className="text-xs text-text-muted mb-1">{t('result.sourcePlaylist', { provider: getProviderName(result.sourceProvider) })}</p>
             <a
               href={sourceUrl}
               target="_blank"
@@ -44,7 +47,7 @@ export function ImportResultModal({ result, onClose }: ImportResultModalProps) {
           </div>
 
           <div className="p-3 bg-surface-hover rounded-md">
-            <p className="text-xs text-text-muted mb-1">Playlista docelowa ({getProviderName(result.targetProvider)})</p>
+            <p className="text-xs text-text-muted mb-1">{t('result.targetPlaylist', { provider: getProviderName(result.targetProvider) })}</p>
             <a
               href={targetUrl}
               target="_blank"
@@ -63,34 +66,34 @@ export function ImportResultModal({ result, onClose }: ImportResultModalProps) {
           <div className="text-center p-3 bg-success/10 rounded-md">
             <CheckCircle className="w-5 h-5 text-success mx-auto mb-1" />
             <p className="text-2xl font-bold text-success">{result.imported}</p>
-            <p className="text-xs text-text-muted">Zaimportowane</p>
+            <p className="text-xs text-text-muted">{t('import.imported')}</p>
           </div>
 
           <div className="text-center p-3 bg-warning/10 rounded-md">
             <SkipForward className="w-5 h-5 text-warning mx-auto mb-1" />
             <p className="text-2xl font-bold text-warning">{result.skipped}</p>
-            <p className="text-xs text-text-muted">Pominięte</p>
+            <p className="text-xs text-text-muted">{t('import.skipped')}</p>
           </div>
 
           {result.duplicatesSkipped ? (
             <div className="text-center p-3 bg-text-muted/10 rounded-md">
               <Copy className="w-5 h-5 text-text-muted mx-auto mb-1" />
               <p className="text-2xl font-bold text-text-muted">{result.duplicatesSkipped}</p>
-              <p className="text-xs text-text-muted">Duplikaty</p>
+              <p className="text-xs text-text-muted">{t('import.duplicates')}</p>
             </div>
           ) : null}
 
           <div className="text-center p-3 bg-primary/10 rounded-md">
             <Clock className="w-5 h-5 text-primary mx-auto mb-1" />
             <p className="text-2xl font-bold text-primary">{formatDuration(result.duration)}</p>
-            <p className="text-xs text-text-muted">Czas</p>
+            <p className="text-xs text-text-muted">{t('import.time')}</p>
           </div>
         </div>
 
         {/* Skipped tracks */}
         {result.skippedTracks.length > 0 && (
           <div className="space-y-2">
-            <p className="text-sm font-medium">Pominięte utwory:</p>
+            <p className="text-sm font-medium">{t('result.skippedTracks')}</p>
             <div className="max-h-40 overflow-y-auto space-y-1">
               {result.skippedTracks.map((track, index) => (
                 <div
@@ -108,14 +111,14 @@ export function ImportResultModal({ result, onClose }: ImportResultModalProps) {
         {/* Actions */}
         <div className="flex gap-3">
           <Button variant="secondary" onClick={onClose} className="flex-1">
-            Zamknij
+            {t('common.close')}
           </Button>
           <Button
             variant="primary"
             onClick={() => window.open(targetUrl, '_blank')}
             className="flex-1"
           >
-            Otwórz playlistę
+            {t('result.openPlaylist')}
           </Button>
         </div>
       </div>

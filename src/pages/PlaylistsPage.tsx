@@ -8,9 +8,12 @@ import { PlaylistCard } from '@/components/PlaylistCard';
 import { Button } from '@/components/ui';
 import { ArrowLeft, Loader2, Search } from 'lucide-react';
 import { getProviderName } from '@/lib/utils';
+import { useTranslation } from '@/i18n/useTranslation';
+import { LanguageSelector } from '@/components/LanguageSelector';
 
 export function PlaylistsPage() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { sourceProvider, getAuth, setSelectedPlaylist, selectedPlaylist, isLoggedIn } = useAppStore();
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
   const [loading, setLoading] = useState(true);
@@ -74,27 +77,32 @@ export function PlaylistsPage() {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="w-8 h-8 animate-spin text-primary mx-auto mb-4" />
-          <p className="text-text-muted">Ładowanie playlist...</p>
+          <p className="text-text-muted">{t('playlists.loading')}</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen p-6">
+    <div className="min-h-screen p-6 relative">
+      {/* Language selector */}
+      <div className="absolute top-4 right-4">
+        <LanguageSelector />
+      </div>
+
       <div className="max-w-2xl mx-auto">
         {/* Header */}
         <div className="mb-6">
           <Button variant="ghost" onClick={() => navigate('/')} className="mb-4">
             <ArrowLeft className="w-4 h-4" />
-            Powrót
+            {t('common.back')}
           </Button>
 
           <h1 className="text-2xl font-bold">
-            Wybierz playlistę z {sourceProvider && getProviderName(sourceProvider)}
+            {t('playlists.title', { provider: sourceProvider ? getProviderName(sourceProvider) : '' })}
           </h1>
           <p className="text-text-muted mt-1">
-            Znaleziono {playlists.length} playlist
+            {t('playlists.found', { count: playlists.length })}
           </p>
         </div>
 
@@ -103,7 +111,7 @@ export function PlaylistsPage() {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
           <input
             type="text"
-            placeholder="Szukaj playlisty..."
+            placeholder={t('playlists.search')}
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
             className="input pl-10"
@@ -115,7 +123,7 @@ export function PlaylistsPage() {
           <div className="p-4 bg-error/10 border border-error rounded-md mb-6">
             <p className="text-error">{error}</p>
             <Button variant="secondary" onClick={fetchPlaylists} className="mt-2">
-              Spróbuj ponownie
+              {t('common.tryAgain')}
             </Button>
           </div>
         )}
@@ -133,7 +141,7 @@ export function PlaylistsPage() {
 
           {filteredPlaylists.length === 0 && !loading && (
             <div className="text-center py-12 text-text-muted">
-              <p>Nie znaleziono żadnych playlist</p>
+              <p>{t('playlists.notFound')}</p>
             </div>
           )}
         </div>

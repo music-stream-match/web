@@ -1,18 +1,21 @@
 import type { ImportProgress as ImportProgressType } from '@/types';
 import { ProgressBar, Card } from '@/components/ui';
 import { Music, SkipForward, CheckCircle, Copy } from 'lucide-react';
+import { useTranslation } from '@/i18n/useTranslation';
 
 interface ImportProgressProps {
   progress: ImportProgressType;
 }
 
 export function ImportProgress({ progress }: ImportProgressProps) {
+  const { t } = useTranslation();
+
   return (
     <Card className="space-y-4">
       <div className="text-center">
-        <h3 className="text-lg font-semibold mb-2">Importowanie playlisty...</h3>
+        <h3 className="text-lg font-semibold mb-2">{t('import.importing')}</h3>
         <p className="text-text-muted">
-          Przenoszenie utworów do docelowego serwisu
+          {t('import.transferringTracks')}
         </p>
       </div>
 
@@ -37,7 +40,7 @@ export function ImportProgress({ progress }: ImportProgressProps) {
         <div className="flex items-center gap-2 p-3 bg-success/10 rounded-md">
           <CheckCircle className="w-5 h-5 text-success" />
           <div>
-            <p className="text-sm text-text-muted">Zaimportowane</p>
+            <p className="text-sm text-text-muted">{t('import.imported')}</p>
             <p className="font-bold text-success">{progress.imported}</p>
           </div>
         </div>
@@ -45,7 +48,7 @@ export function ImportProgress({ progress }: ImportProgressProps) {
         <div className="flex items-center gap-2 p-3 bg-warning/10 rounded-md">
           <SkipForward className="w-5 h-5 text-warning" />
           <div>
-            <p className="text-sm text-text-muted">Pominięte</p>
+            <p className="text-sm text-text-muted">{t('import.skipped')}</p>
             <p className="font-bold text-warning">{progress.skipped}</p>
           </div>
         </div>
@@ -54,7 +57,7 @@ export function ImportProgress({ progress }: ImportProgressProps) {
           <div className="flex items-center gap-2 p-3 bg-text-muted/10 rounded-md">
             <Copy className="w-5 h-5 text-text-muted" />
             <div>
-              <p className="text-sm text-text-muted">Duplikaty</p>
+              <p className="text-sm text-text-muted">{t('import.duplicates')}</p>
               <p className="font-bold text-text-muted">{progress.duplicatesSkipped}</p>
             </div>
           </div>

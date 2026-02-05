@@ -9,10 +9,13 @@ import { ImportResultModal } from '@/components/ImportResultModal';
 import { Button, Input, Card } from '@/components/ui';
 import { ArrowLeft, AlertCircle, Play } from 'lucide-react';
 import { getProviderName } from '@/lib/utils';
+import { useTranslation } from '@/i18n/useTranslation';
+import { LanguageSelector } from '@/components/LanguageSelector';
 import type { Playlist } from '@/types';
 
 export function ImportPage() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const {
     sourceProvider,
     targetProvider,
@@ -141,7 +144,12 @@ export function ImportPage() {
   }
 
   return (
-    <div className="min-h-screen p-6">
+    <div className="min-h-screen p-6 relative">
+      {/* Language selector */}
+      <div className="absolute top-4 right-4">
+        <LanguageSelector />
+      </div>
+
       <div className="max-w-2xl mx-auto">
         {/* Header */}
         <div className="mb-6">
@@ -152,10 +160,10 @@ export function ImportPage() {
             className="mb-4"
           >
             <ArrowLeft className="w-4 h-4" />
-            Powrót
+            {t('common.back')}
           </Button>
 
-          <h1 className="text-2xl font-bold">Import playlisty</h1>
+          <h1 className="text-2xl font-bold">{t('import.title')}</h1>
           <p className="text-text-muted mt-1">
             {getProviderName(sourceProvider)} → {getProviderName(targetProvider)}
           </p>
@@ -171,7 +179,7 @@ export function ImportPage() {
           <div className="space-y-6">
             {/* Source playlist info */}
             <Card>
-              <h3 className="font-semibold mb-2">Playlista źródłowa</h3>
+              <h3 className="font-semibold mb-2">{t('import.sourcePlaylist')}</h3>
               <div className="flex items-center gap-4">
                 {selectedPlaylist.imageUrl && (
                   <img
@@ -182,24 +190,24 @@ export function ImportPage() {
                 )}
                 <div>
                   <p className="font-medium">{selectedPlaylist.name}</p>
-                  <p className="text-sm text-text-muted">{selectedPlaylist.trackCount} utworów</p>
+                  <p className="text-sm text-text-muted">{t('home.tracks', { count: selectedPlaylist.trackCount })}</p>
                 </div>
               </div>
             </Card>
 
             {/* Target playlist name */}
             <Card>
-              <h3 className="font-semibold mb-4">Playlista docelowa</h3>
+              <h3 className="font-semibold mb-4">{t('import.targetPlaylist')}</h3>
 
               <Input
-                label="Nazwa playlisty"
+                label={t('import.playlistName')}
                 value={targetPlaylistName}
                 onChange={e => handleNameChange(e.target.value)}
-                placeholder="Wprowadź nazwę playlisty..."
+                placeholder={t('import.enterPlaylistName')}
               />
 
               {checkingExisting && (
-                <p className="text-sm text-text-muted mt-2">Sprawdzanie...</p>
+                <p className="text-sm text-text-muted mt-2">{t('common.checking')}</p>
               )}
 
               {existingPlaylist && !checkingExisting && (
@@ -207,10 +215,10 @@ export function ImportPage() {
                   <AlertCircle className="w-5 h-5 text-warning flex-shrink-0 mt-0.5" />
                   <div>
                     <p className="text-sm font-medium text-warning">
-                      Playlista o tej nazwie już istnieje
+                      {t('import.playlistExists')}
                     </p>
                     <p className="text-xs text-text-muted mt-1">
-                      Utwory zostaną dodane do istniejącej playlisty ({existingPlaylist.trackCount} utworów)
+                      {t('import.playlistExistsHint', { count: existingPlaylist.trackCount })}
                     </p>
                   </div>
                 </div>
@@ -224,7 +232,7 @@ export function ImportPage() {
                   onChange={e => setAllowDuplicates(e.target.checked)}
                   className="w-4 h-4 rounded border-border text-primary focus:ring-primary focus:ring-offset-0"
                 />
-                <span className="text-sm">Pozwól na duplikaty utworów</span>
+                <span className="text-sm">{t('import.allowDuplicates')}</span>
               </label>
             </Card>
 
@@ -237,7 +245,7 @@ export function ImportPage() {
               className="w-full"
             >
               <Play className="w-5 h-5" />
-              Rozpocznij import
+              {t('import.startImport')}
             </Button>
           </div>
         )}

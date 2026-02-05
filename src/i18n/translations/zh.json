@@ -1,0 +1,98 @@
+{
+  "app": {
+    "name": "Music Stream Match",
+    "tagline": "在流媒体服务之间转移播放列表"
+  },
+  "common": {
+    "back": "返回",
+    "close": "关闭",
+    "cancel": "取消",
+    "continue": "继续",
+    "loading": "加载中...",
+    "checking": "检查中...",
+    "tryAgain": "重试",
+    "from": "从",
+    "to": "到"
+  },
+  "home": {
+    "step": {
+      "source": "来源",
+      "target": "目标",
+      "import": "导入"
+    },
+    "selectSourceService": "选择来源服务",
+    "selectTargetService": "选择目标服务",
+    "selectedPlaylist": "已选播放列表: <strong>{{name}}</strong> 来自 {{provider}}",
+    "readyToImport": "准备导入",
+    "playlist": "播放列表",
+    "tracks": "{{count}} 首歌曲",
+    "startOver": "重新开始",
+    "startImport": "开始导入"
+  },
+  "playlists": {
+    "title": "从 {{provider}} 选择播放列表",
+    "found": "找到 {{count}} 个播放列表",
+    "loading": "正在加载播放列表...",
+    "search": "搜索播放列表...",
+    "notFound": "未找到播放列表",
+    "author": "作者: {{name}}"
+  },
+  "import": {
+    "title": "导入播放列表",
+    "sourcePlaylist": "来源播放列表",
+    "targetPlaylist": "目标播放列表",
+    "playlistName": "播放列表名称",
+    "enterPlaylistName": "输入播放列表名称...",
+    "playlistExists": "同名播放列表已存在",
+    "playlistExistsHint": "歌曲将添加到现有播放列表 ({{count}} 首歌曲)",
+    "allowDuplicates": "允许重复歌曲",
+    "startImport": "开始导入",
+    "importing": "正在导入播放列表...",
+    "transferringTracks": "正在将歌曲转移到目标服务",
+    "imported": "已导入",
+    "skipped": "已跳过",
+    "duplicates": "重复",
+    "time": "时间"
+  },
+  "result": {
+    "title": "导入完成！",
+    "sourcePlaylist": "来源播放列表 ({{provider}})",
+    "targetPlaylist": "目标播放列表 ({{provider}})",
+    "skippedTracks": "已跳过的歌曲:",
+    "openPlaylist": "打开播放列表"
+  },
+  "invitation": {
+    "tagline": "在流媒体服务之间转移您的播放列表",
+    "title": "邀请码",
+    "description": "输入邀请码以获取访问权限",
+    "placeholder": "输入您的邀请码",
+    "label": "邀请码",
+    "error": "请输入邀请码",
+    "invalid": "邀请码无效。请检查并重试。",
+    "noCode": "没有邀请码？请联系管理员。"
+  },
+  "provider": {
+    "sourceService": "来源服务",
+    "targetService": "目标服务",
+    "clickToLogin": "点击登录",
+    "loggedIn": "已登录",
+    "logout": "退出登录"
+  },
+  "deezer": {
+    "title": "登录 Deezer",
+    "arlLabel": "ARL (身份验证参考链接)",
+    "arlPlaceholder": "输入 ARL cookie 值...",
+    "enterArl": "请输入 ARL",
+    "loginFailed": "登录失败",
+    "login": "登录",
+    "loggingIn": "登录中...",
+    "help": {
+      "title": "如何获取 ARL:",
+      "step1": "登录 <link>deezer.com</link>",
+      "step2": "打开开发者工具 (F12)",
+      "step3": "转到 Application → Cookies 选项卡",
+      "step4": "找到名为 \"arl\" 的 cookie",
+      "step5": "复制其值"
+    }
+  }
+}

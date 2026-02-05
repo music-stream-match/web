@@ -4,6 +4,7 @@ import { useAppStore } from '@/store/useAppStore';
 import { deezerService } from '@/services/api';
 import { analytics } from '@/lib/analytics';
 import { AlertCircle, HelpCircle } from 'lucide-react';
+import { useTranslation } from '@/i18n/useTranslation';
 
 interface DeezerArlModalProps {
   isOpen: boolean;
@@ -12,6 +13,7 @@ interface DeezerArlModalProps {
 }
 
 export function DeezerArlModal({ isOpen, onClose, onSuccess }: DeezerArlModalProps) {
+  const { t } = useTranslation();
   const [arl, setArl] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -24,7 +26,7 @@ export function DeezerArlModal({ isOpen, onClose, onSuccess }: DeezerArlModalPro
     e.preventDefault();
     
     if (!arl.trim()) {
-      setError('Proszę wprowadzić ARL');
+      setError(t('deezer.enterArl'));
       return;
     }
 
@@ -46,7 +48,7 @@ export function DeezerArlModal({ isOpen, onClose, onSuccess }: DeezerArlModalPro
       analytics.loginSuccessful('deezer');
       onSuccess();
     } catch (err) {
-      const errorMsg = err instanceof Error ? err.message : 'Nie udało się zalogować';
+      const errorMsg = err instanceof Error ? err.message : t('deezer.loginFailed');
       console.error('[DeezerArlModal] Error:', err);
       analytics.loginFailed('deezer', errorMsg);
       setError(errorMsg);
@@ -63,11 +65,11 @@ export function DeezerArlModal({ isOpen, onClose, onSuccess }: DeezerArlModalPro
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={handleClose} title="Zaloguj się do Deezer">
+    <Modal isOpen={isOpen} onClose={handleClose} title={t('deezer.title')}>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="space-y-2">
           <div className="flex items-center justify-between">
-            <label className="text-sm font-medium">ARL (Authentication Reference Link)</label>
+            <label className="text-sm font-medium">{t('deezer.arlLabel')}</label>
             <button
               type="button"
               onClick={() => setShowHelp(!showHelp)}
@@ -79,13 +81,13 @@ export function DeezerArlModal({ isOpen, onClose, onSuccess }: DeezerArlModalPro
           
           {showHelp && (
             <div className="p-3 bg-surface-hover rounded-md text-sm text-text-muted space-y-2">
-              <p className="font-medium text-text">Jak uzyskać ARL:</p>
+              <p className="font-medium text-text">{t('deezer.help.title')}</p>
               <ol className="list-decimal list-inside space-y-1">
-                <li>Zaloguj się na <a href="https://www.deezer.com" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">deezer.com</a></li>
-                <li>Otwórz narzędzia deweloperskie (F12)</li>
-                <li>Przejdź do zakładki Application → Cookies</li>
-                <li>Znajdź cookie o nazwie "arl"</li>
-                <li>Skopiuj jego wartość</li>
+                <li>{t('deezer.help.step1').replace('<link>', '').replace('</link>', '')} <a href="https://www.deezer.com" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">deezer.com</a></li>
+                <li>{t('deezer.help.step2')}</li>
+                <li>{t('deezer.help.step3')}</li>
+                <li>{t('deezer.help.step4')}</li>
+                <li>{t('deezer.help.step5')}</li>
               </ol>
             </div>
           )}
@@ -94,7 +96,7 @@ export function DeezerArlModal({ isOpen, onClose, onSuccess }: DeezerArlModalPro
             type="password"
             value={arl}
             onChange={(e) => setArl(e.target.value)}
-            placeholder="Wprowadź wartość cookie ARL..."
+            placeholder={t('deezer.arlPlaceholder')}
             className="font-mono text-sm"
             disabled={isLoading}
           />
@@ -115,7 +117,7 @@ export function DeezerArlModal({ isOpen, onClose, onSuccess }: DeezerArlModalPro
             disabled={isLoading}
             className="flex-1"
           >
-            Anuluj
+            {t('common.cancel')}
           </Button>
           <Button
             type="submit"
@@ -123,7 +125,7 @@ export function DeezerArlModal({ isOpen, onClose, onSuccess }: DeezerArlModalPro
             disabled={isLoading || !arl.trim()}
             className="flex-1"
           >
-            {isLoading ? 'Logowanie...' : 'Zaloguj'}
+            {isLoading ? t('deezer.loggingIn') : t('deezer.login')}
           </Button>
         </div>
       </form>

@@ -1,0 +1,98 @@
+{
+  "app": {
+    "name": "Music Stream Match",
+    "tagline": "স্ট্রিমিং পরিষেবাগুলির মধ্যে প্লেলিস্ট স্থানান্তর করুন"
+  },
+  "common": {
+    "back": "ফিরে যান",
+    "close": "বন্ধ করুন",
+    "cancel": "বাতিল",
+    "continue": "চালিয়ে যান",
+    "loading": "লোড হচ্ছে...",
+    "checking": "যাচাই করা হচ্ছে...",
+    "tryAgain": "আবার চেষ্টা করুন",
+    "from": "থেকে",
+    "to": "তে"
+  },
+  "home": {
+    "step": {
+      "source": "উৎস",
+      "target": "লক্ষ্য",
+      "import": "আমদানি"
+    },
+    "selectSourceService": "উৎস পরিষেবা নির্বাচন করুন",
+    "selectTargetService": "লক্ষ্য পরিষেবা নির্বাচন করুন",
+    "selectedPlaylist": "নির্বাচিত প্লেলিস্ট: <strong>{{name}}</strong> {{provider}} থেকে",
+    "readyToImport": "আমদানির জন্য প্রস্তুত",
+    "playlist": "প্লেলিস্ট",
+    "tracks": "{{count}} গান",
+    "startOver": "আবার শুরু করুন",
+    "startImport": "আমদানি শুরু করুন"
+  },
+  "playlists": {
+    "title": "{{provider}} থেকে একটি প্লেলিস্ট নির্বাচন করুন",
+    "found": "{{count}}টি প্লেলিস্ট পাওয়া গেছে",
+    "loading": "প্লেলিস্ট লোড হচ্ছে...",
+    "search": "প্লেলিস্ট খুঁজুন...",
+    "notFound": "কোনো প্লেলিস্ট পাওয়া যায়নি",
+    "author": "লেখক: {{name}}"
+  },
+  "import": {
+    "title": "প্লেলিস্ট আমদানি",
+    "sourcePlaylist": "উৎস প্লেলিস্ট",
+    "targetPlaylist": "লক্ষ্য প্লেলিস্ট",
+    "playlistName": "প্লেলিস্টের নাম",
+    "enterPlaylistName": "প্লেলিস্টের নাম লিখুন...",
+    "playlistExists": "এই নামে একটি প্লেলিস্ট ইতিমধ্যে বিদ্যমান",
+    "playlistExistsHint": "গানগুলি বিদ্যমান প্লেলিস্টে যোগ করা হবে ({{count}} গান)",
+    "allowDuplicates": "ডুপ্লিকেট গানের অনুমতি দিন",
+    "startImport": "আমদানি শুরু করুন",
+    "importing": "প্লেলিস্ট আমদানি হচ্ছে...",
+    "transferringTracks": "লক্ষ্য পরিষেবায় গান স্থানান্তর হচ্ছে",
+    "imported": "আমদানিকৃত",
+    "skipped": "বাদ দেওয়া",
+    "duplicates": "ডুপ্লিকেট",
+    "time": "সময়"
+  },
+  "result": {
+    "title": "আমদানি সম্পন্ন!",
+    "sourcePlaylist": "উৎস প্লেলিস্ট ({{provider}})",
+    "targetPlaylist": "লক্ষ্য প্লেলিস্ট ({{provider}})",
+    "skippedTracks": "বাদ দেওয়া গান:",
+    "openPlaylist": "প্লেলিস্ট খুলুন"
+  },
+  "invitation": {
+    "tagline": "স্ট্রিমিং পরিষেবাগুলির মধ্যে আপনার প্লেলিস্ট স্থানান্তর করুন",
+    "title": "আমন্ত্রণ কোড",
+    "description": "অ্যাক্সেস পেতে কোড লিখুন",
+    "placeholder": "আপনার কোড লিখুন",
+    "label": "আমন্ত্রণ কোড",
+    "error": "অনুগ্রহ করে একটি আমন্ত্রণ কোড লিখুন",
+    "invalid": "অবৈধ আমন্ত্রণ কোড। কোড পরীক্ষা করে আবার চেষ্টা করুন।",
+    "noCode": "আমন্ত্রণ কোড নেই? প্রশাসকের সাথে যোগাযোগ করুন।"
+  },
+  "provider": {
+    "sourceService": "উৎস পরিষেবা",
+    "targetService": "লক্ষ্য পরিষেবা",
+    "clickToLogin": "লগইন করতে ক্লিক করুন",
+    "loggedIn": "লগইন করা হয়েছে",
+    "logout": "লগআউট"
+  },
+  "deezer": {
+    "title": "Deezer-এ লগইন করুন",
+    "arlLabel": "ARL (অথেন্টিকেশন রেফারেন্স লিংক)",
+    "arlPlaceholder": "ARL কুকি মান লিখুন...",
+    "enterArl": "অনুগ্রহ করে ARL লিখুন",
+    "loginFailed": "লগইন ব্যর্থ",
+    "login": "লগইন",
+    "loggingIn": "লগইন হচ্ছে...",
+    "help": {
+      "title": "কিভাবে ARL পাবেন:",
+      "step1": "<link>deezer.com</link>-এ লগইন করুন",
+      "step2": "ডেভেলপার টুলস খুলুন (F12)",
+      "step3": "Application → Cookies ট্যাবে যান",
+      "step4": "\"arl\" নামের কুকি খুঁজুন",
+      "step5": "এর মান কপি করুন"
+    }
+  }
+}

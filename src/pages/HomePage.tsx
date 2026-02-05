@@ -9,9 +9,12 @@ import { providerService } from '@/services/api';
 import { analytics } from '@/lib/analytics';
 import { ArrowRight, Music2, RefreshCw } from 'lucide-react';
 import { getProviderName } from '@/lib/utils';
+import { useTranslation } from '@/i18n/useTranslation';
+import { LanguageSelector } from '@/components/LanguageSelector';
 
 export function HomePage() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const {
     sourceProvider,
     targetProvider,
@@ -111,7 +114,12 @@ export function HomePage() {
   const providers: Provider[] = ['tidal', 'spotify', 'deezer'];
 
   return (
-    <div className="min-h-screen p-6">
+    <div className="min-h-screen p-6 relative">
+      {/* Language selector */}
+      <div className="absolute top-4 right-4">
+        <LanguageSelector />
+      </div>
+
       <div className="max-w-2xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
@@ -120,9 +128,9 @@ export function HomePage() {
               <Music2 className="w-8 h-8 text-primary" />
             </div>
           </div>
-          <h1 className="text-3xl font-bold mb-2">Music Stream Match</h1>
+          <h1 className="text-3xl font-bold mb-2">{t('app.name')}</h1>
           <p className="text-text-muted">
-            Przenoś playlisty między serwisami streamingowymi
+            {t('app.tagline')}
           </p>
         </div>
 
@@ -130,21 +138,21 @@ export function HomePage() {
         <div className="flex items-center justify-center gap-2 mb-8">
           <StepIndicator
             number={1}
-            label="Źródło"
+            label={t('home.step.source')}
             active={step === 'source'}
             completed={!!sourceProvider && !!selectedPlaylist}
           />
           <div className="w-8 h-px bg-border" />
           <StepIndicator
             number={2}
-            label="Cel"
+            label={t('home.step.target')}
             active={step === 'target'}
             completed={!!targetProvider}
           />
           <div className="w-8 h-px bg-border" />
           <StepIndicator
             number={3}
-            label="Import"
+            label={t('home.step.import')}
             active={step === 'ready'}
             completed={false}
           />
@@ -154,7 +162,7 @@ export function HomePage() {
         {step === 'source' && (
           <div className="space-y-4">
             <h2 className="text-xl font-semibold text-center mb-6">
-              Wybierz serwis źródłowy
+              {t('home.selectSourceService')}
             </h2>
             <div className="grid gap-4 md:grid-cols-3">
               {providers.map(provider => (
@@ -174,12 +182,12 @@ export function HomePage() {
         {step === 'target' && (
           <div className="space-y-4">
             <h2 className="text-xl font-semibold text-center mb-2">
-              Wybierz serwis docelowy
+              {t('home.selectTargetService')}
             </h2>
             {selectedPlaylist && (
-              <p className="text-center text-text-muted mb-6">
-                Wybrana playlista: <strong>{selectedPlaylist.name}</strong> z {getProviderName(sourceProvider!)}
-              </p>
+              <p className="text-center text-text-muted mb-6" dangerouslySetInnerHTML={{
+                __html: t('home.selectedPlaylist', { name: selectedPlaylist.name, provider: getProviderName(sourceProvider!) })
+              }} />
             )}
             <div className="grid gap-4 md:grid-cols-3">
               {providers.map(provider => (
@@ -200,13 +208,13 @@ export function HomePage() {
         {step === 'ready' && selectedPlaylist && sourceProvider && targetProvider && (
           <div className="space-y-6">
             <h2 className="text-xl font-semibold text-center mb-6">
-              Gotowy do importu
+              {t('home.readyToImport')}
             </h2>
 
             {/* Summary */}
             <div className="flex items-center justify-center gap-4">
               <div className="text-center">
-                <p className="text-sm text-text-muted mb-1">Z</p>
+                <p className="text-sm text-text-muted mb-1">{t('common.from')}</p>
                 <div className="px-4 py-2 bg-surface rounded-md">
                   <p className="font-medium">{getProviderName(sourceProvider)}</p>
                 </div>
@@ -215,7 +223,7 @@ export function HomePage() {
               <ArrowRight className="w-6 h-6 text-primary" />
 
               <div className="text-center">
-                <p className="text-sm text-text-muted mb-1">Do</p>
+                <p className="text-sm text-text-muted mb-1">{t('common.to')}</p>
                 <div className="px-4 py-2 bg-surface rounded-md">
                   <p className="font-medium">{getProviderName(targetProvider)}</p>
                 </div>
@@ -223,19 +231,19 @@ export function HomePage() {
             </div>
 
             <div className="p-4 bg-surface rounded-md text-center">
-              <p className="text-text-muted mb-1">Playlista</p>
+              <p className="text-text-muted mb-1">{t('home.playlist')}</p>
               <p className="text-lg font-semibold">{selectedPlaylist.name}</p>
-              <p className="text-sm text-text-muted">{selectedPlaylist.trackCount} utworów</p>
+              <p className="text-sm text-text-muted">{t('home.tracks', { count: selectedPlaylist.trackCount })}</p>
             </div>
 
             {/* Actions */}
             <div className="flex gap-3">
               <Button variant="secondary" onClick={handleReset} className="flex-1">
                 <RefreshCw className="w-4 h-4" />
-                Zacznij od nowa
+                {t('home.startOver')}
               </Button>
               <Button variant="primary" onClick={handleStartImport} className="flex-1">
-                Rozpocznij import
+                {t('home.startImport')}
                 <ArrowRight className="w-4 h-4" />
               </Button>
             </div>

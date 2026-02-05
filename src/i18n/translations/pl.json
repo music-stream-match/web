@@ -1,0 +1,98 @@
+{
+  "app": {
+    "name": "Music Stream Match",
+    "tagline": "Przenoś playlisty między serwisami streamingowymi"
+  },
+  "common": {
+    "back": "Powrót",
+    "close": "Zamknij",
+    "cancel": "Anuluj",
+    "continue": "Kontynuuj",
+    "loading": "Ładowanie...",
+    "checking": "Sprawdzanie...",
+    "tryAgain": "Spróbuj ponownie",
+    "from": "Z",
+    "to": "Do"
+  },
+  "home": {
+    "step": {
+      "source": "Źródło",
+      "target": "Cel",
+      "import": "Import"
+    },
+    "selectSourceService": "Wybierz serwis źródłowy",
+    "selectTargetService": "Wybierz serwis docelowy",
+    "selectedPlaylist": "Wybrana playlista: <strong>{{name}}</strong> z {{provider}}",
+    "readyToImport": "Gotowy do importu",
+    "playlist": "Playlista",
+    "tracks": "{{count}} utworów",
+    "startOver": "Zacznij od nowa",
+    "startImport": "Rozpocznij import"
+  },
+  "playlists": {
+    "title": "Wybierz playlistę z {{provider}}",
+    "found": "Znaleziono {{count}} playlist",
+    "loading": "Ładowanie playlist...",
+    "search": "Szukaj playlisty...",
+    "notFound": "Nie znaleziono żadnych playlist",
+    "author": "Autor: {{name}}"
+  },
+  "import": {
+    "title": "Import playlisty",
+    "sourcePlaylist": "Playlista źródłowa",
+    "targetPlaylist": "Playlista docelowa",
+    "playlistName": "Nazwa playlisty",
+    "enterPlaylistName": "Wprowadź nazwę playlisty...",
+    "playlistExists": "Playlista o tej nazwie już istnieje",
+    "playlistExistsHint": "Utwory zostaną dodane do istniejącej playlisty ({{count}} utworów)",
+    "allowDuplicates": "Pozwól na duplikaty utworów",
+    "startImport": "Rozpocznij import",
+    "importing": "Importowanie playlisty...",
+    "transferringTracks": "Przenoszenie utworów do docelowego serwisu",
+    "imported": "Zaimportowane",
+    "skipped": "Pominięte",
+    "duplicates": "Duplikaty",
+    "time": "Czas"
+  },
+  "result": {
+    "title": "Import zakończony!",
+    "sourcePlaylist": "Playlista źródłowa ({{provider}})",
+    "targetPlaylist": "Playlista docelowa ({{provider}})",
+    "skippedTracks": "Pominięte utwory:",
+    "openPlaylist": "Otwórz playlistę"
+  },
+  "invitation": {
+    "tagline": "Przenoś swoje playlisty między serwisami streamingowymi",
+    "title": "Kod zaproszenia",
+    "description": "Wprowadź kod, aby uzyskać dostęp",
+    "placeholder": "Wprowadź swój kod",
+    "label": "Kod zaproszenia",
+    "error": "Proszę wprowadzić kod zaproszenia",
+    "invalid": "Nieprawidłowy kod zaproszenia. Sprawdź kod i spróbuj ponownie.",
+    "noCode": "Nie masz kodu zaproszenia? Skontaktuj się z administratorem."
+  },
+  "provider": {
+    "sourceService": "Serwis źródłowy",
+    "targetService": "Serwis docelowy",
+    "clickToLogin": "Kliknij aby się zalogować",
+    "loggedIn": "Zalogowany",
+    "logout": "Wyloguj"
+  },
+  "deezer": {
+    "title": "Zaloguj się do Deezer",
+    "arlLabel": "ARL (Authentication Reference Link)",
+    "arlPlaceholder": "Wprowadź wartość cookie ARL...",
+    "enterArl": "Proszę wprowadzić ARL",
+    "loginFailed": "Nie udało się zalogować",
+    "login": "Zaloguj",
+    "loggingIn": "Logowanie...",
+    "help": {
+      "title": "Jak uzyskać ARL:",
+      "step1": "Zaloguj się na <link>deezer.com</link>",
+      "step2": "Otwórz narzędzia deweloperskie (F12)",
+      "step3": "Przejdź do zakładki Application → Cookies",
+      "step4": "Znajdź cookie o nazwie \"arl\"",
+      "step5": "Skopiuj jego wartość"
+    }
+  }
+}

@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, useNavigate, useLocation, Navigate } from
 import { HomePage, PlaylistsPage, ImportPage, CallbackPage, InvitationPage } from '@/pages';
 import { useAppStore } from '@/store/useAppStore';
 import { trackPageView } from '@/lib/analytics';
+import { DocumentHead } from '@/components/DocumentHead';
 
 // Base path for GitHub Pages deployment
 const basename = import.meta.env.BASE_URL || '/';
@@ -58,6 +59,7 @@ console.dir( {meta: import.meta.env})
 function App() {
   return (
     <BrowserRouter basename={basename}>
+      <DocumentHead />
       <RedirectHandler />
       <PageTracker />
       <Routes>

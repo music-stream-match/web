@@ -2,6 +2,7 @@ import type { Playlist } from '@/types';
 import { Card } from '@/components/ui';
 import { Music, Calendar, Check } from 'lucide-react';
 import { formatDate, cn } from '@/lib/utils';
+import { useTranslation } from '@/i18n/useTranslation';
 
 interface PlaylistCardProps {
   playlist: Playlist;
@@ -10,6 +11,8 @@ interface PlaylistCardProps {
 }
 
 export function PlaylistCard({ playlist, selected, onClick }: PlaylistCardProps) {
+  const { t } = useTranslation();
+
   return (
     <Card
       hover
@@ -48,7 +51,7 @@ export function PlaylistCard({ playlist, selected, onClick }: PlaylistCardProps)
 
           <div className="mt-1 space-y-1">
             <p className="text-sm text-text-muted">
-              {playlist.trackCount} utworów
+              {t('home.tracks', { count: playlist.trackCount })}
             </p>
 
             {playlist.createdAt && (
@@ -60,7 +63,7 @@ export function PlaylistCard({ playlist, selected, onClick }: PlaylistCardProps)
 
             {playlist.owner && (
               <p className="text-xs text-text-muted">
-                Autor: {playlist.owner}
+                {t('playlists.author', { name: playlist.owner })}
               </p>
             )}
           </div>

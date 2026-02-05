@@ -1,0 +1,98 @@
+{
+  "app": {
+    "name": "Music Stream Match",
+    "tagline": "Akış servisleri arasında çalma listeleri aktarın"
+  },
+  "common": {
+    "back": "Geri",
+    "close": "Kapat",
+    "cancel": "İptal",
+    "continue": "Devam",
+    "loading": "Yükleniyor...",
+    "checking": "Kontrol ediliyor...",
+    "tryAgain": "Tekrar dene",
+    "from": "Kaynak",
+    "to": "Hedef"
+  },
+  "home": {
+    "step": {
+      "source": "Kaynak",
+      "target": "Hedef",
+      "import": "İçe Aktar"
+    },
+    "selectSourceService": "Kaynak servisi seçin",
+    "selectTargetService": "Hedef servisi seçin",
+    "selectedPlaylist": "Seçilen çalma listesi: <strong>{{name}}</strong> ({{provider}} kaynağından)",
+    "readyToImport": "İçe aktarmaya hazır",
+    "playlist": "Çalma Listesi",
+    "tracks": "{{count}} şarkı",
+    "startOver": "Baştan başla",
+    "startImport": "İçe aktarmayı başlat"
+  },
+  "playlists": {
+    "title": "{{provider}} kaynağından çalma listesi seçin",
+    "found": "{{count}} çalma listesi bulundu",
+    "loading": "Çalma listeleri yükleniyor...",
+    "search": "Çalma listesi ara...",
+    "notFound": "Çalma listesi bulunamadı",
+    "author": "Yazar: {{name}}"
+  },
+  "import": {
+    "title": "Çalma listesi içe aktar",
+    "sourcePlaylist": "Kaynak çalma listesi",
+    "targetPlaylist": "Hedef çalma listesi",
+    "playlistName": "Çalma listesi adı",
+    "enterPlaylistName": "Çalma listesi adını girin...",
+    "playlistExists": "Bu isimde bir çalma listesi zaten var",
+    "playlistExistsHint": "Şarkılar mevcut çalma listesine eklenecek ({{count}} şarkı)",
+    "allowDuplicates": "Yinelenen şarkılara izin ver",
+    "startImport": "İçe aktarmayı başlat",
+    "importing": "Çalma listesi içe aktarılıyor...",
+    "transferringTracks": "Şarkılar hedef servise aktarılıyor",
+    "imported": "İçe aktarıldı",
+    "skipped": "Atlandı",
+    "duplicates": "Yinelenler",
+    "time": "Süre"
+  },
+  "result": {
+    "title": "İçe aktarma tamamlandı!",
+    "sourcePlaylist": "Kaynak çalma listesi ({{provider}})",
+    "targetPlaylist": "Hedef çalma listesi ({{provider}})",
+    "skippedTracks": "Atlanan şarkılar:",
+    "openPlaylist": "Çalma listesini aç"
+  },
+  "invitation": {
+    "tagline": "Akış servisleri arasında çalma listelerinizi aktarın",
+    "title": "Davet kodu",
+    "description": "Erişim için kodu girin",
+    "placeholder": "Kodunuzu girin",
+    "label": "Davet kodu",
+    "error": "Lütfen bir davet kodu girin",
+    "invalid": "Geçersiz davet kodu. Kodu kontrol edip tekrar deneyin.",
+    "noCode": "Davet kodunuz yok mu? Yönetici ile iletişime geçin."
+  },
+  "provider": {
+    "sourceService": "Kaynak servis",
+    "targetService": "Hedef servis",
+    "clickToLogin": "Giriş yapmak için tıklayın",
+    "loggedIn": "Giriş yapıldı",
+    "logout": "Çıkış yap"
+  },
+  "deezer": {
+    "title": "Deezer'a giriş yap",
+    "arlLabel": "ARL (Authentication Reference Link)",
+    "arlPlaceholder": "ARL çerez değerini girin...",
+    "enterArl": "Lütfen ARL'yi girin",
+    "loginFailed": "Giriş başarısız",
+    "login": "Giriş yap",
+    "loggingIn": "Giriş yapılıyor...",
+    "help": {
+      "title": "ARL nasıl alınır:",
+      "step1": "<link>deezer.com</link>'a giriş yapın",
+      "step2": "Geliştirici araçlarını açın (F12)",
+      "step3": "Application → Cookies sekmesine gidin",
+      "step4": "\"arl\" adlı çerezi bulun",
+      "step5": "Değerini kopyalayın"
+    }
+  }
+}

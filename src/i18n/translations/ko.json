@@ -1,0 +1,98 @@
+{
+  "app": {
+    "name": "Music Stream Match",
+    "tagline": "스트리밍 서비스 간 플레이리스트 전송"
+  },
+  "common": {
+    "back": "뒤로",
+    "close": "닫기",
+    "cancel": "취소",
+    "continue": "계속",
+    "loading": "로딩 중...",
+    "checking": "확인 중...",
+    "tryAgain": "다시 시도",
+    "from": "에서",
+    "to": "으로"
+  },
+  "home": {
+    "step": {
+      "source": "소스",
+      "target": "대상",
+      "import": "가져오기"
+    },
+    "selectSourceService": "소스 서비스 선택",
+    "selectTargetService": "대상 서비스 선택",
+    "selectedPlaylist": "선택한 플레이리스트: <strong>{{name}}</strong> ({{provider}}에서)",
+    "readyToImport": "가져오기 준비 완료",
+    "playlist": "플레이리스트",
+    "tracks": "{{count}}곡",
+    "startOver": "처음부터 다시",
+    "startImport": "가져오기 시작"
+  },
+  "playlists": {
+    "title": "{{provider}}에서 플레이리스트 선택",
+    "found": "{{count}}개의 플레이리스트 발견",
+    "loading": "플레이리스트 로딩 중...",
+    "search": "플레이리스트 검색...",
+    "notFound": "플레이리스트를 찾을 수 없습니다",
+    "author": "작성자: {{name}}"
+  },
+  "import": {
+    "title": "플레이리스트 가져오기",
+    "sourcePlaylist": "소스 플레이리스트",
+    "targetPlaylist": "대상 플레이리스트",
+    "playlistName": "플레이리스트 이름",
+    "enterPlaylistName": "플레이리스트 이름 입력...",
+    "playlistExists": "같은 이름의 플레이리스트가 이미 존재합니다",
+    "playlistExistsHint": "곡이 기존 플레이리스트에 추가됩니다 ({{count}}곡)",
+    "allowDuplicates": "중복 곡 허용",
+    "startImport": "가져오기 시작",
+    "importing": "플레이리스트 가져오는 중...",
+    "transferringTracks": "대상 서비스로 곡 전송 중",
+    "imported": "가져옴",
+    "skipped": "건너뜀",
+    "duplicates": "중복",
+    "time": "시간"
+  },
+  "result": {
+    "title": "가져오기 완료!",
+    "sourcePlaylist": "소스 플레이리스트 ({{provider}})",
+    "targetPlaylist": "대상 플레이리스트 ({{provider}})",
+    "skippedTracks": "건너뛴 곡:",
+    "openPlaylist": "플레이리스트 열기"
+  },
+  "invitation": {
+    "tagline": "스트리밍 서비스 간에 플레이리스트를 전송하세요",
+    "title": "초대 코드",
+    "description": "접근하려면 코드를 입력하세요",
+    "placeholder": "코드 입력",
+    "label": "초대 코드",
+    "error": "초대 코드를 입력해 주세요",
+    "invalid": "유효하지 않은 초대 코드입니다. 코드를 확인하고 다시 시도해 주세요.",
+    "noCode": "초대 코드가 없나요? 관리자에게 문의하세요."
+  },
+  "provider": {
+    "sourceService": "소스 서비스",
+    "targetService": "대상 서비스",
+    "clickToLogin": "클릭하여 로그인",
+    "loggedIn": "로그인됨",
+    "logout": "로그아웃"
+  },
+  "deezer": {
+    "title": "Deezer 로그인",
+    "arlLabel": "ARL (인증 참조 링크)",
+    "arlPlaceholder": "ARL 쿠키 값 입력...",
+    "enterArl": "ARL을 입력해 주세요",
+    "loginFailed": "로그인 실패",
+    "login": "로그인",
+    "loggingIn": "로그인 중...",
+    "help": {
+      "title": "ARL 얻는 방법:",
+      "step1": "<link>deezer.com</link>에 로그인",
+      "step2": "개발자 도구 열기 (F12)",
+      "step3": "Application → Cookies 탭으로 이동",
+      "step4": "\"arl\"이라는 쿠키 찾기",
+      "step5": "값 복사"
+    }
+  }
+}

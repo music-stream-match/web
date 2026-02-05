@@ -1,0 +1,98 @@
+{
+  "app": {
+    "name": "Music Stream Match",
+    "tagline": "ストリーミングサービス間でプレイリストを転送"
+  },
+  "common": {
+    "back": "戻る",
+    "close": "閉じる",
+    "cancel": "キャンセル",
+    "continue": "続ける",
+    "loading": "読み込み中...",
+    "checking": "確認中...",
+    "tryAgain": "再試行",
+    "from": "から",
+    "to": "へ"
+  },
+  "home": {
+    "step": {
+      "source": "ソース",
+      "target": "ターゲット",
+      "import": "インポート"
+    },
+    "selectSourceService": "ソースサービスを選択",
+    "selectTargetService": "ターゲットサービスを選択",
+    "selectedPlaylist": "選択したプレイリスト: <strong>{{name}}</strong> ({{provider}}から)",
+    "readyToImport": "インポート準備完了",
+    "playlist": "プレイリスト",
+    "tracks": "{{count}} 曲",
+    "startOver": "最初からやり直す",
+    "startImport": "インポート開始"
+  },
+  "playlists": {
+    "title": "{{provider}}からプレイリストを選択",
+    "found": "{{count}} 件のプレイリストが見つかりました",
+    "loading": "プレイリストを読み込み中...",
+    "search": "プレイリストを検索...",
+    "notFound": "プレイリストが見つかりません",
+    "author": "作成者: {{name}}"
+  },
+  "import": {
+    "title": "プレイリストのインポート",
+    "sourcePlaylist": "ソースプレイリスト",
+    "targetPlaylist": "ターゲットプレイリスト",
+    "playlistName": "プレイリスト名",
+    "enterPlaylistName": "プレイリスト名を入力...",
+    "playlistExists": "同じ名前のプレイリストが既に存在します",
+    "playlistExistsHint": "曲は既存のプレイリストに追加されます（{{count}} 曲）",
+    "allowDuplicates": "重複曲を許可",
+    "startImport": "インポート開始",
+    "importing": "プレイリストをインポート中...",
+    "transferringTracks": "ターゲットサービスに曲を転送中",
+    "imported": "インポート済み",
+    "skipped": "スキップ",
+    "duplicates": "重複",
+    "time": "時間"
+  },
+  "result": {
+    "title": "インポート完了！",
+    "sourcePlaylist": "ソースプレイリスト（{{provider}}）",
+    "targetPlaylist": "ターゲットプレイリスト（{{provider}}）",
+    "skippedTracks": "スキップした曲:",
+    "openPlaylist": "プレイリストを開く"
+  },
+  "invitation": {
+    "tagline": "ストリーミングサービス間でプレイリストを転送",
+    "title": "招待コード",
+    "description": "アクセスするにはコードを入力してください",
+    "placeholder": "コードを入力",
+    "label": "招待コード",
+    "error": "招待コードを入力してください",
+    "invalid": "無効な招待コードです。コードを確認して再試行してください。",
+    "noCode": "招待コードがありませんか？管理者にお問い合わせください。"
+  },
+  "provider": {
+    "sourceService": "ソースサービス",
+    "targetService": "ターゲットサービス",
+    "clickToLogin": "クリックしてログイン",
+    "loggedIn": "ログイン済み",
+    "logout": "ログアウト"
+  },
+  "deezer": {
+    "title": "Deezerにログイン",
+    "arlLabel": "ARL（認証参照リンク）",
+    "arlPlaceholder": "ARL cookieの値を入力...",
+    "enterArl": "ARLを入力してください",
+    "loginFailed": "ログインに失敗しました",
+    "login": "ログイン",
+    "loggingIn": "ログイン中...",
+    "help": {
+      "title": "ARLの取得方法:",
+      "step1": "<link>deezer.com</link>にログイン",
+      "step2": "開発者ツールを開く（F12）",
+      "step3": "Application → Cookiesタブに移動",
+      "step4": "\"arl\"という名前のcookieを見つける",
+      "step5": "その値をコピー"
+    }
+  }
+}

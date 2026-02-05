@@ -4,10 +4,13 @@ import { useAppStore } from '@/store/useAppStore';
 import { analytics } from '@/lib/analytics';
 import { Button, Input } from '@/components/ui';
 import { Music2, KeyRound, AlertCircle } from 'lucide-react';
+import { useTranslation } from '@/i18n/useTranslation';
+import { LanguageSelector } from '@/components/LanguageSelector';
 import type { InvitationConfig } from '@/types';
 
 export function InvitationPage() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { setInvitation } = useAppStore();
 
   const [code, setCode] = useState('');
@@ -19,7 +22,7 @@ export function InvitationPage() {
     
     const trimmedCode = code.trim();
     if (!trimmedCode) {
-      setError('Proszę wprowadzić kod zaproszenia');
+      setError(t('invitation.error'));
       return;
     }
 
@@ -33,7 +36,7 @@ export function InvitationPage() {
       
       if (!response.ok) {
         console.log(`[InvitationPage] Invalid invitation code: ${trimmedCode}, status: ${response.status}`);
-        setError('Nieprawidłowy kod zaproszenia. Sprawdź kod i spróbuj ponownie.');
+        setError(t('invitation.invalid'));
         setIsLoading(false);
         return;
       }
@@ -46,14 +49,19 @@ export function InvitationPage() {
       navigate('/');
     } catch (err) {
       console.error('[InvitationPage] Error validating invitation code:', err);
-      setError('Nieprawidłowy kod zaproszenia. Sprawdź kod i spróbuj ponownie.');
+      setError(t('invitation.invalid'));
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen p-6 flex items-center justify-center">
+    <div className="min-h-screen p-6 flex items-center justify-center relative">
+      {/* Language selector */}
+      <div className="absolute top-4 right-4">
+        <LanguageSelector />
+      </div>
+
       <div className="w-full max-w-md">
         {/* Header */}
         <div className="text-center mb-8">
@@ -62,9 +70,9 @@ export function InvitationPage() {
               <Music2 className="w-8 h-8 text-primary" />
             </div>
           </div>
-          <h1 className="text-3xl font-bold mb-2">Music Stream Match</h1>
+          <h1 className="text-3xl font-bold mb-2">{t('app.name')}</h1>
           <p className="text-text-muted">
-            Przenoś swoje playlisty między serwisami streamingowymi
+            {t('invitation.tagline')}
           </p>
         </div>
 
@@ -75,17 +83,17 @@ export function InvitationPage() {
               <KeyRound className="w-5 h-5 text-primary" />
             </div>
             <div>
-              <h2 className="text-lg font-semibold">Kod zaproszenia</h2>
+              <h2 className="text-lg font-semibold">{t('invitation.title')}</h2>
               <p className="text-sm text-text-muted">
-                Wprowadź kod, aby uzyskać dostęp
+                {t('invitation.description')}
               </p>
             </div>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <Input
-              label="Kod zaproszenia"
-              placeholder="Wprowadź swój kod"
+              label={t('invitation.label')}
+              placeholder={t('invitation.placeholder')}
               value={code}
               onChange={(e) => {
                 setCode(e.target.value);
@@ -108,14 +116,14 @@ export function InvitationPage() {
               className="w-full"
               disabled={isLoading || !code.trim()}
             >
-              {isLoading ? 'Sprawdzanie...' : 'Kontynuuj'}
+              {isLoading ? t('common.checking') : t('common.continue')}
             </Button>
           </form>
         </div>
 
         {/* Footer */}
         <p className="text-center text-xs text-text-muted mt-6">
-          Nie masz kodu zaproszenia? Skontaktuj się z administratorem.
+          {t('invitation.noCode')}
         </p>
       </div>
     </div>

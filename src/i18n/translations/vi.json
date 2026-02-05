@@ -1,0 +1,98 @@
+{
+  "app": {
+    "name": "Music Stream Match",
+    "tagline": "Chuyển playlist giữa các dịch vụ streaming"
+  },
+  "common": {
+    "back": "Quay lại",
+    "close": "Đóng",
+    "cancel": "Hủy",
+    "continue": "Tiếp tục",
+    "loading": "Đang tải...",
+    "checking": "Đang kiểm tra...",
+    "tryAgain": "Thử lại",
+    "from": "Từ",
+    "to": "Đến"
+  },
+  "home": {
+    "step": {
+      "source": "Nguồn",
+      "target": "Đích",
+      "import": "Nhập"
+    },
+    "selectSourceService": "Chọn dịch vụ nguồn",
+    "selectTargetService": "Chọn dịch vụ đích",
+    "selectedPlaylist": "Playlist đã chọn: <strong>{{name}}</strong> từ {{provider}}",
+    "readyToImport": "Sẵn sàng nhập",
+    "playlist": "Playlist",
+    "tracks": "{{count}} bài hát",
+    "startOver": "Bắt đầu lại",
+    "startImport": "Bắt đầu nhập"
+  },
+  "playlists": {
+    "title": "Chọn playlist từ {{provider}}",
+    "found": "Tìm thấy {{count}} playlist",
+    "loading": "Đang tải playlist...",
+    "search": "Tìm kiếm playlist...",
+    "notFound": "Không tìm thấy playlist nào",
+    "author": "Tác giả: {{name}}"
+  },
+  "import": {
+    "title": "Nhập playlist",
+    "sourcePlaylist": "Playlist nguồn",
+    "targetPlaylist": "Playlist đích",
+    "playlistName": "Tên playlist",
+    "enterPlaylistName": "Nhập tên playlist...",
+    "playlistExists": "Playlist với tên này đã tồn tại",
+    "playlistExistsHint": "Bài hát sẽ được thêm vào playlist hiện có ({{count}} bài hát)",
+    "allowDuplicates": "Cho phép bài hát trùng lặp",
+    "startImport": "Bắt đầu nhập",
+    "importing": "Đang nhập playlist...",
+    "transferringTracks": "Đang chuyển bài hát đến dịch vụ đích",
+    "imported": "Đã nhập",
+    "skipped": "Đã bỏ qua",
+    "duplicates": "Trùng lặp",
+    "time": "Thời gian"
+  },
+  "result": {
+    "title": "Nhập hoàn tất!",
+    "sourcePlaylist": "Playlist nguồn ({{provider}})",
+    "targetPlaylist": "Playlist đích ({{provider}})",
+    "skippedTracks": "Bài hát đã bỏ qua:",
+    "openPlaylist": "Mở playlist"
+  },
+  "invitation": {
+    "tagline": "Chuyển playlist của bạn giữa các dịch vụ streaming",
+    "title": "Mã mời",
+    "description": "Nhập mã để truy cập",
+    "placeholder": "Nhập mã của bạn",
+    "label": "Mã mời",
+    "error": "Vui lòng nhập mã mời",
+    "invalid": "Mã mời không hợp lệ. Kiểm tra mã và thử lại.",
+    "noCode": "Không có mã mời? Liên hệ quản trị viên."
+  },
+  "provider": {
+    "sourceService": "Dịch vụ nguồn",
+    "targetService": "Dịch vụ đích",
+    "clickToLogin": "Nhấp để đăng nhập",
+    "loggedIn": "Đã đăng nhập",
+    "logout": "Đăng xuất"
+  },
+  "deezer": {
+    "title": "Đăng nhập Deezer",
+    "arlLabel": "ARL (Authentication Reference Link)",
+    "arlPlaceholder": "Nhập giá trị cookie ARL...",
+    "enterArl": "Vui lòng nhập ARL",
+    "loginFailed": "Đăng nhập thất bại",
+    "login": "Đăng nhập",
+    "loggingIn": "Đang đăng nhập...",
+    "help": {
+      "title": "Cách lấy ARL:",
+      "step1": "Đăng nhập vào <link>deezer.com</link>",
+      "step2": "Mở công cụ nhà phát triển (F12)",
+      "step3": "Vào tab Application → Cookies",
+      "step4": "Tìm cookie có tên \"arl\"",
+      "step5": "Sao chép giá trị của nó"
+    }
+  }
+}

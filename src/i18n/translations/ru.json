@@ -1,0 +1,98 @@
+{
+  "app": {
+    "name": "Music Stream Match",
+    "tagline": "Переносите плейлисты между стриминговыми сервисами"
+  },
+  "common": {
+    "back": "Назад",
+    "close": "Закрыть",
+    "cancel": "Отмена",
+    "continue": "Продолжить",
+    "loading": "Загрузка...",
+    "checking": "Проверка...",
+    "tryAgain": "Попробовать снова",
+    "from": "Из",
+    "to": "В"
+  },
+  "home": {
+    "step": {
+      "source": "Источник",
+      "target": "Цель",
+      "import": "Импорт"
+    },
+    "selectSourceService": "Выберите исходный сервис",
+    "selectTargetService": "Выберите целевой сервис",
+    "selectedPlaylist": "Выбранный плейлист: <strong>{{name}}</strong> из {{provider}}",
+    "readyToImport": "Готов к импорту",
+    "playlist": "Плейлист",
+    "tracks": "{{count}} треков",
+    "startOver": "Начать заново",
+    "startImport": "Начать импорт"
+  },
+  "playlists": {
+    "title": "Выберите плейлист из {{provider}}",
+    "found": "Найдено {{count}} плейлистов",
+    "loading": "Загрузка плейлистов...",
+    "search": "Поиск плейлистов...",
+    "notFound": "Плейлисты не найдены",
+    "author": "Автор: {{name}}"
+  },
+  "import": {
+    "title": "Импорт плейлиста",
+    "sourcePlaylist": "Исходный плейлист",
+    "targetPlaylist": "Целевой плейлист",
+    "playlistName": "Название плейлиста",
+    "enterPlaylistName": "Введите название плейлиста...",
+    "playlistExists": "Плейлист с таким названием уже существует",
+    "playlistExistsHint": "Треки будут добавлены в существующий плейлист ({{count}} треков)",
+    "allowDuplicates": "Разрешить дубликаты треков",
+    "startImport": "Начать импорт",
+    "importing": "Импорт плейлиста...",
+    "transferringTracks": "Перенос треков в целевой сервис",
+    "imported": "Импортировано",
+    "skipped": "Пропущено",
+    "duplicates": "Дубликаты",
+    "time": "Время"
+  },
+  "result": {
+    "title": "Импорт завершён!",
+    "sourcePlaylist": "Исходный плейлист ({{provider}})",
+    "targetPlaylist": "Целевой плейлист ({{provider}})",
+    "skippedTracks": "Пропущенные треки:",
+    "openPlaylist": "Открыть плейлист"
+  },
+  "invitation": {
+    "tagline": "Переносите свои плейлисты между стриминговыми сервисами",
+    "title": "Код приглашения",
+    "description": "Введите код для получения доступа",
+    "placeholder": "Введите ваш код",
+    "label": "Код приглашения",
+    "error": "Пожалуйста, введите код приглашения",
+    "invalid": "Неверный код приглашения. Проверьте код и попробуйте снова.",
+    "noCode": "Нет кода приглашения? Свяжитесь с администратором."
+  },
+  "provider": {
+    "sourceService": "Исходный сервис",
+    "targetService": "Целевой сервис",
+    "clickToLogin": "Нажмите, чтобы войти",
+    "loggedIn": "Выполнен вход",
+    "logout": "Выйти"
+  },
+  "deezer": {
+    "title": "Войти в Deezer",
+    "arlLabel": "ARL (Authentication Reference Link)",
+    "arlPlaceholder": "Введите значение cookie ARL...",
+    "enterArl": "Пожалуйста, введите ARL",
+    "loginFailed": "Не удалось войти",
+    "login": "Войти",
+    "loggingIn": "Вход...",
+    "help": {
+      "title": "Как получить ARL:",
+      "step1": "Войдите на <link>deezer.com</link>",
+      "step2": "Откройте инструменты разработчика (F12)",
+      "step3": "Перейдите на вкладку Application → Cookies",
+      "step4": "Найдите cookie с названием \"arl\"",
+      "step5": "Скопируйте его значение"
+    }
+  }
+}

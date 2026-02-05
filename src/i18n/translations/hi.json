@@ -1,0 +1,98 @@
+{
+  "app": {
+    "name": "Music Stream Match",
+    "tagline": "स्ट्रीमिंग सेवाओं के बीच प्लेलिस्ट ट्रांसफर करें"
+  },
+  "common": {
+    "back": "वापस",
+    "close": "बंद करें",
+    "cancel": "रद्द करें",
+    "continue": "जारी रखें",
+    "loading": "लोड हो रहा है...",
+    "checking": "जांच हो रही है...",
+    "tryAgain": "पुनः प्रयास करें",
+    "from": "से",
+    "to": "को"
+  },
+  "home": {
+    "step": {
+      "source": "स्रोत",
+      "target": "लक्ष्य",
+      "import": "आयात"
+    },
+    "selectSourceService": "स्रोत सेवा चुनें",
+    "selectTargetService": "लक्ष्य सेवा चुनें",
+    "selectedPlaylist": "चयनित प्लेलिस्ट: <strong>{{name}}</strong> {{provider}} से",
+    "readyToImport": "आयात के लिए तैयार",
+    "playlist": "प्लेलिस्ट",
+    "tracks": "{{count}} गाने",
+    "startOver": "फिर से शुरू करें",
+    "startImport": "आयात शुरू करें"
+  },
+  "playlists": {
+    "title": "{{provider}} से प्लेलिस्ट चुनें",
+    "found": "{{count}} प्लेलिस्ट मिलीं",
+    "loading": "प्लेलिस्ट लोड हो रही हैं...",
+    "search": "प्लेलिस्ट खोजें...",
+    "notFound": "कोई प्लेलिस्ट नहीं मिली",
+    "author": "लेखक: {{name}}"
+  },
+  "import": {
+    "title": "प्लेलिस्ट आयात",
+    "sourcePlaylist": "स्रोत प्लेलिस्ट",
+    "targetPlaylist": "लक्ष्य प्लेलिस्ट",
+    "playlistName": "प्लेलिस्ट का नाम",
+    "enterPlaylistName": "प्लेलिस्ट का नाम दर्ज करें...",
+    "playlistExists": "इस नाम की प्लेलिस्ट पहले से मौजूद है",
+    "playlistExistsHint": "गाने मौजूदा प्लेलिस्ट में जोड़े जाएंगे ({{count}} गाने)",
+    "allowDuplicates": "डुप्लिकेट गानों की अनुमति दें",
+    "startImport": "आयात शुरू करें",
+    "importing": "प्लेलिस्ट आयात हो रही है...",
+    "transferringTracks": "गाने लक्ष्य सेवा में ट्रांसफर हो रहे हैं",
+    "imported": "आयातित",
+    "skipped": "छोड़े गए",
+    "duplicates": "डुप्लिकेट",
+    "time": "समय"
+  },
+  "result": {
+    "title": "आयात पूर्ण!",
+    "sourcePlaylist": "स्रोत प्लेलिस्ट ({{provider}})",
+    "targetPlaylist": "लक्ष्य प्लेलिस्ट ({{provider}})",
+    "skippedTracks": "छोड़े गए गाने:",
+    "openPlaylist": "प्लेलिस्ट खोलें"
+  },
+  "invitation": {
+    "tagline": "स्ट्रीमिंग सेवाओं के बीच अपनी प्लेलिस्ट ट्रांसफर करें",
+    "title": "आमंत्रण कोड",
+    "description": "एक्सेस पाने के लिए कोड दर्ज करें",
+    "placeholder": "अपना कोड दर्ज करें",
+    "label": "आमंत्रण कोड",
+    "error": "कृपया आमंत्रण कोड दर्ज करें",
+    "invalid": "अमान्य आमंत्रण कोड। कोड जांचें और पुनः प्रयास करें।",
+    "noCode": "आमंत्रण कोड नहीं है? व्यवस्थापक से संपर्क करें।"
+  },
+  "provider": {
+    "sourceService": "स्रोत सेवा",
+    "targetService": "लक्ष्य सेवा",
+    "clickToLogin": "लॉगिन करने के लिए क्लिक करें",
+    "loggedIn": "लॉग इन",
+    "logout": "लॉग आउट"
+  },
+  "deezer": {
+    "title": "Deezer में लॉगिन करें",
+    "arlLabel": "ARL (प्रमाणीकरण संदर्भ लिंक)",
+    "arlPlaceholder": "ARL कुकी मान दर्ज करें...",
+    "enterArl": "कृपया ARL दर्ज करें",
+    "loginFailed": "लॉगिन विफल",
+    "login": "लॉगिन",
+    "loggingIn": "लॉगिन हो रहा है...",
+    "help": {
+      "title": "ARL कैसे प्राप्त करें:",
+      "step1": "<link>deezer.com</link> पर लॉगिन करें",
+      "step2": "डेवलपर टूल्स खोलें (F12)",
+      "step3": "Application → Cookies टैब पर जाएं",
+      "step4": "\"arl\" नाम की कुकी खोजें",
+      "step5": "उसका मान कॉपी करें"
+    }
+  }
+}
