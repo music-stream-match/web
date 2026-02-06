@@ -224,7 +224,7 @@ export const deezerService = {
       for (const song of songs) {
         if (song.SNG_ID) {
           tracks.push({
-            id: song.SNG_ID,
+            id: String(song.SNG_ID),
             title: song.SNG_TITLE || `Unknown Track (${song.SNG_ID})`,
             artistName: song.ART_NAME || 'Unknown Artist',
             albumTitle: song.ALB_TITLE,
@@ -537,7 +537,7 @@ export const tidalService = {
       const includedTracks = new Map<string, any>();
       for (const included of (data.included || [])) {
         if (included.type === 'tracks') {
-          includedTracks.set(included.id, included);
+          includedTracks.set(String(included.id), included);
         }
       }
 
@@ -819,7 +819,7 @@ export const spotifyService = {
             .join(', ');
           
           tracks.push({
-            id: item.track.id,
+            id: String(item.track.id),
             title: item.track.name || `Unknown Track (${item.track.id})`,
             artistName: artistNames || 'Unknown Artist',
             albumTitle: item.track.album?.name,
@@ -1013,10 +1013,12 @@ export const trackMappingService = {
   },
 
   findTargetProviderId(track: Track, targetProvider: Provider): string | null {
-    const providerId = track.providers[`${targetProvider}TrackId` as keyof typeof track.providers] as string | undefined;
+    const providerId = track.providers[`${targetProvider}TrackId` as keyof typeof track.providers];
     if (providerId) {
-      console.log(`[TrackMapping] Found ${targetProvider} ID: ${providerId} for track ${track.id}`);
-      return providerId;
+      // Ensure ID is always a string for consistent comparison
+      const stringId = String(providerId);
+      console.log(`[TrackMapping] Found ${targetProvider} ID: ${stringId} for track ${track.id}`);
+      return stringId;
     }
     console.log(`[TrackMapping] No ${targetProvider} mapping found for track ${track.id}`);
     return null;
