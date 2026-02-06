@@ -627,8 +627,8 @@ export const tidalService = {
     console.log(`[TIDAL] Adding ${trackIds.length} tracks to playlist ${playlistId}...`);
     const config = getTidalConfig();
     
-    // TIDAL might have limits on batch size
-    const batchSize = 50;
+    // TIDAL API accepts max 20 tracks per request
+    const batchSize = 20;
     for (let i = 0; i < trackIds.length; i += batchSize) {
       const batch = trackIds.slice(i, i + batchSize);
       
