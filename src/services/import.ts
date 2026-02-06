@@ -1,4 +1,4 @@
-import type { Provider, Playlist, ImportProgress, ImportResult, ProviderAuth, SourceTrack } from '@/types';
+import type { Provider, Playlist, ImportProgress, ImportResult, ProviderAuth, SourceTrack, PlaylistLoadingProgress } from '@/types';
 import { providerService, trackMappingService } from './api';
 
 // Configuration for large playlist handling
@@ -19,7 +19,8 @@ export async function importPlaylist(
   sourceAuth: ProviderAuth | null,
   targetAuth: ProviderAuth | null,
   onProgress: (progress: ImportProgress) => void,
-  allowDuplicates: boolean = false
+  allowDuplicates: boolean = false,
+  onLoadingProgress?: (progress: PlaylistLoadingProgress) => void
 ): Promise<ImportResult> {
   const startTime = Date.now();
   
@@ -33,12 +34,27 @@ export async function importPlaylist(
 
   // Step 1: Get source playlist tracks (now includes title/artist info)
   console.log('[Import] Step 1: Fetching source playlist tracks...');
+  
+  // Report loading start
+  if (onLoadingProgress) {
+    onLoadingProgress({ phase: 'loading', current: 0, total: sourcePlaylist.trackCount || 0 });
+  }
+  
   const sourceTracks = await providerService.getPlaylistTracks(
     sourceProvider,
     sourcePlaylist.id,
-    sourceAuth
+    sourceAuth,
+    undefined,
+    onLoadingProgress ? (loaded, total) => {
+      onLoadingProgress({ phase: 'loading', current: loaded, total });
+    } : undefined
   );
   console.log(`[Import] Found ${sourceTracks.length} tracks in source playlist`);
+
+  // Report preparing phase
+  if (onLoadingProgress) {
+    onLoadingProgress({ phase: 'preparing', current: sourceTracks.length, total: sourceTracks.length });
+  }
 
   // Step 2: Check if target playlist exists or create new one
   console.log('[Import] Step 2: Checking/creating target playlist...');

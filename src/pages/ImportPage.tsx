@@ -5,6 +5,7 @@ import { providerService } from '@/services/api';
 import { importPlaylist } from '@/services/import';
 import { analytics } from '@/lib/analytics';
 import { ImportProgress } from '@/components/ImportProgress';
+import { PlaylistLoading } from '@/components/PlaylistLoading';
 import { ImportResultModal } from '@/components/ImportResultModal';
 import { Button, Input, Card } from '@/components/ui';
 import { ArrowLeft, AlertCircle, Play } from 'lucide-react';
@@ -12,7 +13,7 @@ import { getProviderName } from '@/lib/utils';
 import { useTranslation } from '@/i18n/useTranslation';
 import { LanguageSelector } from '@/components/LanguageSelector';
 import { SupportButton } from '@/components/SupportModal';
-import type { Playlist } from '@/types';
+import type { Playlist, PlaylistLoadingProgress } from '@/types';
 
 export function ImportPage() {
   const navigate = useNavigate();
@@ -35,6 +36,7 @@ export function ImportPage() {
   const [checkingExisting, setCheckingExisting] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
   const [allowDuplicates, setAllowDuplicates] = useState(false);
+  const [loadingProgress, setLoadingProgress] = useState<PlaylistLoadingProgress | null>(null);
 
   useEffect(() => {
     if (!sourceProvider || !targetProvider || !selectedPlaylist) {
@@ -96,6 +98,7 @@ export function ImportPage() {
 
     try {
       setIsImporting(true);
+      setLoadingProgress({ phase: 'loading', current: 0, total: selectedPlaylist.trackCount || 0 });
       console.log('[ImportPage] Starting import...');
       
       analytics.importStarted(sourceProvider, targetProvider, selectedPlaylist.trackCount);
@@ -107,8 +110,12 @@ export function ImportPage() {
         targetPlaylistName,
         sourceAuth,
         targetAuth,
-        (progress) => setImportProgress(progress),
-        allowDuplicates
+        (progress) => {
+          setLoadingProgress(null); // Clear loading progress when import starts
+          setImportProgress(progress);
+        },
+        allowDuplicates,
+        (progress) => setLoadingProgress(progress)
       );
 
       const durationMs = Date.now() - startTime;
@@ -131,6 +138,7 @@ export function ImportPage() {
     } finally {
       setIsImporting(false);
       setImportProgress(null);
+      setLoadingProgress(null);
     }
   };
 
@@ -171,8 +179,17 @@ export function ImportPage() {
           </p>
         </div>
 
+        {/* Loading source playlist */}
+        {isImporting && loadingProgress && (
+          <PlaylistLoading 
+            progress={loadingProgress} 
+            provider={sourceProvider} 
+            playlistName={selectedPlaylist.name}
+          />
+        )}
+
         {/* Import in progress */}
-        {isImporting && importProgress && (
+        {isImporting && !loadingProgress && importProgress && (
           <ImportProgress progress={importProgress} />
         )}
 

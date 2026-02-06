@@ -58,6 +58,12 @@ export interface Track {
   providers: TrackProviders;
 }
 
+export interface PlaylistLoadingProgress {
+  phase: 'loading' | 'preparing';
+  current: number;
+  total: number;
+}
+
 export interface ImportProgress {
   total: number;
   current: number;

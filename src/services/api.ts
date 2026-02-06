@@ -203,13 +203,18 @@ export const deezerService = {
     return playlists;
   },
 
-  async getPlaylistTracks(playlistId: string, arl: string): Promise<SourceTrack[]> {
+  async getPlaylistTracks(
+    playlistId: string, 
+    arl: string,
+    onProgress?: (loaded: number, total: number) => void
+  ): Promise<SourceTrack[]> {
     console.log(`[Deezer] Fetching tracks for playlist ${playlistId}...`);
     
     const tracks: SourceTrack[] = [];
     let start = 0;
     const limit = 500; // Deezer supports up to 2000 per request, but 500 is safer
     let hasMore = true;
+    let estimatedTotal = 0;
     
     while (hasMore) {
       console.log(`[Deezer] Fetching tracks ${start} to ${start + limit}...`);
@@ -221,6 +226,11 @@ export const deezerService = {
 
       const songs = data.results?.SONGS?.data || [];
       
+      // Try to get total from playlist data on first request
+      if (start === 0 && data.results?.DATA?.NB_SONG) {
+        estimatedTotal = data.results.DATA.NB_SONG;
+      }
+      
       for (const song of songs) {
         if (song.SNG_ID) {
           tracks.push({
@@ -230,6 +240,11 @@ export const deezerService = {
             albumTitle: song.ALB_TITLE,
           });
         }
+      }
+      
+      // Report progress
+      if (onProgress) {
+        onProgress(tracks.length, estimatedTotal || tracks.length);
       }
       
       // Check if we got less than requested - means no more tracks
@@ -497,12 +512,17 @@ export const tidalService = {
     return playlists;
   },
 
-  async getPlaylistTracks(playlistId: string, accessToken: string): Promise<SourceTrack[]> {
+  async getPlaylistTracks(
+    playlistId: string, 
+    accessToken: string,
+    onProgress?: (loaded: number, total: number) => void
+  ): Promise<SourceTrack[]> {
     console.log(`[TIDAL] Fetching tracks for playlist ${playlistId}...`);
     const config = getTidalConfig();
     const tracks: SourceTrack[] = [];
     let cursor: string | null = null;
     const limit = 100;
+    let estimatedTotal = 0;
 
     while (true) {
       // TIDAL OpenAPI uses /playlists/{id}/items with include=items to get track details
@@ -532,6 +552,11 @@ export const tidalService = {
 
       const data = await response.json();
       console.log('[TIDAL] Playlist items response:', data);
+
+      // Try to get total from meta on first request
+      if (estimatedTotal === 0 && data.meta?.total) {
+        estimatedTotal = data.meta.total;
+      }
 
       // JSON:API format - included contains full track details
       const includedTracks = new Map<string, any>();
@@ -570,6 +595,11 @@ export const tidalService = {
             });
           }
         }
+      }
+
+      // Report progress
+      if (onProgress) {
+        onProgress(tracks.length, estimatedTotal || tracks.length);
       }
 
       // Check for pagination
@@ -792,11 +822,16 @@ export const spotifyService = {
     return playlists;
   },
 
-  async getPlaylistTracks(playlistId: string, accessToken: string): Promise<SourceTrack[]> {
+  async getPlaylistTracks(
+    playlistId: string, 
+    accessToken: string,
+    onProgress?: (loaded: number, total: number) => void
+  ): Promise<SourceTrack[]> {
     console.log(`[Spotify] Fetching tracks for playlist ${playlistId}...`);
     const config = getSpotifyConfig();
     const tracks: SourceTrack[] = [];
     let url: string | null = `${config.apiUrl}/playlists/${playlistId}/tracks?limit=100`;
+    let estimatedTotal = 0;
 
     while (url) {
       const response = await fetchWithRetry(url, {
@@ -810,6 +845,11 @@ export const spotifyService = {
       }
 
       const data = await response.json();
+
+      // Get total from first response
+      if (estimatedTotal === 0 && data.total) {
+        estimatedTotal = data.total;
+      }
 
       for (const item of data.items) {
         if (item.track?.id) {
@@ -825,6 +865,11 @@ export const spotifyService = {
             albumTitle: item.track.album?.name,
           });
         }
+      }
+
+      // Report progress
+      if (onProgress) {
+        onProgress(tracks.length, estimatedTotal || tracks.length);
       }
 
       url = data.next;
@@ -1087,17 +1132,23 @@ export const providerService = {
     }
   },
 
-  async getPlaylistTracks(provider: Provider, playlistId: string, auth: ProviderAuth | null, arl?: string): Promise<SourceTrack[]> {
+  async getPlaylistTracks(
+    provider: Provider, 
+    playlistId: string, 
+    auth: ProviderAuth | null, 
+    arl?: string,
+    onProgress?: (loaded: number, total: number) => void
+  ): Promise<SourceTrack[]> {
     if (provider === 'deezer') {
       const deezerArl = arl || useAppStore.getState().getDeezerArl();
       if (!deezerArl) throw new Error('No Deezer ARL available');
-      return deezerService.getPlaylistTracks(playlistId, deezerArl);
+      return deezerService.getPlaylistTracks(playlistId, deezerArl, onProgress);
     } else if (provider === 'spotify') {
       if (!auth) throw new Error('No auth available for Spotify');
-      return spotifyService.getPlaylistTracks(playlistId, auth.tokens.accessToken);
+      return spotifyService.getPlaylistTracks(playlistId, auth.tokens.accessToken, onProgress);
     } else {
       if (!auth) throw new Error('No auth available for TIDAL');
-      return tidalService.getPlaylistTracks(playlistId, auth.tokens.accessToken);
+      return tidalService.getPlaylistTracks(playlistId, auth.tokens.accessToken, onProgress);
     }
   },
 
