@@ -71,6 +71,7 @@ export interface ImportProgress {
   imported: number;
   skipped: number;
   skippedTracks: SourceTrack[];
+  importedTracks: SourceTrack[];
   duplicatesSkipped?: number;
 }
 
@@ -81,6 +82,7 @@ export interface ImportResult {
   imported: number;
   skipped: number;
   skippedTracks: SourceTrack[];
+  importedTracks: SourceTrack[];
   duplicatesSkipped?: number;
   duration: number;
   sourceProvider: Provider;

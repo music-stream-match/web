@@ -107,6 +107,7 @@ export async function importPlaylist(
     imported: 0,
     skipped: 0,
     skippedTracks: [],
+    importedTracks: [],
     duplicatesSkipped: 0,
   };
 
@@ -139,30 +140,40 @@ export async function importPlaylist(
   console.log('[Import] Processing mapping results...');
   const tracksToAdd: string[] = [];
 
-  for (const sourceTrack of sourceTracks) {
+  for (let i = 0; i < sourceTracks.length; i++) {
+    const sourceTrack = sourceTracks[i];
     const mappedTrack = mappedTracks.get(sourceTrack.id);
     progress.currentTrack = sourceTrack;
+    progress.current = i + 1;
 
     if (!mappedTrack) {
       console.log(`[Import] ⚠ Track ${sourceTrack.id} not found in local database: ${sourceTrack.title} - ${sourceTrack.artistName}`);
       progress.skipped++;
       progress.skippedTracks.push(sourceTrack);
-      continue;
-    }
-
-    const targetTrackId = targetIdMap.get(sourceTrack.id);
-
-    if (!targetTrackId) {
-      console.log(`[Import] ⚠ No ${targetProvider} mapping for: ${sourceTrack.title} - ${sourceTrack.artistName}`);
-      progress.skipped++;
-      progress.skippedTracks.push(sourceTrack);
-    } else if (!allowDuplicates && existingTrackIds.has(targetTrackId)) {
-      console.log(`[Import] ⏭ Duplicate skipped: ${sourceTrack.title} - ${sourceTrack.artistName}`);
-      progress.duplicatesSkipped = (progress.duplicatesSkipped || 0) + 1;
+      // Update immediately when track is skipped
+      onProgress({ ...progress });
     } else {
-      console.log(`[Import] ✓ Mapped: ${sourceTrack.title} -> ${targetTrackId}`);
-      tracksToAdd.push(targetTrackId);
-      progress.imported++;
+      const targetTrackId = targetIdMap.get(sourceTrack.id);
+
+      if (!targetTrackId) {
+        console.log(`[Import] ⚠ No ${targetProvider} mapping for: ${sourceTrack.title} - ${sourceTrack.artistName}`);
+        progress.skipped++;
+        progress.skippedTracks.push(sourceTrack);
+        // Update immediately when track is skipped
+        onProgress({ ...progress });
+      } else if (!allowDuplicates && existingTrackIds.has(targetTrackId)) {
+        console.log(`[Import] ⏭ Duplicate skipped: ${sourceTrack.title} - ${sourceTrack.artistName}`);
+        progress.duplicatesSkipped = (progress.duplicatesSkipped || 0) + 1;
+        // Update immediately when duplicate is skipped
+        onProgress({ ...progress });
+      } else {
+        console.log(`[Import] ✓ Mapped: ${sourceTrack.title} -> ${targetTrackId}`);
+        tracksToAdd.push(targetTrackId);
+        progress.imported++;
+        progress.importedTracks.push(sourceTrack);
+        // Update immediately when track is imported
+        onProgress({ ...progress });
+      }
     }
   }
 
@@ -196,6 +207,7 @@ export async function importPlaylist(
     imported: progress.imported,
     skipped: progress.skipped,
     skippedTracks: progress.skippedTracks,
+    importedTracks: progress.importedTracks,
     duplicatesSkipped: progress.duplicatesSkipped,
     duration,
     sourceProvider,

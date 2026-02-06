@@ -57,7 +57,9 @@
     "imported": "आयातित",
     "skipped": "छोड़े गए",
     "duplicates": "डुप्लिकेट",
-    "time": "समय"
+    "time": "समय",
+    "recentlyImported": "हाल ही में आयातित",
+    "recentlySkipped": "हाल ही में छोड़े गए"
   },
   "result": {
     "title": "आयात पूर्ण!",

@@ -57,7 +57,9 @@
     "imported": "インポート済み",
     "skipped": "スキップ",
     "duplicates": "重複",
-    "time": "時間"
+    "time": "時間",
+    "recentlyImported": "最近インポートした曲",
+    "recentlySkipped": "最近スキップした曲"
   },
   "result": {
     "title": "インポート完了！",

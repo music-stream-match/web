@@ -57,7 +57,9 @@
     "imported": "Importiert",
     "skipped": "Übersprungen",
     "duplicates": "Duplikate",
-    "time": "Zeit"
+    "time": "Zeit",
+    "recentlyImported": "Kürzlich importiert",
+    "recentlySkipped": "Kürzlich übersprungen"
   },
   "result": {
     "title": "Import abgeschlossen!",

@@ -55,7 +55,9 @@
     "imported": "আমদানিকৃত",
     "skipped": "বাদ দেওয়া",
     "duplicates": "ডুপ্লিকেট",
-    "time": "সময়"
+    "time": "সময়",
+    "recentlyImported": "সম্প্রতি আমদানিকৃত",
+    "recentlySkipped": "সম্প্রতি বাদ দেওয়া"
   },
   "result": {
     "title": "আমদানি সম্পন্ন!",

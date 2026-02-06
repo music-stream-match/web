@@ -57,7 +57,9 @@
     "imported": "تم الاستيراد",
     "skipped": "تم التخطي",
     "duplicates": "مكررات",
-    "time": "الوقت"
+    "time": "الوقت",
+    "recentlyImported": "تم استيرادها مؤخراً",
+    "recentlySkipped": "تم تخطيها مؤخراً"
   },
   "result": {
     "title": "اكتمل الاستيراد!",

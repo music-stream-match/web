@@ -57,7 +57,9 @@
     "imported": "已导入",
     "skipped": "已跳过",
     "duplicates": "重复",
-    "time": "时间"
+    "time": "时间",
+    "recentlyImported": "最近导入的歌曲",
+    "recentlySkipped": "最近跳过的歌曲"
   },
   "result": {
     "title": "导入完成！",

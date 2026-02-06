@@ -57,7 +57,9 @@
     "imported": "가져옴",
     "skipped": "건너뜀",
     "duplicates": "중복",
-    "time": "시간"
+    "time": "시간",
+    "recentlyImported": "최근 가져온 곡",
+    "recentlySkipped": "최근 건너뛴 곡"
   },
   "result": {
     "title": "가져오기 완료!",

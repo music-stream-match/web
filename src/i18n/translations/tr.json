@@ -57,7 +57,9 @@
     "imported": "İçe aktarıldı",
     "skipped": "Atlandı",
     "duplicates": "Yinelenler",
-    "time": "Süre"
+    "time": "Süre",
+    "recentlyImported": "Son içe aktarılanlar",
+    "recentlySkipped": "Son atlananlar"
   },
   "result": {
     "title": "İçe aktarma tamamlandı!",

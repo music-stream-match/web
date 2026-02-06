@@ -1,6 +1,7 @@
+import { useState } from 'react';
 import type { ImportResult } from '@/types';
 import { Modal, Button } from '@/components/ui';
-import { CheckCircle, SkipForward, Clock, ExternalLink, Music, Copy } from 'lucide-react';
+import { CheckCircle, SkipForward, Clock, ExternalLink, Music, Copy, ChevronDown, ChevronUp } from 'lucide-react';
 import { formatDuration, getProviderName } from '@/lib/utils';
 import { providerService } from '@/services/api';
 import { useTranslation } from '@/i18n/useTranslation';
@@ -12,6 +13,8 @@ interface ImportResultModalProps {
 
 export function ImportResultModal({ result, onClose }: ImportResultModalProps) {
   const { t } = useTranslation();
+  const [showImported, setShowImported] = useState(false);
+  const [showSkipped, setShowSkipped] = useState(false);
 
   if (!result) return null;
 
@@ -63,17 +66,35 @@ export function ImportResultModal({ result, onClose }: ImportResultModalProps) {
 
         {/* Stats */}
         <div className={`grid gap-3 ${result.duplicatesSkipped ? 'grid-cols-4' : 'grid-cols-3'}`}>
-          <div className="text-center p-3 bg-success/10 rounded-md">
-            <CheckCircle className="w-5 h-5 text-success mx-auto mb-1" />
+          <button
+            onClick={() => result.imported > 0 && setShowImported(!showImported)}
+            disabled={result.imported === 0}
+            className="text-center p-3 bg-success/10 rounded-md hover:bg-success/20 transition-colors disabled:cursor-default disabled:hover:bg-success/10"
+          >
+            <div className="flex items-center justify-center gap-1 mb-1">
+              <CheckCircle className="w-5 h-5 text-success" />
+              {result.imported > 0 && (
+                showImported ? <ChevronUp className="w-4 h-4 text-success" /> : <ChevronDown className="w-4 h-4 text-success" />
+              )}
+            </div>
             <p className="text-2xl font-bold text-success">{result.imported}</p>
             <p className="text-xs text-text-muted">{t('import.imported')}</p>
-          </div>
+          </button>
 
-          <div className="text-center p-3 bg-warning/10 rounded-md">
-            <SkipForward className="w-5 h-5 text-warning mx-auto mb-1" />
+          <button
+            onClick={() => result.skipped > 0 && setShowSkipped(!showSkipped)}
+            disabled={result.skipped === 0}
+            className="text-center p-3 bg-warning/10 rounded-md hover:bg-warning/20 transition-colors disabled:cursor-default disabled:hover:bg-warning/10"
+          >
+            <div className="flex items-center justify-center gap-1 mb-1">
+              <SkipForward className="w-5 h-5 text-warning" />
+              {result.skipped > 0 && (
+                showSkipped ? <ChevronUp className="w-4 h-4 text-warning" /> : <ChevronDown className="w-4 h-4 text-warning" />
+              )}
+            </div>
             <p className="text-2xl font-bold text-warning">{result.skipped}</p>
             <p className="text-xs text-text-muted">{t('import.skipped')}</p>
-          </div>
+          </button>
 
           {result.duplicatesSkipped ? (
             <div className="text-center p-3 bg-text-muted/10 rounded-md">
@@ -90,18 +111,42 @@ export function ImportResultModal({ result, onClose }: ImportResultModalProps) {
           </div>
         </div>
 
-        {/* Skipped tracks */}
-        {result.skippedTracks.length > 0 && (
-          <div className="space-y-2">
-            <p className="text-sm font-medium">{t('result.skippedTracks')}</p>
-            <div className="max-h-40 overflow-y-auto space-y-1">
-              {result.skippedTracks.map((track, index) => (
-                <div
+        {/* Imported tracks list */}
+        {showImported && result.importedTracks.length > 0 && (
+          <div className="border border-success/30 rounded-md overflow-hidden">
+            <div className="bg-success/10 px-3 py-2 text-sm font-medium text-success flex items-center gap-2">
+              <CheckCircle className="w-4 h-4" />
+              {t('import.recentlyImported')} ({result.importedTracks.length})
+            </div>
+            <div className="max-h-48 overflow-y-auto">
+              {result.importedTracks.map((track, index) => (
+                <div 
                   key={`${track.id}-${index}`}
-                  className="text-sm p-2 bg-surface-hover rounded-md"
+                  className="px-3 py-2 border-t border-success/10 first:border-t-0 text-sm"
                 >
-                  <span className="font-medium">{track.title}</span>
-                  <span className="text-text-muted"> - {track.artistName}</span>
+                  <p className="truncate font-medium">{track.title}</p>
+                  <p className="truncate text-text-muted text-xs">{track.artistName}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Skipped tracks list */}
+        {showSkipped && result.skippedTracks.length > 0 && (
+          <div className="border border-warning/30 rounded-md overflow-hidden">
+            <div className="bg-warning/10 px-3 py-2 text-sm font-medium text-warning flex items-center gap-2">
+              <SkipForward className="w-4 h-4" />
+              {t('import.recentlySkipped')} ({result.skippedTracks.length})
+            </div>
+            <div className="max-h-48 overflow-y-auto">
+              {result.skippedTracks.map((track, index) => (
+                <div 
+                  key={`${track.id}-${index}`}
+                  className="px-3 py-2 border-t border-warning/10 first:border-t-0 text-sm"
+                >
+                  <p className="truncate font-medium">{track.title}</p>
+                  <p className="truncate text-text-muted text-xs">{track.artistName}</p>
                 </div>
               ))}
             </div>

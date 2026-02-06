@@ -57,7 +57,9 @@
     "imported": "Đã nhập",
     "skipped": "Đã bỏ qua",
     "duplicates": "Trùng lặp",
-    "time": "Thời gian"
+    "time": "Thời gian",
+    "recentlyImported": "Nhập gần đây",
+    "recentlySkipped": "Bỏ qua gần đây"
   },
   "result": {
     "title": "Nhập hoàn tất!",

@@ -57,7 +57,9 @@
     "imported": "Импортировано",
     "skipped": "Пропущено",
     "duplicates": "Дубликаты",
-    "time": "Время"
+    "time": "Время",
+    "recentlyImported": "Недавно импортированные",
+    "recentlySkipped": "Недавно пропущенные"
   },
   "result": {
     "title": "Импорт завершён!",
