@@ -18,8 +18,8 @@ export const DEEZER_CONFIG = {
 // Note: TIDAL's API access may require approval for certain endpoints
 
 const TIDAL_DEFAULTS = {
-  clientId: undefined,
-  clientSecret: undefined,
+  clientId: '',
+  clientSecret: '',
   redirectUri: import.meta.env.MODE === 'production'
     ? 'https://music-stream-match.space/callback/tidal'
     : 'https://localhost-vite.mobulum.xyz/callback/tidal',
@@ -50,8 +50,8 @@ export const TIDAL_CONFIG = TIDAL_DEFAULTS;
 // 5. Copy the Client ID and Client Secret
 
 const SPOTIFY_DEFAULTS = {
-  clientId: undefined,
-  clientSecret: undefined,
+  clientId: '',
+  clientSecret: '',
   redirectUri: import.meta.env.MODE === 'production'
     ? 'https://music-stream-match.space/callback/spotify'
     : 'https://localhost-vite.mobulum.xyz/callback/spotify',
@@ -84,7 +84,7 @@ export const SPOTIFY_CONFIG = SPOTIFY_DEFAULTS;
 // 5. The developer token is used server-side; on the client MusicKit JS handles user auth
 
 const APPLE_DEFAULTS = {
-  developerToken: undefined, // invitation
+  developerToken: '', // invitation
   redirectUri: import.meta.env.MODE === 'production'
     ? 'https://music-stream-match.space/callback/apple'
     : 'https://localhost-vite.mobulum.xyz/callback/apple',
