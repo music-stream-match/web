@@ -102,6 +102,11 @@
       "step5": "값 복사"
     }
   },
+  "apple": {
+    "authorizing": "Apple Music에 연결 중...",
+    "authorizingHint": "팝업 창에서 Apple ID로 로그인해 주세요",
+    "authFailed": "Apple Music 연결에 실패했습니다"
+  },
   "onboarding": {
     "skip": "건너뛰기",
     "next": "다음",

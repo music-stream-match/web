@@ -102,6 +102,11 @@
       "step5": "Copia su valor"
     }
   },
+  "apple": {
+    "authorizing": "Conectando con Apple Music...",
+    "authorizingHint": "Por favor, inicia sesión con tu Apple ID en la ventana emergente",
+    "authFailed": "Error al conectar con Apple Music"
+  },
   "onboarding": {
     "skip": "Omitir",
     "next": "Siguiente",

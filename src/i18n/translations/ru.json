@@ -102,6 +102,11 @@
       "step5": "Скопируйте его значение"
     }
   },
+  "apple": {
+    "authorizing": "Подключение к Apple Music...",
+    "authorizingHint": "Пожалуйста, войдите с помощью Apple ID во всплывающем окне",
+    "authFailed": "Не удалось подключиться к Apple Music"
+  },
   "onboarding": {
     "skip": "Пропустить",
     "next": "Далее",

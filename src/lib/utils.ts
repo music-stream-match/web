@@ -43,14 +43,16 @@ function base64UrlEncode(buffer: Uint8Array): string {
   return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 }
 
-export function getProviderColor(provider: 'tidal' | 'deezer' | 'spotify'): string {
+export function getProviderColor(provider: 'tidal' | 'deezer' | 'spotify' | 'apple'): string {
   if (provider === 'tidal') return 'tidal';
   if (provider === 'spotify') return 'spotify';
+  if (provider === 'apple') return 'apple';
   return 'deezer';
 }
 
-export function getProviderName(provider: 'tidal' | 'deezer' | 'spotify'): string {
+export function getProviderName(provider: 'tidal' | 'deezer' | 'spotify' | 'apple'): string {
   if (provider === 'tidal') return 'TIDAL';
   if (provider === 'spotify') return 'Spotify';
+  if (provider === 'apple') return 'Apple Music';
   return 'Deezer';
 }

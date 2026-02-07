@@ -11,6 +11,7 @@ export const useAppStore = create<AppState>()(
       tidalAuth: null,
       deezerAuth: null,
       spotifyAuth: null,
+      appleAuth: null,
       deezerArl: null,
       sourceProvider: null,
       targetProvider: null,
@@ -32,6 +33,7 @@ export const useAppStore = create<AppState>()(
           tidalAuth: null,
           deezerAuth: null,
           spotifyAuth: null,
+          appleAuth: null,
           deezerArl: null,
           sourceProvider: null,
           targetProvider: null,
@@ -47,6 +49,8 @@ export const useAppStore = create<AppState>()(
           set({ tidalAuth: auth });
         } else if (provider === 'spotify') {
           set({ spotifyAuth: auth });
+        } else if (provider === 'apple') {
+          set({ appleAuth: auth });
         } else {
           set({ deezerAuth: auth });
         }
@@ -101,6 +105,7 @@ export const useAppStore = create<AppState>()(
         const state = get();
         if (provider === 'tidal') return state.tidalAuth;
         if (provider === 'spotify') return state.spotifyAuth;
+        if (provider === 'apple') return state.appleAuth;
         return state.deezerAuth;
       },
 
@@ -108,6 +113,12 @@ export const useAppStore = create<AppState>()(
         // For Deezer, check if we have ARL stored
         if (provider === 'deezer') {
           return !!get().deezerArl;
+        }
+        // For Apple Music, check if we have auth with valid token
+        if (provider === 'apple') {
+          const auth = get().getAuth('apple');
+          if (!auth) return false;
+          return auth.tokens.expiresAt > Date.now() + 5 * 60 * 1000;
         }
         const auth = get().getAuth(provider);
         if (!auth) return false;
@@ -125,6 +136,7 @@ export const useAppStore = create<AppState>()(
         if (provider === 'tidal') return config.tidal || null;
         if (provider === 'spotify') return config.spotify || null;
         if (provider === 'deezer') return config.deezer || null;
+        if (provider === 'apple') return config.apple || null;
         return null;
       },
     }),
@@ -136,6 +148,7 @@ export const useAppStore = create<AppState>()(
         tidalAuth: state.tidalAuth,
         deezerAuth: state.deezerAuth,
         spotifyAuth: state.spotifyAuth,
+        appleAuth: state.appleAuth,
         deezerArl: state.deezerArl,
       }),
     }

@@ -102,6 +102,11 @@
       "step5": "复制其值"
     }
   },
+  "apple": {
+    "authorizing": "正在连接 Apple Music...",
+    "authorizingHint": "请在弹出窗口中使用您的 Apple ID 登录",
+    "authFailed": "连接 Apple Music 失败"
+  },
   "onboarding": {
     "skip": "跳过",
     "next": "下一步",

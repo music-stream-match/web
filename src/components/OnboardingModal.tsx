@@ -48,11 +48,14 @@ export function OnboardingModal({ isOpen, onClose }: OnboardingModalProps) {
           <div className="w-10 h-10 rounded-lg bg-deezer flex items-center justify-center">
             <Music2 className="w-5 h-5 text-white" />
           </div>
+          <div className="w-10 h-10 rounded-lg bg-apple flex items-center justify-center">
+            <Music2 className="w-5 h-5 text-white" />
+          </div>
         </div>
       ),
       titleKey: 'onboarding.providers.title',
       descriptionKey: 'onboarding.providers.description',
-      providers: ['TIDAL', 'Spotify', 'Deezer'],
+      providers: ['TIDAL', 'Spotify', 'Deezer', 'Apple Music'],
     },
     {
       icon: <KeyRound className="w-12 h-12 text-primary" />,
@@ -150,7 +153,8 @@ export function OnboardingModal({ isOpen, onClose }: OnboardingModalProps) {
                   'px-4 py-2 rounded-lg font-medium',
                   provider === 'TIDAL' && 'bg-tidal border border-white/30 text-white',
                   provider === 'Spotify' && 'bg-spotify/20 text-spotify',
-                  provider === 'Deezer' && 'bg-deezer/20 text-deezer'
+                  provider === 'Deezer' && 'bg-deezer/20 text-deezer',
+                  provider === 'Apple Music' && 'bg-apple/20 text-apple'
                 )}
               >
                 {provider}

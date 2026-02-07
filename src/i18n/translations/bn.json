@@ -100,6 +100,11 @@
       "step5": "এর মান কপি করুন"
     }
   },
+  "apple": {
+    "authorizing": "Apple Music-এ সংযোগ হচ্ছে...",
+    "authorizingHint": "অনুগ্রহ করে পপআপ উইন্ডোতে আপনার Apple ID দিয়ে সাইন ইন করুন",
+    "authFailed": "Apple Music-এ সংযোগ করতে ব্যর্থ হয়েছে"
+  },
   "onboarding": {
     "skip": "এড়িয়ে যান",
     "next": "পরবর্তী",

@@ -100,7 +100,13 @@
       "step3": "Application → Cookies sekmesine gidin",
       "step4": "\"arl\" adlı çerezi bulun",
       "step5": "Değerini kopyalayın"
-    }  },
+    }
+  },
+  "apple": {
+    "authorizing": "Apple Music'e bağlanılıyor...",
+    "authorizingHint": "Lütfen açılır pencerede Apple ID'nizle giriş yapın",
+    "authFailed": "Apple Music'e bağlanılamadı"
+  },
   "onboarding": {
     "skip": "Atla",
     "next": "Sonraki",

@@ -1,10 +1,10 @@
 # Music Stream Match
 
-Application for transferring playlists between TIDAL, Spotify, and Deezer streaming services.
+Application for transferring playlists between TIDAL, Spotify, Deezer, and Apple Music streaming services.
 
 ## 🎵 Features
 
-- **OAuth authentication** for TIDAL and Spotify
+- **OAuth authentication** for TIDAL, Spotify, and Apple Music
 - **Deezer ARL Cookie** authentication
 - **Playlist transfer** between supported streaming services
 - **Real-time progress tracking** during import

@@ -102,6 +102,11 @@
       "step5": "Sao chép giá trị của nó"
     }
   },
+  "apple": {
+    "authorizing": "Đang kết nối với Apple Music...",
+    "authorizingHint": "Vui lòng đăng nhập bằng Apple ID của bạn trong cửa sổ bật lên",
+    "authFailed": "Không thể kết nối với Apple Music"
+  },
   "onboarding": {
     "skip": "Bỏ qua",
     "next": "Tiếp",

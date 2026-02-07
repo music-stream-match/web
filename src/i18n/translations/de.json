@@ -101,8 +101,11 @@
       "step4": "Finden Sie das Cookie namens \"arl\"",
       "step5": "Kopieren Sie dessen Wert"
     }
-  },
-  "onboarding": {
+  },  "apple": {
+    "authorizing": "Verbindung zu Apple Music wird hergestellt...",
+    "authorizingHint": "Bitte melden Sie sich im Popup-Fenster mit Ihrer Apple-ID an",
+    "authFailed": "Verbindung zu Apple Music fehlgeschlagen"
+  },  "onboarding": {
     "skip": "Überspringen",
     "next": "Weiter",
     "previous": "Zurück",

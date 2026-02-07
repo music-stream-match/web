@@ -102,6 +102,11 @@
       "step5": "Skopiuj jego wartość"
     }
   },
+  "apple": {
+    "authorizing": "Łączenie z Apple Music...",
+    "authorizingHint": "Zaloguj się swoim Apple ID w oknie popup",
+    "authFailed": "Nie udało się połączyć z Apple Music"
+  },
   "onboarding": {
     "skip": "Pomiń",
     "next": "Dalej",

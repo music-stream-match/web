@@ -102,6 +102,11 @@
       "step5": "उसका मान कॉपी करें"
     }
   },
+  "apple": {
+    "authorizing": "Apple Music से कनेक्ट हो रहा है...",
+    "authorizingHint": "कृपया पॉपअप विंडो में अपनी Apple ID से साइन इन करें",
+    "authFailed": "Apple Music से कनेक्ट करने में विफल"
+  },
   "onboarding": {
     "skip": "छोड़ें",
     "next": "आगे",

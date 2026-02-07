@@ -102,6 +102,11 @@
       "step5": "その値をコピー"
     }
   },
+  "apple": {
+    "authorizing": "Apple Musicに接続中...",
+    "authorizingHint": "ポップアップウィンドウでApple IDにサインインしてください",
+    "authFailed": "Apple Musicへの接続に失敗しました"
+  },
   "onboarding": {
     "skip": "スキップ",
     "next": "次へ",

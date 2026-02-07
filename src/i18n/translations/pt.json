@@ -102,6 +102,11 @@
       "step5": "Copie seu valor"
     }
   },
+  "apple": {
+    "authorizing": "Conectando ao Apple Music...",
+    "authorizingHint": "Faça login com seu Apple ID na janela pop-up",
+    "authFailed": "Falha ao conectar ao Apple Music"
+  },
   "onboarding": {
     "skip": "Pular",
     "next": "Próximo",

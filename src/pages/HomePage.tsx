@@ -7,7 +7,7 @@ import { DeezerArlModal } from '@/components/DeezerArlModal';
 import { Button } from '@/components/ui';
 import { providerService } from '@/services/api';
 import { analytics } from '@/lib/analytics';
-import { ArrowRight, Music2, RefreshCw } from 'lucide-react';
+import { ArrowRight, Loader2, Music2, RefreshCw } from 'lucide-react';
 import { getProviderName } from '@/lib/utils';
 import { useTranslation } from '@/i18n/useTranslation';
 import { LanguageSelector } from '@/components/LanguageSelector';
@@ -22,6 +22,7 @@ export function HomePage() {
     selectedPlaylist,
     setSourceProvider,
     setTargetProvider,
+    setAuth,
     isLoggedIn,
     reset,
   } = useAppStore();
@@ -38,6 +39,9 @@ export function HomePage() {
   const [showDeezerArlModal, setShowDeezerArlModal] = useState(false);
   const [pendingDeezerMode, setPendingDeezerMode] = useState<'source' | 'target' | null>(null);
 
+  // Apple Music auth state
+  const [appleAuthLoading, setAppleAuthLoading] = useState(false);
+
   const handleProviderClick = (provider: Provider, mode: 'source' | 'target') => {
     console.log(`[HomePage] Provider ${provider} clicked for ${mode}`);
 
@@ -47,6 +51,13 @@ export function HomePage() {
         console.log('[HomePage] Showing Deezer ARL modal');
         setPendingDeezerMode(mode);
         setShowDeezerArlModal(true);
+        return;
+      }
+
+      // Apple Music uses MusicKit JS inline auth
+      if (provider === 'apple') {
+        console.log('[HomePage] Starting Apple Music MusicKit JS auth');
+        handleAppleMusicAuth(mode);
         return;
       }
 
@@ -101,6 +112,38 @@ export function HomePage() {
     setPendingDeezerMode(null);
   };
 
+  const handleAppleMusicAuth = async (mode: 'source' | 'target') => {
+    setAppleAuthLoading(true);
+    analytics.loginAttempted('apple');
+    
+    try {
+      const { appleService } = await import('@/services/api');
+      const auth = await appleService.authorize();
+      
+      setAuth('apple', auth);
+      analytics.loginSuccessful('apple');
+      console.log('[HomePage] Apple Music auth successful');
+
+      if (mode === 'source') {
+        console.log('[HomePage] Source provider selected: apple');
+        analytics.sourceProviderSelected('apple');
+        setSourceProvider('apple');
+        navigate('/playlists');
+      } else {
+        console.log('[HomePage] Target provider selected: apple');
+        analytics.targetProviderSelected('apple');
+        setTargetProvider('apple');
+        setStep('ready');
+      }
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Apple Music authentication failed';
+      console.error('[HomePage] Apple Music auth error:', message);
+      analytics.loginFailed('apple', message);
+    } finally {
+      setAppleAuthLoading(false);
+    }
+  };
+
   const handleStartImport = () => {
     console.log('[HomePage] Starting import process');
     navigate('/import');
@@ -112,7 +155,7 @@ export function HomePage() {
     setStep('source');
   };
 
-  const providers: Provider[] = ['tidal', 'spotify', 'deezer'];
+  const providers: Provider[] = ['tidal', 'spotify', 'deezer', 'apple'];
 
   return (
     <div className="min-h-screen p-6 relative">
@@ -122,7 +165,7 @@ export function HomePage() {
         <LanguageSelector />
       </div>
 
-      <div className="max-w-2xl mx-auto">
+      <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
           <div className="flex justify-center mb-4">
@@ -135,6 +178,17 @@ export function HomePage() {
             {t('app.tagline')}
           </p>
         </div>
+
+        {/* Apple Music loading overlay */}
+        {appleAuthLoading && (
+          <div className="fixed inset-0 bg-background/80 flex items-center justify-center z-50">
+            <div className="text-center">
+              <Loader2 className="w-12 h-12 animate-spin text-apple mx-auto mb-4" />
+              <p className="text-lg font-medium">{t('apple.authorizing')}</p>
+              <p className="text-sm text-text-muted">{t('apple.authorizingHint')}</p>
+            </div>
+          </div>
+        )}
 
         {/* Step indicator */}
         <div className="flex items-center justify-center gap-2 mb-8">
@@ -166,7 +220,7 @@ export function HomePage() {
             <h2 className="text-xl font-semibold text-center mb-6">
               {t('home.selectSourceService')}
             </h2>
-            <div className="grid gap-4 md:grid-cols-3">
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
               {providers.map(provider => (
                 <ProviderCard
                   key={provider}
@@ -191,7 +245,7 @@ export function HomePage() {
                 __html: t('home.selectedPlaylist', { name: selectedPlaylist.name, provider: getProviderName(sourceProvider!) })
               }} />
             )}
-            <div className="grid gap-4 md:grid-cols-3">
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
               {providers.map(provider => (
                 <ProviderCard
                   key={provider}

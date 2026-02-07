@@ -18,6 +18,7 @@
   --color-tidal: oklch(0.15 0 0);
   --color-deezer: oklch(0.55 0.28 305);
   --color-spotify: oklch(0.63 0.19 145);
+  --color-apple: oklch(0.62 0.26 360);
   
   --font-sans: 'Inter', system-ui, sans-serif;
   --radius-lg: 1rem;
@@ -59,6 +60,10 @@
   
   .btn-spotify {
     @apply bg-spotify text-white hover:opacity-90;
+  }
+  
+  .btn-apple {
+    @apply bg-apple text-white hover:opacity-90;
   }
   
   .card {

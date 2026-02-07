@@ -20,13 +20,24 @@ export function ProviderCard({ provider, mode, disabled, selected, onClick }: Pr
   const setAuth = useAppStore(state => state.setAuth);
   const setDeezerArl = useAppStore(state => state.setDeezerArl);
 
-  const handleLogout = (e: React.MouseEvent) => {
+  const handleLogout = async (e: React.MouseEvent) => {
     e.stopPropagation();
     console.log(`[ProviderCard] Logging out from ${provider}`);
     setAuth(provider, null);
     // Also clear Deezer ARL if logging out from Deezer
     if (provider === 'deezer') {
       setDeezerArl(null);
+    }
+    // Also unauthorize MusicKit if logging out from Apple Music
+    if (provider === 'apple') {
+      try {
+        const { appleService } = await import('@/services/api');
+        const music = await appleService.getMusicKitInstance();
+        await music.unauthorize();
+        console.log('[ProviderCard] MusicKit JS unauthorized successfully');
+      } catch (err) {
+        console.warn('[ProviderCard] Failed to unauthorize MusicKit:', err);
+      }
     }
   };
 
@@ -47,7 +58,8 @@ export function ProviderCard({ provider, mode, disabled, selected, onClick }: Pr
           'absolute inset-0 opacity-10',
           provider === 'tidal' && 'bg-gradient-to-br from-tidal to-transparent',
           provider === 'deezer' && 'bg-gradient-to-br from-deezer to-transparent',
-          provider === 'spotify' && 'bg-gradient-to-br from-spotify to-transparent'
+          provider === 'spotify' && 'bg-gradient-to-br from-spotify to-transparent',
+          provider === 'apple' && 'bg-gradient-to-br from-apple to-transparent'
         )}
       />
 
@@ -60,7 +72,8 @@ export function ProviderCard({ provider, mode, disabled, selected, onClick }: Pr
                 'w-12 h-12 rounded-lg flex items-center justify-center',
                 provider === 'tidal' && 'bg-tidal border border-white/30',
                 provider === 'deezer' && 'bg-deezer',
-                provider === 'spotify' && 'bg-spotify'
+                provider === 'spotify' && 'bg-spotify',
+                provider === 'apple' && 'bg-apple'
               )}
             >
               <Music className="w-6 h-6 text-white" />
@@ -93,12 +106,12 @@ export function ProviderCard({ provider, mode, disabled, selected, onClick }: Pr
               ) : (
                 <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
                   <span className="text-sm font-medium">
-                    {auth?.user.name?.[0] || (provider === 'deezer' ? 'D' : '?')}
+                    {auth?.user.name?.[0] || (provider === 'deezer' ? 'D' : provider === 'apple' ? 'A' : '?')}
                   </span>
                 </div>
               )}
               <span className="text-sm font-medium">
-                {auth?.user.name || (provider === 'deezer' ? 'Deezer (ARL)' : t('provider.loggedIn'))}
+                {auth?.user.name || (provider === 'deezer' ? 'Deezer (ARL)' : provider === 'apple' ? 'Apple Music' : t('provider.loggedIn'))}
               </span>
             </div>
             <button

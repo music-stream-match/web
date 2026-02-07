@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-This is a React + TypeScript SPA for transferring playlists between TIDAL and Deezer streaming services. Deployed on GitHub Pages at `music-stream-match.github.io`.
+This is a React + TypeScript SPA for transferring playlists between TIDAL, Deezer, Spotify, and Apple Music streaming services. Deployed on GitHub Pages at `music-stream-match.github.io`.
 
 ## Architecture
 
@@ -17,8 +17,8 @@ This is a React + TypeScript SPA for transferring playlists between TIDAL and De
 - `src/components/ui/` - Reusable UI primitives (Button, Card, Modal, Input, ProgressBar)
 - `src/components/` - Feature components (ProviderCard, PlaylistCard, ImportProgress)
 - `src/pages/` - Route pages (HomePage, PlaylistsPage, ImportPage, CallbackPage)
-- `src/services/` - API services for Deezer, TIDAL, and track mapping
-- `src/config/api.ts` - OAuth configuration for both providers
+- `src/services/` - API services for Deezer, TIDAL, Spotify, Apple Music, and track mapping
+- `src/config/api.ts` - OAuth configuration for all providers
 - `public/api/providers/{provider}/tracks/{id}.json` - Local track mapping database
 
 ### Data Flow
@@ -41,7 +41,7 @@ This is a React + TypeScript SPA for transferring playlists between TIDAL and De
 
 ### Styling
 - Use Tailwind utility classes
-- Custom colors defined in CSS: `primary`, `surface`, `border`, `text`, `text-muted`, `tidal`, `deezer`
+- Custom colors defined in CSS: `primary`, `surface`, `border`, `text`, `text-muted`, `tidal`, `deezer`, `spotify`, `apple`
 - Component classes: `.btn`, `.btn-primary`, `.card`, `.input`
 
 ### State Management
@@ -59,6 +59,16 @@ This is a React + TypeScript SPA for transferring playlists between TIDAL and De
 - Uses Authorization Code with PKCE
 - Code verifier stored in `sessionStorage`
 - Callback exchanges code for tokens
+
+### Spotify
+- Uses Authorization Code flow
+- State parameter stored in `sessionStorage`
+- Callback exchanges code for tokens using client credentials
+
+### Apple Music
+- Uses MusicKit JS for authentication
+- Developer token (JWT) required server-side
+- Music User Token obtained via MusicKit JS authorization
 
 ## Track Mapping
 

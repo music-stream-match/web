@@ -23,7 +23,7 @@ export function CallbackPage() {
     console.log(`[Callback] URL hash: ${window.location.hash}`);
     console.log(`[Callback] URL search: ${window.location.search}`);
 
-    if (provider !== 'tidal' && provider !== 'deezer' && provider !== 'spotify') {
+    if (provider !== 'tidal' && provider !== 'deezer' && provider !== 'spotify' && provider !== 'apple') {
       setError('Invalid provider');
       setStatus('error');
       return;
@@ -32,6 +32,13 @@ export function CallbackPage() {
     // Deezer now uses ARL-based auth, not OAuth callbacks
     if (provider === 'deezer') {
       console.log('[Callback] Deezer uses ARL-based auth, redirecting to home');
+      navigate('/');
+      return;
+    }
+
+    // Apple Music uses MusicKit JS inline auth, not OAuth callbacks
+    if (provider === 'apple') {
+      console.log('[Callback] Apple Music uses MusicKit JS, redirecting to home');
       navigate('/');
       return;
     }

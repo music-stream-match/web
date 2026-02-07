@@ -1,5 +1,5 @@
 import type { Provider, Playlist, Track, ProviderAuth, User, AuthTokens, SourceTrack } from '@/types';
-import { DEEZER_CONFIG, getTidalConfig, getSpotifyConfig } from '@/config/api';
+import { DEEZER_CONFIG, getTidalConfig, getSpotifyConfig, getAppleConfig } from '@/config/api';
 import { useAppStore } from '@/store/useAppStore';
 
 // ============================================
@@ -937,6 +937,333 @@ export const spotifyService = {
 };
 
 // ============================================
+// APPLE MUSIC SERVICE (MusicKit JS authentication)
+// ============================================
+
+export const appleService = {
+  // Apple Music uses MusicKit JS for auth - authorize inline, no redirect needed
+  async authorize(): Promise<ProviderAuth> {
+    console.log('[Apple Music] Starting MusicKit JS authorization...');
+
+    const music = await this.getMusicKitInstance();
+
+    // Authorize the user - this opens Apple's sign-in popup
+    const musicUserToken = await music.authorize();
+    if (!musicUserToken) {
+      throw new Error('Authorization was cancelled or failed');
+    }
+
+    console.log('[Apple Music] Got music user token');
+
+    const tokens: AuthTokens = {
+      accessToken: musicUserToken,
+      expiresAt: Date.now() + (6 * 30 * 24 * 60 * 60 * 1000), // ~6 months
+    };
+
+    const user: User = {
+      id: 'apple-music-user',
+      name: 'Apple Music User',
+    };
+
+    const auth: ProviderAuth = {
+      provider: 'apple',
+      user,
+      tokens,
+    };
+
+    console.log('[Apple Music] Auth successful');
+    return auth;
+  },
+
+  // Wait for MusicKit JS to load
+  async getMusicKit(): Promise<any> {
+    // MusicKit might already be available
+    if ((window as any).MusicKit) {
+      return (window as any).MusicKit;
+    }
+
+    // Wait for musickitloaded event
+    return new Promise((resolve, reject) => {
+      const timeout = setTimeout(() => {
+        reject(new Error('MusicKit JS failed to load. Please refresh the page and try again.'));
+      }, 15000);
+
+      document.addEventListener('musickitloaded', () => {
+        clearTimeout(timeout);
+        resolve((window as any).MusicKit);
+      }, { once: true });
+    });
+  },
+
+  // Get or configure MusicKit instance (ensures it's ready for API calls)
+  async getMusicKitInstance(): Promise<any> {
+    const MusicKit = await this.getMusicKit();
+    const config = getAppleConfig();
+
+    // Configure MusicKit if not already configured
+    try {
+      await MusicKit.configure({
+        developerToken: config.developerToken,
+        app: {
+          name: config.appName,
+          build: config.appBuild,
+        },
+      });
+    } catch (e) {
+      // Already configured — that's fine
+    }
+
+    return MusicKit.getInstance();
+  },
+
+  // Ensure user is authorized before making API calls (as per Apple docs)
+  // If user already authorized, this resolves immediately without showing popup
+  // Returns the fresh music user token for use with direct API calls
+  async ensureAuthorized(): Promise<{ music: any; musicUserToken: string; developerToken: string }> {
+    const music = await this.getMusicKitInstance();
+    const config = getAppleConfig();
+    console.log(`[Apple Music] isAuthorized: ${music.isAuthorized}, musicUserToken: ${music.musicUserToken ? 'present' : 'missing'}`);
+    await music.authorize();
+    const musicUserToken = music.musicUserToken;
+    console.log(`[Apple Music] Authorization ensured, isAuthorized: ${music.isAuthorized}, token present: ${!!musicUserToken}`);
+    if (!musicUserToken) {
+      throw new Error('Apple Music authorization succeeded but no Music User Token received');
+    }
+    return { music, musicUserToken, developerToken: config.developerToken };
+  },
+
+  // Make an authenticated GET request to the Apple Music API
+  async apiGet(path: string, musicUserToken: string, developerToken: string): Promise<any> {
+    const url = `https://api.music.apple.com/${path}`;
+    console.log(`[Apple Music] GET ${url}`);
+
+    const response = await fetchWithRetry(url, {
+      headers: {
+        'Authorization': `Bearer ${developerToken}`,
+        'Music-User-Token': musicUserToken,
+        'Content-Type': 'application/json',
+      },
+    }, { maxRetries: 3, baseDelay: 1000 });
+
+    console.log(`[Apple Music] Response status: ${response.status}`);
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error(`[Apple Music] API error: ${response.status}`, errorText);
+      throw new Error(`Apple Music API error: ${response.status} - ${errorText}`);
+    }
+
+    return response.json();
+  },
+
+  // Make an authenticated POST request to the Apple Music API
+  async apiPost(path: string, body: any, musicUserToken: string, developerToken: string): Promise<{ status: number; data: any }> {
+    const url = `https://api.music.apple.com/${path}`;
+    console.log(`[Apple Music] POST ${url}`, JSON.stringify(body));
+
+    const response = await fetchWithRetry(url, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${developerToken}`,
+        'Music-User-Token': musicUserToken,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(body),
+    }, { maxRetries: 3, baseDelay: 1000 });
+
+    console.log(`[Apple Music] Response status: ${response.status}`);
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error(`[Apple Music] API error: ${response.status}`, errorText);
+      throw new Error(`Apple Music API error: ${response.status} - ${errorText}`);
+    }
+
+    // 204 No Content has no body
+    if (response.status === 204) {
+      return { status: 204, data: null };
+    }
+
+    const responseText = await response.text();
+    const data = responseText ? JSON.parse(responseText) : null;
+    return { status: response.status, data };
+  },
+
+  async getPlaylists(_accessToken: string): Promise<Playlist[]> {
+    console.log('[Apple Music] Fetching playlists...');
+    const { musicUserToken, developerToken } = await this.ensureAuthorized();
+
+    const playlists: Playlist[] = [];
+    let offset = 0;
+    const limit = 100;
+    let hasMore = true;
+
+    while (hasMore) {
+      console.log(`[Apple Music] Fetching playlists offset=${offset} limit=${limit}...`);
+
+      const data = await this.apiGet(
+        `v1/me/library/playlists?limit=${limit}&offset=${offset}`,
+        musicUserToken,
+        developerToken
+      );
+
+      const items = data?.data || [];
+      console.log(`[Apple Music] Got ${items.length} playlists in this page`);
+
+      for (const p of items) {
+        playlists.push({
+          id: p.id,
+          name: p.attributes?.name || 'Unknown Playlist',
+          description: p.attributes?.description?.standard,
+          imageUrl: p.attributes?.artwork?.url
+            ?.replace('{w}', '200').replace('{h}', '200'),
+          trackCount: p.attributes?.trackCount || 0,
+          createdAt: p.attributes?.dateAdded || '',
+          owner: undefined,
+        });
+      }
+
+      if (data?.next) {
+        offset += limit;
+      } else {
+        hasMore = false;
+      }
+    }
+
+    console.log(`[Apple Music] Found ${playlists.length} playlists total`);
+    return playlists;
+  },
+
+  async getPlaylistTracks(
+    playlistId: string,
+    _accessToken: string,
+    onProgress?: (loaded: number, total: number) => void
+  ): Promise<SourceTrack[]> {
+    console.log(`[Apple Music] Fetching tracks for playlist ${playlistId}...`);
+    const { musicUserToken, developerToken } = await this.ensureAuthorized();
+
+    const tracks: SourceTrack[] = [];
+    let offset = 0;
+    const limit = 100;
+    let hasMore = true;
+    let estimatedTotal = 0;
+
+    while (hasMore) {
+      const data = await this.apiGet(
+        `v1/me/library/playlists/${playlistId}/tracks?limit=${limit}&offset=${offset}`,
+        musicUserToken,
+        developerToken
+      );
+
+      if (estimatedTotal === 0 && data?.meta?.total) {
+        estimatedTotal = data.meta.total;
+      }
+
+      for (const item of (data?.data || [])) {
+        if (item.id) {
+          const attrs = item.attributes || {};
+          tracks.push({
+            id: String(item.id),
+            title: attrs.name || `Unknown Track (${item.id})`,
+            artistName: attrs.artistName || 'Unknown Artist',
+            albumTitle: attrs.albumName,
+          });
+        }
+      }
+
+      if (onProgress) {
+        onProgress(tracks.length, estimatedTotal || tracks.length);
+      }
+
+      if (data?.next) {
+        offset += limit;
+      } else {
+        hasMore = false;
+      }
+    }
+
+    console.log(`[Apple Music] Found ${tracks.length} tracks in playlist`);
+    return tracks;
+  },
+
+  async checkPlaylistExists(name: string, accessToken: string): Promise<Playlist | null> {
+    const playlists = await this.getPlaylists(accessToken);
+    return playlists.find(p => p.name.toLowerCase() === name.toLowerCase()) || null;
+  },
+
+  async createPlaylist(name: string, _accessToken: string): Promise<string> {
+    console.log(`[Apple Music] Creating playlist: ${name}...`);
+    const { musicUserToken, developerToken } = await this.ensureAuthorized();
+
+    const requestBody = {
+      attributes: {
+        name,
+        description: 'Created by Music Stream Match',
+      },
+    };
+
+    const { status, data } = await this.apiPost(
+      'v1/me/library/playlists',
+      requestBody,
+      musicUserToken,
+      developerToken
+    );
+
+    console.log(`[Apple Music] Create playlist status: ${status}, data:`, JSON.stringify(data));
+
+    const playlistId = data?.data?.[0]?.id;
+
+    if (!playlistId) {
+      // Playlist creation may be asynchronous — poll for it
+      console.log('[Apple Music] No playlist ID in response, polling...');
+      for (let attempt = 0; attempt < 10; attempt++) {
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        console.log(`[Apple Music] Polling for playlist "${name}" (attempt ${attempt + 1}/10)...`);
+
+        const found = await this.checkPlaylistExists(name, _accessToken);
+        if (found) {
+          console.log(`[Apple Music] Found created playlist via polling: ${found.id}`);
+          return found.id;
+        }
+      }
+
+      throw new Error('Apple Music playlist creation was accepted but playlist not found after polling');
+    }
+
+    console.log(`[Apple Music] Created playlist with ID: ${playlistId}`);
+    return playlistId;
+  },
+
+  async addTracksToPlaylist(playlistId: string, trackIds: string[], _accessToken: string): Promise<void> {
+    console.log(`[Apple Music] Adding ${trackIds.length} tracks to playlist ${playlistId}...`);
+    const { musicUserToken, developerToken } = await this.ensureAuthorized();
+
+    // Apple Music accepts catalog track IDs; split into batches of 25
+    const batchSize = 25;
+    for (let i = 0; i < trackIds.length; i += batchSize) {
+      const batch = trackIds.slice(i, i + batchSize);
+      const requestBody = {
+        data: batch.map(id => ({
+          id: String(id),
+          type: 'songs' as const,
+        })),
+      };
+
+      console.log(`[Apple Music] Adding batch ${Math.floor(i / batchSize) + 1}/${Math.ceil(trackIds.length / batchSize)}`);
+
+      await this.apiPost(
+        `v1/me/library/playlists/${playlistId}/tracks`,
+        requestBody,
+        musicUserToken,
+        developerToken
+      );
+    }
+
+    console.log('[Apple Music] Tracks added successfully');
+  },
+};
+
+// ============================================
 // TRACK MAPPING SERVICE (Local JSON files with caching and batch support)
 // ============================================
 
@@ -1099,6 +1426,10 @@ export const providerService = {
     if (provider === 'deezer') {
       throw new Error('Deezer uses ARL authentication, not OAuth');
     }
+    // Apple Music uses MusicKit JS inline auth, no redirect needed
+    if (provider === 'apple') {
+      throw new Error('Apple Music uses MusicKit JS authentication, not OAuth');
+    }
     if (provider === 'spotify') return spotifyService.getAuthUrl();
     return tidalService.getAuthUrl();
   },
@@ -1107,6 +1438,8 @@ export const providerService = {
     // Deezer uses ARL-based auth, no callback handling needed
     if (provider === 'deezer') {
       throw new Error('Deezer uses ARL authentication, not OAuth');
+    } else if (provider === 'apple') {
+      throw new Error('Apple Music uses MusicKit JS authentication, not OAuth callback');
     } else if (provider === 'spotify') {
       const code = (params as URLSearchParams).get('code');
       if (!code) throw new Error('No code in Spotify callback');
@@ -1126,6 +1459,9 @@ export const providerService = {
     } else if (provider === 'spotify') {
       if (!auth) throw new Error('No auth available for Spotify');
       return spotifyService.getPlaylists(auth.tokens.accessToken);
+    } else if (provider === 'apple') {
+      if (!auth) throw new Error('No auth available for Apple Music');
+      return appleService.getPlaylists(auth.tokens.accessToken);
     } else {
       if (!auth) throw new Error('No auth available for TIDAL');
       return tidalService.getPlaylists(auth.tokens.accessToken, auth.user.id);
@@ -1146,6 +1482,9 @@ export const providerService = {
     } else if (provider === 'spotify') {
       if (!auth) throw new Error('No auth available for Spotify');
       return spotifyService.getPlaylistTracks(playlistId, auth.tokens.accessToken, onProgress);
+    } else if (provider === 'apple') {
+      if (!auth) throw new Error('No auth available for Apple Music');
+      return appleService.getPlaylistTracks(playlistId, auth.tokens.accessToken, onProgress);
     } else {
       if (!auth) throw new Error('No auth available for TIDAL');
       return tidalService.getPlaylistTracks(playlistId, auth.tokens.accessToken, onProgress);
@@ -1160,6 +1499,9 @@ export const providerService = {
     } else if (provider === 'spotify') {
       if (!auth) throw new Error('No auth available for Spotify');
       return spotifyService.checkPlaylistExists(name, auth.tokens.accessToken);
+    } else if (provider === 'apple') {
+      if (!auth) throw new Error('No auth available for Apple Music');
+      return appleService.checkPlaylistExists(name, auth.tokens.accessToken);
     } else {
       if (!auth) throw new Error('No auth available for TIDAL');
       return tidalService.checkPlaylistExists(name, auth.tokens.accessToken, auth.user.id);
@@ -1174,6 +1516,9 @@ export const providerService = {
     } else if (provider === 'spotify') {
       if (!auth) throw new Error('No auth available for Spotify');
       return spotifyService.createPlaylist(name, auth.tokens.accessToken, auth.user.id);
+    } else if (provider === 'apple') {
+      if (!auth) throw new Error('No auth available for Apple Music');
+      return appleService.createPlaylist(name, auth.tokens.accessToken);
     } else {
       if (!auth) throw new Error('No auth available for TIDAL');
       return tidalService.createPlaylist(name, auth.tokens.accessToken, auth.user.id);
@@ -1188,6 +1533,9 @@ export const providerService = {
     } else if (provider === 'spotify') {
       if (!auth) throw new Error('No auth available for Spotify');
       return spotifyService.addTracksToPlaylist(playlistId, trackIds, auth.tokens.accessToken);
+    } else if (provider === 'apple') {
+      if (!auth) throw new Error('No auth available for Apple Music');
+      return appleService.addTracksToPlaylist(playlistId, trackIds, auth.tokens.accessToken);
     } else {
       if (!auth) throw new Error('No auth available for TIDAL');
       return tidalService.addTracksToPlaylist(playlistId, trackIds, auth.tokens.accessToken);
@@ -1199,6 +1547,10 @@ export const providerService = {
       return `https://www.deezer.com/playlist/${playlistId}`;
     } else if (provider === 'spotify') {
       return `https://open.spotify.com/playlist/${playlistId}`;
+    } else if (provider === 'apple') {
+      // Apple Music library playlists are personal and only accessible when signed in
+      // Use the music:// URL scheme to open directly in Music app
+      return `https://music.apple.com/library/playlist/${playlistId}`;
     } else {
       return `https://listen.tidal.com/playlist/${playlistId}`;
     }

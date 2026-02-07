@@ -74,3 +74,33 @@ export const getSpotifyConfig = () => {
 
 // Legacy export for compatibility
 export const SPOTIFY_CONFIG = SPOTIFY_DEFAULTS;
+
+// Apple Music API Configuration
+// Apple Music uses MusicKit JS for authentication
+// To get these credentials:
+// 1. Go to https://developer.apple.com/account
+// 2. Create a MusicKit identifier
+// 3. Generate a private key for MusicKit
+// 4. Use the key to generate a developer token (JWT)
+// 5. The developer token is used server-side; on the client MusicKit JS handles user auth
+
+const APPLE_DEFAULTS = {
+  developerToken: 'APPLE_DEVELOPER_TOKEN',
+  redirectUri: import.meta.env.MODE === 'production'
+    ? 'https://music-stream-match.space/callback/apple'
+    : 'https://localhost-vite.mobulum.xyz/callback/apple',
+  apiUrl: 'https://api.music.apple.com/v1',
+  appName: 'Music Stream Match',
+  appBuild: '1.0.0',
+};
+
+export const getAppleConfig = () => {
+  const credentials = useAppStore.getState().getProviderCredentials('apple');
+  return {
+    ...APPLE_DEFAULTS,
+    developerToken: credentials?.clientId || APPLE_DEFAULTS.developerToken,
+  };
+};
+
+// Legacy export for compatibility
+export const APPLE_CONFIG = APPLE_DEFAULTS;

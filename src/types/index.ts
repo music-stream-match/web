@@ -1,4 +1,4 @@
-export type Provider = 'tidal' | 'deezer' | 'spotify';
+export type Provider = 'tidal' | 'deezer' | 'spotify' | 'apple';
 
 export interface User {
   id: string;
@@ -51,6 +51,7 @@ export interface TrackProviders {
   deezerTrackId?: string;
   tidalTrackId?: string;
   spotifyTrackId?: string;
+  appleTrackId?: string;
 }
 
 export interface Track {
@@ -99,6 +100,7 @@ export interface InvitationConfig {
   deezer?: ProviderCredentials;
   tidal?: ProviderCredentials;
   spotify?: ProviderCredentials;
+  apple?: ProviderCredentials;
 }
 
 export interface AppState {
@@ -110,6 +112,7 @@ export interface AppState {
   tidalAuth: ProviderAuth | null;
   deezerAuth: ProviderAuth | null;
   spotifyAuth: ProviderAuth | null;
+  appleAuth: ProviderAuth | null;
   
   // Deezer ARL state
   deezerArl: string | null;

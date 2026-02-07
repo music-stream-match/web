@@ -10,5 +10,8 @@
   "spotify": {
     "clientId": "0e76963b0dce4667b238dd0dbb20b4e3",
     "clientSecret": "dc1aa409c33e41c7bbf0656fa78aa7d2"
+  },
+  "apple": {
+    "clientId": "TODO"
   }
 }

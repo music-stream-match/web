@@ -102,6 +102,11 @@
       "step5": "انسخ قيمته"
     }
   },
+  "apple": {
+    "authorizing": "جارٍ الاتصال بـ Apple Music...",
+    "authorizingHint": "يرجى تسجيل الدخول باستخدام Apple ID الخاص بك في النافذة المنبثقة",
+    "authFailed": "فشل الاتصال بـ Apple Music"
+  },
   "onboarding": {
     "skip": "تخطي",
     "next": "التالي",
