@@ -83,7 +83,8 @@
     "targetService": "ターゲットサービス",
     "clickToLogin": "クリックしてログイン",
     "loggedIn": "ログイン済み",
-    "logout": "ログアウト"
+    "logout": "ログアウト",
+    "unsupported": "この招待では対応していません"
   },
   "deezer": {
     "title": "Deezerにログイン",

@@ -83,7 +83,8 @@
     "targetService": "Service cible",
     "clickToLogin": "Cliquez pour vous connecter",
     "loggedIn": "Connecté",
-    "logout": "Déconnexion"
+    "logout": "Déconnexion",
+    "unsupported": "Non pris en charge dans cette invitation"
   },
   "deezer": {
     "title": "Connexion à Deezer",

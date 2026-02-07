@@ -83,7 +83,8 @@
     "targetService": "Target service",
     "clickToLogin": "Click to log in",
     "loggedIn": "Logged in",
-    "logout": "Log out"
+    "logout": "Log out",
+    "unsupported": "Not supported in this invitation"
   },
   "deezer": {
     "title": "Log in to Deezer",

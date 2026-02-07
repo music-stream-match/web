@@ -83,7 +83,8 @@
     "targetService": "Serviço de destino",
     "clickToLogin": "Clique para fazer login",
     "loggedIn": "Conectado",
-    "logout": "Sair"
+    "logout": "Sair",
+    "unsupported": "Não suportado neste convite"
   },
   "deezer": {
     "title": "Entrar no Deezer",

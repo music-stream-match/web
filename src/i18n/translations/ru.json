@@ -83,7 +83,8 @@
     "targetService": "Целевой сервис",
     "clickToLogin": "Нажмите, чтобы войти",
     "loggedIn": "Выполнен вход",
-    "logout": "Выйти"
+    "logout": "Выйти",
+    "unsupported": "Не поддерживается в этом приглашении"
   },
   "deezer": {
     "title": "Войти в Deezer",

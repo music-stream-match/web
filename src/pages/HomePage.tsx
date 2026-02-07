@@ -24,6 +24,7 @@ export function HomePage() {
     setTargetProvider,
     setAuth,
     isLoggedIn,
+    isProviderSupported,
     reset,
   } = useAppStore();
 
@@ -44,6 +45,11 @@ export function HomePage() {
 
   const handleProviderClick = (provider: Provider, mode: 'source' | 'target') => {
     console.log(`[HomePage] Provider ${provider} clicked for ${mode}`);
+
+    if (!isProviderSupported(provider)) {
+      console.log(`[HomePage] Provider ${provider} is not supported in current invitation`);
+      return;
+    }
 
     if (!isLoggedIn(provider)) {
       // Deezer uses ARL-based auth, not OAuth

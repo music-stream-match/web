@@ -1,7 +1,7 @@
 import type { Provider } from '@/types';
 import { useAppStore } from '@/store/useAppStore';
 import { Card } from '@/components/ui';
-import { Music, Check, LogOut } from 'lucide-react';
+import { Music, Check, LogOut, Ban } from 'lucide-react';
 import { cn, getProviderName } from '@/lib/utils';
 import { useTranslation } from '@/i18n/useTranslation';
 
@@ -17,8 +17,11 @@ export function ProviderCard({ provider, mode, disabled, selected, onClick }: Pr
   const { t } = useTranslation();
   const auth = useAppStore(state => state.getAuth(provider));
   const isLoggedIn = useAppStore(state => state.isLoggedIn(provider));
+  const isSupported = useAppStore(state => state.isProviderSupported(provider));
   const setAuth = useAppStore(state => state.setAuth);
   const setDeezerArl = useAppStore(state => state.setDeezerArl);
+
+  const isUnsupported = !isSupported;
 
   const handleLogout = async (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -43,13 +46,13 @@ export function ProviderCard({ provider, mode, disabled, selected, onClick }: Pr
 
   return (
     <Card
-      hover={!disabled}
-      onClick={disabled ? undefined : onClick}
+      hover={!disabled && !isUnsupported}
+      onClick={disabled || isUnsupported ? undefined : onClick}
       className={cn(
         'relative overflow-hidden transition-all duration-200',
-        disabled && 'opacity-40 cursor-not-allowed',
+        (disabled || isUnsupported) && 'opacity-40 cursor-not-allowed',
         selected && 'ring-2 ring-primary border-primary',
-        !disabled && !selected && 'hover:shadow-lg'
+        !disabled && !isUnsupported && !selected && 'hover:shadow-lg'
       )}
     >
       {/* Provider gradient background */}
@@ -94,7 +97,14 @@ export function ProviderCard({ provider, mode, disabled, selected, onClick }: Pr
         </div>
 
         {/* User info */}
-        {isLoggedIn ? (
+        {isUnsupported ? (
+          <div className="flex items-center gap-2 p-3 bg-error/10 rounded-md text-center">
+            <Ban className="w-4 h-4 text-error flex-shrink-0" />
+            <p className="text-sm text-error">
+              {t('provider.unsupported')}
+            </p>
+          </div>
+        ) : isLoggedIn ? (
           <div className="flex items-center justify-between p-3 bg-surface-hover rounded-md">
             <div className="flex items-center gap-3">
               {auth?.user.picture ? (

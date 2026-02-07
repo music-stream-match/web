@@ -83,7 +83,8 @@
     "targetService": "目标服务",
     "clickToLogin": "点击登录",
     "loggedIn": "已登录",
-    "logout": "退出登录"
+    "logout": "退出登录",
+    "unsupported": "此邀请不支持该服务"
   },
   "deezer": {
     "title": "登录 Deezer",

@@ -81,7 +81,8 @@
     "targetService": "লক্ষ্য পরিষেবা",
     "clickToLogin": "লগইন করতে ক্লিক করুন",
     "loggedIn": "লগইন করা হয়েছে",
-    "logout": "লগআউট"
+    "logout": "লগআউট",
+    "unsupported": "এই আমন্ত্রণে সমর্থিত নয়"
   },
   "deezer": {
     "title": "Deezer-এ লগইন করুন",

@@ -83,7 +83,8 @@
     "targetService": "Servizio di destinazione",
     "clickToLogin": "Clicca per accedere",
     "loggedIn": "Connesso",
-    "logout": "Esci"
+    "logout": "Esci",
+    "unsupported": "Non supportato in questo invito"
   },
   "deezer": {
     "title": "Accedi a Deezer",

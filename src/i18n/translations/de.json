@@ -83,7 +83,8 @@
     "targetService": "Zieldienst",
     "clickToLogin": "Klicken Sie zum Anmelden",
     "loggedIn": "Angemeldet",
-    "logout": "Abmelden"
+    "logout": "Abmelden",
+    "unsupported": "In dieser Einladung nicht unterstützt"
   },
   "deezer": {
     "title": "Bei Deezer anmelden",

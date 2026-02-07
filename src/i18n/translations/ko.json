@@ -83,7 +83,8 @@
     "targetService": "대상 서비스",
     "clickToLogin": "클릭하여 로그인",
     "loggedIn": "로그인됨",
-    "logout": "로그아웃"
+    "logout": "로그아웃",
+    "unsupported": "이 초대에서 지원되지 않음"
   },
   "deezer": {
     "title": "Deezer 로그인",

@@ -83,7 +83,8 @@
     "targetService": "Dịch vụ đích",
     "clickToLogin": "Nhấp để đăng nhập",
     "loggedIn": "Đã đăng nhập",
-    "logout": "Đăng xuất"
+    "logout": "Đăng xuất",
+    "unsupported": "Không được hỗ trợ trong lời mời này"
   },
   "deezer": {
     "title": "Đăng nhập Deezer",

@@ -83,7 +83,8 @@
     "targetService": "Servicio de destino",
     "clickToLogin": "Haz clic para iniciar sesión",
     "loggedIn": "Conectado",
-    "logout": "Cerrar sesión"
+    "logout": "Cerrar sesión",
+    "unsupported": "No compatible con esta invitación"
   },
   "deezer": {
     "title": "Iniciar sesión en Deezer",

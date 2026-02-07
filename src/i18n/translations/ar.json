@@ -83,7 +83,8 @@
     "targetService": "خدمة الهدف",
     "clickToLogin": "انقر لتسجيل الدخول",
     "loggedIn": "تم تسجيل الدخول",
-    "logout": "تسجيل الخروج"
+    "logout": "تسجيل الخروج",
+    "unsupported": "غير مدعوم في هذه الدعوة"
   },
   "deezer": {
     "title": "تسجيل الدخول إلى Deezer",

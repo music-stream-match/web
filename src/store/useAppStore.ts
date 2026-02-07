@@ -126,6 +126,16 @@ export const useAppStore = create<AppState>()(
         return auth.tokens.expiresAt > Date.now() + 5 * 60 * 1000;
       },
 
+      isProviderSupported: (provider: Provider) => {
+        const config = get().invitationConfig;
+        if (!config) return false;
+        if (provider === 'deezer') return !!config.deezer;
+        if (provider === 'tidal') return !!config.tidal;
+        if (provider === 'spotify') return !!config.spotify;
+        if (provider === 'apple') return !!config.apple;
+        return false;
+      },
+
       getDeezerArl: () => {
         return get().deezerArl;
       },

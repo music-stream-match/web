@@ -83,7 +83,8 @@
     "targetService": "Serwis docelowy",
     "clickToLogin": "Kliknij aby się zalogować",
     "loggedIn": "Zalogowany",
-    "logout": "Wyloguj"
+    "logout": "Wyloguj",
+    "unsupported": "Niewspierany w tym zaproszeniu"
   },
   "deezer": {
     "title": "Zaloguj się do Deezer",

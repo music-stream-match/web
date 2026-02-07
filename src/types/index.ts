@@ -139,6 +139,7 @@ export interface AppState {
   reset: () => void;
   getAuth: (provider: Provider) => ProviderAuth | null;
   isLoggedIn: (provider: Provider) => boolean;
+  isProviderSupported: (provider: Provider) => boolean;
   getDeezerArl: () => string | null;
   getProviderCredentials: (provider: Provider) => ProviderCredentials | null;
 }

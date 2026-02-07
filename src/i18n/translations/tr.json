@@ -83,7 +83,8 @@
     "targetService": "Hedef servis",
     "clickToLogin": "Giriş yapmak için tıklayın",
     "loggedIn": "Giriş yapıldı",
-    "logout": "Çıkış yap"
+    "logout": "Çıkış yap",
+    "unsupported": "Bu davette desteklenmiyor"
   },
   "deezer": {
     "title": "Deezer'a giriş yap",
