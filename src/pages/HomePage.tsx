@@ -331,7 +331,7 @@ export function HomePage() {
             {t('footer.privacy')}
           </Link>
           <span className="hidden sm:inline">·</span>
-          <a href="https://discord.gg/rwJcE5Zwez" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">
+          <a href="https://discord.gg/rwJcE5Zwez" target="_blank" rel="noopener noreferrer" onClick={() => analytics.footerLinkClicked('Discord')} className="hover:text-primary transition-colors">
             {t('footer.discord')}
           </a>
         </div>

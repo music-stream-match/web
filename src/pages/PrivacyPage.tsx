@@ -3,6 +3,7 @@ import { useTranslation } from '@/i18n/useTranslation';
 import { ArrowLeft, Shield, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui';
 import { LanguageSelector } from '@/components/LanguageSelector';
+import { analytics } from '@/lib/analytics';
 
 const THIRD_PARTY_SERVICES = [
   {
@@ -69,8 +70,8 @@ export function PrivacyPage() {
             <h2 className="text-xl font-semibold mb-3">{t('privacy.controller.title')}</h2>
             <div className="bg-surface rounded-lg p-4 space-y-1">
               <p>Music Stream Match</p>
-              <p>{t('privacy.controller.email')} <a href="mailto:music-stream-match@mobulum.com" className="text-primary hover:underline">music-stream-match@mobulum.com</a></p>
-              <p>{t('privacy.controller.discord')} <a href="https://discord.gg/rwJcE5Zwez" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline inline-flex items-center gap-1">discord.gg/rwJcE5Zwez <ExternalLink className="w-3 h-3" /></a></p>
+              <p>{t('privacy.controller.email')} <a href="mailto:music-stream-match@mobulum.com" onClick={() => analytics.externalLinkClicked('email', 'mailto:music-stream-match@mobulum.com', 'privacy_page')} className="text-primary hover:underline">music-stream-match@mobulum.com</a></p>
+              <p>{t('privacy.controller.discord')} <a href="https://discord.gg/rwJcE5Zwez" target="_blank" rel="noopener noreferrer" onClick={() => analytics.externalLinkClicked('Discord', 'https://discord.gg/rwJcE5Zwez', 'privacy_page')} className="text-primary hover:underline inline-flex items-center gap-1">discord.gg/rwJcE5Zwez <ExternalLink className="w-3 h-3" /></a></p>
             </div>
           </section>
 
@@ -93,14 +94,14 @@ export function PrivacyPage() {
             {/* 2.2 Analytics */}
             <h3 className="text-lg font-medium mt-6 mb-2">{t('privacy.whatWeCollect.analytics.title')}</h3>
             <p className="text-text-muted mb-2">{t('privacy.whatWeCollect.analytics.description')}</p>
-            <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline inline-flex items-center gap-1 text-sm">
+            <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" onClick={() => analytics.externalLinkClicked('Google Analytics Privacy', 'https://policies.google.com/privacy', 'privacy_page')} className="text-primary hover:underline inline-flex items-center gap-1 text-sm">
               {t('privacy.whatWeCollect.analytics.link')} <ExternalLink className="w-3 h-3" />
             </a>
 
             {/* 2.3 Proxy */}
             <h3 className="text-lg font-medium mt-6 mb-2">{t('privacy.whatWeCollect.proxy.title')}</h3>
             <p className="text-text-muted mb-2">{t('privacy.whatWeCollect.proxy.description')}</p>
-            <a href="https://www.cloudflare.com/privacypolicy/" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline inline-flex items-center gap-1 text-sm">
+            <a href="https://www.cloudflare.com/privacypolicy/" target="_blank" rel="noopener noreferrer" onClick={() => analytics.externalLinkClicked('Cloudflare Privacy', 'https://www.cloudflare.com/privacypolicy/', 'privacy_page')} className="text-primary hover:underline inline-flex items-center gap-1 text-sm">
               {t('privacy.whatWeCollect.proxy.link')} <ExternalLink className="w-3 h-3" />
             </a>
           </section>
@@ -138,7 +139,7 @@ export function PrivacyPage() {
                       <td className="py-2 pr-4 text-text-muted">{service.name}</td>
                       <td className="py-2 pr-4 text-text-muted">{service.purpose}</td>
                       <td className="py-2">
-                        <a href={service.url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline inline-flex items-center gap-1">
+                        <a href={service.url} target="_blank" rel="noopener noreferrer" onClick={() => analytics.externalLinkClicked(`${service.name} Privacy`, service.url, 'privacy_page')} className="text-primary hover:underline inline-flex items-center gap-1">
                           Link <ExternalLink className="w-3 h-3" />
                         </a>
                       </td>
@@ -193,9 +194,9 @@ export function PrivacyPage() {
             <h2 className="text-xl font-semibold mb-3">{t('privacy.contact.title')}</h2>
             <p className="text-text-muted mb-3">{t('privacy.contact.description')}</p>
             <div className="bg-surface rounded-lg p-4 space-y-1">
-              <p>{t('privacy.contact.email')} <a href="mailto:music-stream-match@mobulum.com" className="text-primary hover:underline">music-stream-match@mobulum.com</a></p>
-              <p>{t('privacy.contact.discord')} <a href="https://discord.gg/rwJcE5Zwez" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline inline-flex items-center gap-1">discord.gg/rwJcE5Zwez <ExternalLink className="w-3 h-3" /></a></p>
-              <p>{t('privacy.contact.github')} <a href="https://github.com/music-stream-match" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline inline-flex items-center gap-1">github.com/music-stream-match <ExternalLink className="w-3 h-3" /></a></p>
+              <p>{t('privacy.contact.email')} <a href="mailto:music-stream-match@mobulum.com" onClick={() => analytics.externalLinkClicked('email', 'mailto:music-stream-match@mobulum.com', 'privacy_contact')} className="text-primary hover:underline">music-stream-match@mobulum.com</a></p>
+              <p>{t('privacy.contact.discord')} <a href="https://discord.gg/rwJcE5Zwez" target="_blank" rel="noopener noreferrer" onClick={() => analytics.externalLinkClicked('Discord', 'https://discord.gg/rwJcE5Zwez', 'privacy_contact')} className="text-primary hover:underline inline-flex items-center gap-1">discord.gg/rwJcE5Zwez <ExternalLink className="w-3 h-3" /></a></p>
+              <p>{t('privacy.contact.github')} <a href="https://github.com/music-stream-match" target="_blank" rel="noopener noreferrer" onClick={() => analytics.externalLinkClicked('GitHub', 'https://github.com/music-stream-match', 'privacy_contact')} className="text-primary hover:underline inline-flex items-center gap-1">github.com/music-stream-match <ExternalLink className="w-3 h-3" /></a></p>
             </div>
           </section>
         </div>

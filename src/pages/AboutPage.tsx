@@ -3,6 +3,7 @@ import { useTranslation } from '@/i18n/useTranslation';
 import { ArrowLeft, Music2, Heart, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui';
 import { LanguageSelector } from '@/components/LanguageSelector';
+import { analytics } from '@/lib/analytics';
 
 export function AboutPage() {
   const navigate = useNavigate();
@@ -60,13 +61,13 @@ export function AboutPage() {
             </div>
             <p className="text-text-muted leading-relaxed mb-4">{t('about.free.description')}</p>
             <div className="flex flex-wrap gap-3">
-              <a href="https://paypal.me/zenedithPL" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-primary hover:underline text-sm">
+              <a href="https://paypal.me/zenedithPL" target="_blank" rel="noopener noreferrer" onClick={() => analytics.externalLinkClicked('PayPal', 'https://paypal.me/zenedithPL', 'about_page')} className="inline-flex items-center gap-1 text-primary hover:underline text-sm">
                 PayPal <ExternalLink className="w-3 h-3" />
               </a>
-              <a href="https://ko-fi.com/K3K11ABGW5" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-primary hover:underline text-sm">
+              <a href="https://ko-fi.com/K3K11ABGW5" target="_blank" rel="noopener noreferrer" onClick={() => analytics.externalLinkClicked('Ko-fi', 'https://ko-fi.com/K3K11ABGW5', 'about_page')} className="inline-flex items-center gap-1 text-primary hover:underline text-sm">
                 Ko-fi <ExternalLink className="w-3 h-3" />
               </a>
-              <a href="https://patreon.com/Zenedith" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-primary hover:underline text-sm">
+              <a href="https://patreon.com/Zenedith" target="_blank" rel="noopener noreferrer" onClick={() => analytics.externalLinkClicked('Patreon', 'https://patreon.com/Zenedith', 'about_page')} className="inline-flex items-center gap-1 text-primary hover:underline text-sm">
                 Patreon <ExternalLink className="w-3 h-3" />
               </a>
             </div>

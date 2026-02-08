@@ -5,6 +5,7 @@ import { CheckCircle, SkipForward, Clock, ExternalLink, Music, Copy, ChevronDown
 import { formatDuration, getProviderName } from '@/lib/utils';
 import { providerService } from '@/services/api';
 import { useTranslation } from '@/i18n/useTranslation';
+import { analytics } from '@/lib/analytics';
 
 interface ImportResultModalProps {
   result: ImportResult | null;
@@ -160,7 +161,10 @@ export function ImportResultModal({ result, onClose }: ImportResultModalProps) {
           </Button>
           <Button
             variant="primary"
-            onClick={() => window.open(targetUrl, '_blank')}
+            onClick={() => {
+              analytics.importResultPlaylistOpened(result.targetProvider);
+              window.open(targetUrl, '_blank');
+            }}
             className="flex-1"
           >
             {t('result.openPlaylist')}

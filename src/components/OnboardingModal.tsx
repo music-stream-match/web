@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Modal, Button } from '@/components/ui';
 import { useTranslation } from '@/i18n/useTranslation';
+import { analytics } from '@/lib/analytics';
 import { 
   Music2, 
   KeyRound, 
@@ -19,6 +20,12 @@ interface OnboardingModalProps {
 export function OnboardingModal({ isOpen, onClose }: OnboardingModalProps) {
   const { t } = useTranslation();
   const [currentStep, setCurrentStep] = useState(0);
+
+  useEffect(() => {
+    if (isOpen) {
+      analytics.onboardingStarted();
+    }
+  }, [isOpen]);
 
   const steps = [
     {
@@ -74,6 +81,7 @@ export function OnboardingModal({ isOpen, onClose }: OnboardingModalProps) {
     if (currentStep < steps.length - 1) {
       setCurrentStep(currentStep + 1);
     } else {
+      analytics.onboardingCompleted(currentStep + 1);
       onClose();
     }
   };
@@ -85,6 +93,7 @@ export function OnboardingModal({ isOpen, onClose }: OnboardingModalProps) {
   };
 
   const handleSkip = () => {
+    analytics.onboardingSkipped(currentStep);
     onClose();
   };
 

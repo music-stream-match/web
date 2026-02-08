@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useTranslation, SUPPORTED_LANGUAGES } from '@/i18n/useTranslation';
 import { Globe, ChevronDown, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { analytics } from '@/lib/analytics';
 
 export function LanguageSelector() {
   const { language, setLanguage } = useTranslation();
@@ -70,6 +71,7 @@ export function LanguageSelector() {
             <button
               key={lang.code}
               onClick={() => {
+                analytics.languageChanged(language, lang.code);
                 setLanguage(lang.code);
                 setIsOpen(false);
                 console.log(`[LanguageSelector] Language changed to: ${lang.code}`);

@@ -111,4 +111,59 @@ export const analytics = {
       platform,
     });
   },
+
+  // External link clicks
+  externalLinkClicked: (linkName: string, url: string, context: string) => {
+    trackEvent('external_link_clicked', {
+      link_name: linkName,
+      url,
+      context,
+    });
+  },
+
+  // Navigation events
+  footerLinkClicked: (linkName: string) => {
+    trackEvent('footer_link_clicked', {
+      link_name: linkName,
+    });
+  },
+
+  // Onboarding events
+  onboardingStarted: () => {
+    trackEvent('onboarding_started');
+  },
+
+  onboardingCompleted: (stepsViewed: number) => {
+    trackEvent('onboarding_completed', {
+      steps_viewed: stepsViewed,
+    });
+  },
+
+  onboardingSkipped: (atStep: number) => {
+    trackEvent('onboarding_skipped', {
+      at_step: atStep,
+    });
+  },
+
+  // Language events
+  languageChanged: (from: string, to: string) => {
+    trackEvent('language_changed', {
+      from_language: from,
+      to_language: to,
+    });
+  },
+
+  // Import result events
+  importResultPlaylistOpened: (provider: string) => {
+    trackEvent('import_result_playlist_opened', {
+      provider,
+    });
+  },
+
+  // Logout events
+  logoutClicked: (provider: string) => {
+    trackEvent('logout_clicked', {
+      provider,
+    });
+  },
 };

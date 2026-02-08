@@ -4,6 +4,7 @@ import { Card } from '@/components/ui';
 import { Music, Check, LogOut, Ban } from 'lucide-react';
 import { cn, getProviderName } from '@/lib/utils';
 import { useTranslation } from '@/i18n/useTranslation';
+import { analytics } from '@/lib/analytics';
 
 interface ProviderCardProps {
   provider: Provider;
@@ -26,6 +27,7 @@ export function ProviderCard({ provider, mode, disabled, selected, onClick }: Pr
   const handleLogout = async (e: React.MouseEvent) => {
     e.stopPropagation();
     console.log(`[ProviderCard] Logging out from ${provider}`);
+    analytics.logoutClicked(provider);
     setAuth(provider, null);
     // Also clear Deezer ARL if logging out from Deezer
     if (provider === 'deezer') {
