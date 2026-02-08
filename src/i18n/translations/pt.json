@@ -143,5 +143,116 @@
     "title": "Apoie o autor",
     "description": "Se você gosta deste aplicativo e quer apoiar seu desenvolvimento, pode fazê-lo através das seguintes plataformas:",
     "thanks": "Obrigado pelo seu apoio! ❤️"
+  },
+  "footer": {
+    "about": "About",
+    "privacy": "Privacy Policy",
+    "discord": "Discord"
+  },
+  "about": {
+    "title": "About Music Stream Match",
+    "what": {
+      "title": "What",
+      "description": "Music Stream Match is a free, open-source web application that lets you transfer playlists between TIDAL, Spotify, Deezer, and Apple Music. Simply log in to your source and target services, pick a playlist, and transfer it — all from your browser."
+    },
+    "why": {
+      "title": "Why",
+      "description": "Switching between music streaming services shouldn't mean losing your carefully curated playlists. Commercial playlist transfer tools are often paid, limited, or require you to hand over your credentials to a third-party server. Music Stream Match was built as a free, open-source alternative that runs entirely in your browser — your tokens never leave your device."
+    },
+    "how": {
+      "title": "How",
+      "description": "All authentication happens directly with the streaming provider via OAuth. Your tokens are stored only in your browser's localStorage and are never sent to any backend server we operate.",
+      "step1": "Enter an invitation code to access the app",
+      "step2": "Select a source streaming service and log in",
+      "step3": "Choose a playlist to transfer",
+      "step4": "Select a target streaming service and log in",
+      "step5": "Start the import — tracks are matched and added to the target playlist"
+    },
+    "free": {
+      "title": "Free, forever",
+      "description": "Feel free to use however you like, but please do not sell it. It is free for everyone, forever."
+    },
+    "backToHome": "Back to home"
+  },
+  "privacy": {
+    "title": "Privacy Policy",
+    "lastUpdated": "Last updated: February 8, 2026",
+    "intro": "Music Stream Match (\"the App\") is a free, open-source web application that helps users transfer playlists between streaming music services. This Privacy Policy explains what data we collect, how we use it, and your rights.",
+    "controller": {
+      "title": "1. Data Controller",
+      "email": "Email:",
+      "discord": "Discord:"
+    },
+    "whatWeCollect": {
+      "title": "2. What Data We Collect",
+      "localStorage": {
+        "title": "2.1 Data Stored in Your Browser",
+        "description": "When you use the App, the following data is stored exclusively in your browser's localStorage and is never transmitted to our servers:",
+        "tokens": "OAuth tokens — access tokens and refresh tokens issued by the streaming services to authorize playlist operations on your behalf.",
+        "arl": "Deezer ARL cookie — an authentication reference link you provide manually.",
+        "invitation": "Invitation code and configuration — the code used to access the App.",
+        "language": "Language preference — your chosen display language.",
+        "profile": "Basic profile info — your username and user ID as returned by the streaming providers (used only for display purposes).",
+        "noAccess": "We do not have access to this data. It stays on your device and is never sent to any backend server."
+      },
+      "analytics": {
+        "title": "2.2 Google Analytics",
+        "description": "We use Google Analytics to collect anonymous usage statistics such as pages visited, general interaction events, browser type, screen size, and geographic region. No personally identifiable information is deliberately collected.",
+        "link": "Google's Privacy Policy"
+      },
+      "proxy": {
+        "title": "2.3 Cloudflare Worker Proxy (Deezer Only)",
+        "description": "Deezer API requests are routed through a Cloudflare Worker proxy to handle CORS restrictions. This proxy may log standard HTTP request metadata as part of Cloudflare's default infrastructure.",
+        "link": "Cloudflare's Privacy Policy"
+      }
+    },
+    "howWeUse": {
+      "title": "3. How We Use Data",
+      "tokens": "Streaming service tokens — used solely to read your playlists from the source service and create/add tracks to playlists on the target service.",
+      "analytics": "Analytics data — used to understand how the App is used, identify issues, and improve the user experience.",
+      "noSell": "We do not sell or share your data with third parties for marketing purposes.",
+      "noProfiling": "We do not use your data for profiling or targeted advertising.",
+      "noStore": "We do not store your streaming credentials on any server."
+    },
+    "thirdParty": {
+      "title": "4. Third-Party Services",
+      "description": "The App interacts with the following third-party services, each with its own privacy policy:",
+      "service": "Service",
+      "purpose": "Purpose",
+      "privacyPolicy": "Privacy Policy"
+    },
+    "retention": {
+      "title": "5. Data Retention",
+      "browser": "Browser localStorage data persists until you clear your browser data, log out, or clear the App's storage. You are in full control.",
+      "analytics": "Google Analytics data is retained according to Google Analytics default retention settings (14 months).",
+      "cloudflare": "Cloudflare logs are retained according to Cloudflare's standard log retention policy."
+    },
+    "rights": {
+      "title": "6. Your Rights",
+      "access": "Access — view all data stored by the App in your browser's developer tools (Application → localStorage).",
+      "delete": "Delete — clear all locally stored data at any time by clearing your browser's localStorage or using the log-out functionality.",
+      "optOut": "Opt out of analytics — use browser extensions such as Google Analytics Opt-out or enable \"Do Not Track\" in your browser settings.",
+      "revoke": "Revoke access — remove the App's OAuth permissions from your streaming service account settings at any time."
+    },
+    "cookies": {
+      "title": "7. Cookies",
+      "description": "The App uses Google Analytics cookies (_ga, _ga_*) to distinguish unique visitors. No other cookies are set by the App. localStorage is used instead of cookies for application state."
+    },
+    "children": {
+      "title": "8. Children's Privacy",
+      "description": "The App is not directed at children under 16. We do not knowingly collect any personal information from children."
+    },
+    "changes": {
+      "title": "9. Changes to This Policy",
+      "description": "We may update this Privacy Policy from time to time. Changes will be reflected by updating the \"Last updated\" date at the top of this page."
+    },
+    "contact": {
+      "title": "10. Contact",
+      "description": "If you have questions about this Privacy Policy, please contact us:",
+      "email": "Email:",
+      "discord": "Discord:",
+      "github": "GitHub:"
+    },
+    "backToHome": "Back to home"
   }
 }
