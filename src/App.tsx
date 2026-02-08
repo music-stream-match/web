@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, useNavigate, useLocation, Navigate } from 'react-router-dom';
-import { HomePage, PlaylistsPage, ImportPage, CallbackPage, InvitationPage } from '@/pages';
+import { HomePage, PlaylistsPage, ImportPage, CallbackPage, InvitationPage, AboutPage, PrivacyPage } from '@/pages';
 import { useAppStore } from '@/store/useAppStore';
 import { trackPageView } from '@/lib/analytics';
 import { DocumentHead } from '@/components/DocumentHead';
@@ -66,6 +66,8 @@ function App() {
         <Route path="/invitation" element={<InvitationPage />} />
         <Route path="/auth/:provider" element={<CallbackPage />} />
         <Route path="/callback/:provider" element={<CallbackPage />} />
+        <Route path="/about" element={<AboutPage />} />
+        <Route path="/privacy" element={<PrivacyPage />} />
         <Route
           path="/*"
           element={

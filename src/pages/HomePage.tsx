@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import type { Provider } from '@/types';
 import { useAppStore } from '@/store/useAppStore';
 import { ProviderCard } from '@/components/ProviderCard';
@@ -319,6 +319,23 @@ export function HomePage() {
         onClose={handleDeezerArlClose}
         onSuccess={handleDeezerArlSuccess}
       />
+
+      {/* Footer */}
+      <footer className="max-w-4xl mx-auto mt-16 pt-6 border-t border-border">
+        <div className="flex flex-wrap items-center justify-center gap-4 text-sm text-text-muted">
+          <Link to="/about" className="hover:text-primary transition-colors">
+            {t('footer.about')}
+          </Link>
+          <span className="hidden sm:inline">·</span>
+          <Link to="/privacy" className="hover:text-primary transition-colors">
+            {t('footer.privacy')}
+          </Link>
+          <span className="hidden sm:inline">·</span>
+          <a href="https://discord.gg/rwJcE5Zwez" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">
+            {t('footer.discord')}
+          </a>
+        </div>
+      </footer>
     </div>
   );
 }
