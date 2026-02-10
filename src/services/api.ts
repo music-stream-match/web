@@ -1,4 +1,5 @@
 import type { Provider, Playlist, Track, ProviderAuth, User, AuthTokens, SourceTrack } from '@/types';
+import { FAVORITES_PLAYLIST_ID } from '@/types';
 import { DEEZER_CONFIG, getTidalConfig, getSpotifyConfig, getAppleConfig } from '@/config/api';
 import { useAppStore } from '@/store/useAppStore';
 
@@ -174,6 +175,101 @@ export const deezerService = {
     }
   },
 
+  async getFavoriteTracks(
+    arl: string,
+    onProgress?: (loaded: number, total: number) => void
+  ): Promise<SourceTrack[]> {
+    console.log('[Deezer] Fetching favorite tracks via proxy...');
+    
+    const userId = useAppStore.getState().deezerAuth?.user?.id;
+    if (!userId) throw new Error('Deezer user ID not available');
+
+    const tracks: SourceTrack[] = [];
+    let start = 0;
+    const limit = 500;
+    let hasMore = true;
+    let estimatedTotal = 0;
+    
+    while (hasMore) {
+      console.log(`[Deezer] Fetching favorite tracks ${start} to ${start + limit}...`);
+      
+      interface DeezerFavoritesResponse {
+        data?: DeezerTrackData[];
+        total?: number;
+      }
+      
+      const data = await deezerProxyRequest<DeezerApiResponse<DeezerFavoritesResponse>>(
+        '/api/call',
+        arl,
+        {
+          method: 'POST',
+          body: JSON.stringify({
+            method: 'favorite_song.getList',
+            params: { user_id: userId, start, nb: limit },
+          }),
+        }
+      );
+
+      const songs = data.results?.data || [];
+      
+      if (start === 0 && data.results?.total) {
+        estimatedTotal = data.results.total;
+      }
+      
+      for (const song of songs) {
+        if (song.SNG_ID) {
+          tracks.push({
+            id: String(song.SNG_ID),
+            title: song.SNG_TITLE || `Unknown Track (${song.SNG_ID})`,
+            artistName: song.ART_NAME || 'Unknown Artist',
+            albumTitle: song.ALB_TITLE,
+          });
+        }
+      }
+      
+      if (onProgress) {
+        onProgress(tracks.length, estimatedTotal || tracks.length);
+      }
+      
+      hasMore = songs.length >= limit;
+      start += limit;
+      
+      if (start >= 10000) {
+        console.log('[Deezer] Reached maximum favorite tracks limit (10000)');
+        hasMore = false;
+      }
+    }
+
+    console.log(`[Deezer] Found ${tracks.length} favorite tracks`);
+    return tracks;
+  },
+
+  async getFavoriteCount(arl: string): Promise<number> {
+    console.log('[Deezer] Fetching favorite count...');
+    
+    const userId = useAppStore.getState().deezerAuth?.user?.id;
+    if (!userId) return 0;
+
+    interface DeezerFavoritesResponse {
+      data?: DeezerTrackData[];
+      total?: number;
+    }
+    
+    const data = await deezerProxyRequest<DeezerApiResponse<DeezerFavoritesResponse>>(
+      '/api/call',
+      arl,
+      {
+        method: 'POST',
+        body: JSON.stringify({
+          method: 'favorite_song.getList',
+          params: { user_id: userId, start: 0, nb: 1 },
+        }),
+      }
+    );
+
+    return data.results?.total || 0;
+  },
+
   async getPlaylists(arl: string): Promise<Playlist[]> {
     console.log('[Deezer] Fetching playlists via proxy...');
     
@@ -200,6 +296,22 @@ export const deezerService = {
     }
 
     console.log(`[Deezer] Found ${playlists.length} playlists`);
+
+    // Prepend favorites playlist
+    try {
+      const favoriteCount = await this.getFavoriteCount(arl);
+      playlists.unshift({
+        id: FAVORITES_PLAYLIST_ID,
+        name: '❤️ Loved Tracks',
+        description: 'Your favorite tracks on Deezer',
+        trackCount: favoriteCount,
+        createdAt: '',
+        isFavorites: true,
+      });
+    } catch (e) {
+      console.warn('[Deezer] Could not fetch favorite count:', e);
+    }
+
     return playlists;
   },
 
@@ -208,6 +320,10 @@ export const deezerService = {
     arl: string,
     onProgress?: (loaded: number, total: number) => void
   ): Promise<SourceTrack[]> {
+    if (playlistId === FAVORITES_PLAYLIST_ID) {
+      return this.getFavoriteTracks(arl, onProgress);
+    }
+
     console.log(`[Deezer] Fetching tracks for playlist ${playlistId}...`);
     
     const tracks: SourceTrack[] = [];
@@ -509,7 +625,132 @@ export const tidalService = {
     }));
 
     console.log(`[TIDAL] Found ${playlists.length} playlists`);
+
+    // Prepend favorites playlist
+    try {
+      const favoriteCount = await this.getFavoriteCount(accessToken);
+      playlists.unshift({
+        id: FAVORITES_PLAYLIST_ID,
+        name: '❤️ Favorite Tracks',
+        description: 'Your favorite tracks on TIDAL',
+        trackCount: favoriteCount,
+        createdAt: '',
+        isFavorites: true,
+      });
+    } catch (e) {
+      console.warn('[TIDAL] Could not fetch favorite count:', e);
+    }
+
     return playlists;
+  },
+
+  async getFavoriteCount(accessToken: string): Promise<number> {
+    console.log('[TIDAL] Fetching favorite count...');
+    const config = getTidalConfig();
+    
+    const response = await fetchWithRetry(
+      `${config.apiUrl}/me/favorites?countryCode=US&include=tracks&limit=1`,
+      {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': 'application/vnd.api+json',
+          'Accept': 'application/vnd.api+json',
+        },
+      },
+      { maxRetries: 3, baseDelay: 1000 }
+    );
+
+    if (!response.ok) {
+      console.warn('[TIDAL] Could not fetch favorites count');
+      return 0;
+    }
+
+    const data = await response.json();
+    return data.meta?.total || 0;
+  },
+
+  async getFavoriteTracks(
+    accessToken: string,
+    onProgress?: (loaded: number, total: number) => void
+  ): Promise<SourceTrack[]> {
+    console.log('[TIDAL] Fetching favorite tracks...');
+    const config = getTidalConfig();
+    const tracks: SourceTrack[] = [];
+    let cursor: string | null = null;
+    const limit = 100;
+    let estimatedTotal = 0;
+
+    while (true) {
+      const url = cursor
+        ? `${config.apiUrl}/me/favorites?countryCode=US&include=tracks&limit=${limit}&cursor=${cursor}`
+        : `${config.apiUrl}/me/favorites?countryCode=US&include=tracks&limit=${limit}`;
+
+      const response = await fetchWithRetry(url, {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': 'application/vnd.api+json',
+          'Accept': 'application/vnd.api+json',
+        },
+      }, { maxRetries: 3, baseDelay: 1000 });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('[TIDAL] Failed to fetch favorite tracks:', response.status, errorText);
+        throw new Error(`Failed to fetch TIDAL favorite tracks: ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      if (estimatedTotal === 0 && data.meta?.total) {
+        estimatedTotal = data.meta.total;
+      }
+
+      const includedTracks = new Map<string, any>();
+      for (const included of (data.included || [])) {
+        if (included.type === 'tracks') {
+          includedTracks.set(String(included.id), included);
+        }
+      }
+
+      for (const item of (data.data || [])) {
+        const trackRef = item.relationships?.item?.data || item.relationships?.track?.data;
+        if (trackRef?.type === 'tracks') {
+          const trackId = trackRef.id.toString();
+          const trackDetails = includedTracks.get(trackId);
+
+          if (trackDetails) {
+            const attrs = trackDetails.attributes || {};
+            const artistNames = (attrs.artists || [])
+              .map((a: any) => a.name)
+              .filter(Boolean)
+              .join(', ');
+
+            tracks.push({
+              id: trackId,
+              title: attrs.title || `Unknown Track (${trackId})`,
+              artistName: artistNames || 'Unknown Artist',
+              albumTitle: attrs.album?.title,
+            });
+          } else {
+            tracks.push({
+              id: trackId,
+              title: `Unknown Track (${trackId})`,
+              artistName: 'Unknown Artist',
+            });
+          }
+        }
+      }
+
+      if (onProgress) {
+        onProgress(tracks.length, estimatedTotal || tracks.length);
+      }
+
+      cursor = data.links?.next ? new URL(data.links.next).searchParams.get('cursor') : null;
+      if (!cursor || (data.data || []).length < limit) break;
+    }
+
+    console.log(`[TIDAL] Found ${tracks.length} favorite tracks`);
+    return tracks;
   },
 
   async getPlaylistTracks(
@@ -517,6 +758,10 @@ export const tidalService = {
     accessToken: string,
     onProgress?: (loaded: number, total: number) => void
   ): Promise<SourceTrack[]> {
+    if (playlistId === FAVORITES_PLAYLIST_ID) {
+      return this.getFavoriteTracks(accessToken, onProgress);
+    }
+
     console.log(`[TIDAL] Fetching tracks for playlist ${playlistId}...`);
     const config = getTidalConfig();
     const tracks: SourceTrack[] = [];
@@ -819,7 +1064,96 @@ export const spotifyService = {
     }
 
     console.log(`[Spotify] Found ${playlists.length} playlists`);
+
+    // Prepend favorites (Liked Songs) playlist
+    try {
+      const favoriteCount = await this.getFavoriteCount(accessToken);
+      playlists.unshift({
+        id: FAVORITES_PLAYLIST_ID,
+        name: '❤️ Liked Songs',
+        description: 'Your liked songs on Spotify',
+        trackCount: favoriteCount,
+        createdAt: '',
+        isFavorites: true,
+      });
+    } catch (e) {
+      console.warn('[Spotify] Could not fetch liked songs count:', e);
+    }
+
     return playlists;
+  },
+
+  async getFavoriteCount(accessToken: string): Promise<number> {
+    console.log('[Spotify] Fetching liked songs count...');
+    const config = getSpotifyConfig();
+    
+    const response = await fetchWithRetry(`${config.apiUrl}/me/tracks?limit=1`, {
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+      },
+    }, { maxRetries: 3, baseDelay: 1000 });
+
+    if (!response.ok) {
+      console.warn('[Spotify] Could not fetch liked songs count');
+      return 0;
+    }
+
+    const data = await response.json();
+    return data.total || 0;
+  },
+
+  async getFavoriteTracks(
+    accessToken: string,
+    onProgress?: (loaded: number, total: number) => void
+  ): Promise<SourceTrack[]> {
+    console.log('[Spotify] Fetching liked songs...');
+    const config = getSpotifyConfig();
+    const tracks: SourceTrack[] = [];
+    let url: string | null = `${config.apiUrl}/me/tracks?limit=50`;
+    let estimatedTotal = 0;
+
+    while (url) {
+      const response = await fetchWithRetry(url, {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+        },
+      }, { maxRetries: 3, baseDelay: 1000 });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch Spotify liked songs');
+      }
+
+      const data = await response.json();
+
+      if (estimatedTotal === 0 && data.total) {
+        estimatedTotal = data.total;
+      }
+
+      for (const item of data.items) {
+        if (item.track?.id) {
+          const artistNames = (item.track.artists || [])
+            .map((a: any) => a.name)
+            .filter(Boolean)
+            .join(', ');
+
+          tracks.push({
+            id: String(item.track.id),
+            title: item.track.name || `Unknown Track (${item.track.id})`,
+            artistName: artistNames || 'Unknown Artist',
+            albumTitle: item.track.album?.name,
+          });
+        }
+      }
+
+      if (onProgress) {
+        onProgress(tracks.length, estimatedTotal || tracks.length);
+      }
+
+      url = data.next;
+    }
+
+    console.log(`[Spotify] Found ${tracks.length} liked songs`);
+    return tracks;
   },
 
   async getPlaylistTracks(
@@ -827,6 +1161,10 @@ export const spotifyService = {
     accessToken: string,
     onProgress?: (loaded: number, total: number) => void
   ): Promise<SourceTrack[]> {
+    if (playlistId === FAVORITES_PLAYLIST_ID) {
+      return this.getFavoriteTracks(accessToken, onProgress);
+    }
+
     console.log(`[Spotify] Fetching tracks for playlist ${playlistId}...`);
     const config = getSpotifyConfig();
     const tracks: SourceTrack[] = [];
@@ -1131,7 +1469,86 @@ export const appleService = {
     }
 
     console.log(`[Apple Music] Found ${playlists.length} playlists total`);
+
+    // Prepend favorites (library songs) playlist
+    try {
+      const favoriteCount = await this.getFavoriteCount();
+      playlists.unshift({
+        id: FAVORITES_PLAYLIST_ID,
+        name: '❤️ Favorite Songs',
+        description: 'Your favorite songs on Apple Music',
+        trackCount: favoriteCount,
+        createdAt: '',
+        isFavorites: true,
+      });
+    } catch (e) {
+      console.warn('[Apple Music] Could not fetch favorites count:', e);
+    }
+
     return playlists;
+  },
+
+  async getFavoriteCount(): Promise<number> {
+    console.log('[Apple Music] Fetching favorites count...');
+    const { musicUserToken, developerToken } = await this.ensureAuthorized();
+
+    const data = await this.apiGet(
+      'v1/me/library/songs?limit=1',
+      musicUserToken,
+      developerToken
+    );
+
+    return data?.meta?.total || 0;
+  },
+
+  async getFavoriteTracks(
+    onProgress?: (loaded: number, total: number) => void
+  ): Promise<SourceTrack[]> {
+    console.log('[Apple Music] Fetching favorite songs...');
+    const { musicUserToken, developerToken } = await this.ensureAuthorized();
+
+    const tracks: SourceTrack[] = [];
+    let offset = 0;
+    const limit = 100;
+    let hasMore = true;
+    let estimatedTotal = 0;
+
+    while (hasMore) {
+      const data = await this.apiGet(
+        `v1/me/library/songs?limit=${limit}&offset=${offset}`,
+        musicUserToken,
+        developerToken
+      );
+
+      if (estimatedTotal === 0 && data?.meta?.total) {
+        estimatedTotal = data.meta.total;
+      }
+
+      for (const item of (data?.data || [])) {
+        if (item.id) {
+          const attrs = item.attributes || {};
+          tracks.push({
+            id: String(item.id),
+            title: attrs.name || `Unknown Track (${item.id})`,
+            artistName: attrs.artistName || 'Unknown Artist',
+            albumTitle: attrs.albumName,
+          });
+        }
+      }
+
+      if (onProgress) {
+        onProgress(tracks.length, estimatedTotal || tracks.length);
+      }
+
+      if (data?.next) {
+        offset += limit;
+      } else {
+        hasMore = false;
+      }
+    }
+
+    console.log(`[Apple Music] Found ${tracks.length} favorite songs`);
+    return tracks;
   },
 
   async getPlaylistTracks(
@@ -1139,6 +1556,10 @@ export const appleService = {
     _accessToken: string,
     onProgress?: (loaded: number, total: number) => void
   ): Promise<SourceTrack[]> {
+    if (playlistId === FAVORITES_PLAYLIST_ID) {
+      return this.getFavoriteTracks(onProgress);
+    }
+
     console.log(`[Apple Music] Fetching tracks for playlist ${playlistId}...`);
     const { musicUserToken, developerToken } = await this.ensureAuthorized();
 

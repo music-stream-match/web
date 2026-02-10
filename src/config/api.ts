@@ -58,7 +58,7 @@ const SPOTIFY_DEFAULTS = {
   authUrl: 'https://accounts.spotify.com/authorize',
   tokenUrl: 'https://accounts.spotify.com/api/token',
   apiUrl: 'https://api.spotify.com/v1',
-  scopes: ['user-read-private', 'user-read-email', 'playlist-read-private', 'playlist-modify-public', 'playlist-modify-private'],
+  scopes: ['user-read-private', 'user-read-email', 'user-library-read', 'playlist-read-private', 'playlist-modify-public', 'playlist-modify-private'],
 };
 
 export const getSpotifyConfig = () => {

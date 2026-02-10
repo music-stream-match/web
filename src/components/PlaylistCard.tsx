@@ -1,6 +1,6 @@
 import type { Playlist } from '@/types';
 import { Card } from '@/components/ui';
-import { Music, Calendar, Check } from 'lucide-react';
+import { Music, Calendar, Check, Heart } from 'lucide-react';
 import { formatDate, cn } from '@/lib/utils';
 import { useTranslation } from '@/i18n/useTranslation';
 
@@ -19,13 +19,18 @@ export function PlaylistCard({ playlist, selected, onClick }: PlaylistCardProps)
       onClick={onClick}
       className={cn(
         'transition-all duration-200',
-        selected && 'ring-2 ring-primary border-primary'
+        selected && 'ring-2 ring-primary border-primary',
+        playlist.isFavorites && 'border-pink-500/30 bg-pink-500/5'
       )}
     >
       <div className="flex gap-4">
         {/* Playlist image */}
         <div className="flex-shrink-0">
-          {playlist.imageUrl ? (
+          {playlist.isFavorites ? (
+            <div className="w-20 h-20 rounded-md bg-gradient-to-br from-pink-500 to-purple-600 flex items-center justify-center">
+              <Heart className="w-8 h-8 text-white fill-white" />
+            </div>
+          ) : playlist.imageUrl ? (
             <img
               src={playlist.imageUrl}
               alt={playlist.name}

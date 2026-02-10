@@ -19,6 +19,8 @@ export interface ProviderAuth {
   tokens: AuthTokens;
 }
 
+export const FAVORITES_PLAYLIST_ID = '__favorites__';
+
 export interface Playlist {
   id: string;
   name: string;
@@ -27,6 +29,7 @@ export interface Playlist {
   trackCount: number;
   createdAt: string;
   owner?: string;
+  isFavorites?: boolean;
 }
 
 export interface Artist {
