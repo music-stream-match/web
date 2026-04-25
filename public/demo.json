@@ -4,12 +4,12 @@
     "clientId": "YOUR_DEEZER_APP_ID"
   },
   "tidal": {
-    "clientId": "ZlAcmYg4dODn9GP8",
-    "clientSecret": "mIDPPmhQAMwFfmydCKsvnyyk1TWmWp0JjdLuElMmmCM="
+    "clientId": "7cz1uAzGwIeag7HF",
+    "clientSecret": "T9yOf7eWe9TY2vUdVLCr6J5CUF2MiNkRSRcnmfJUWy4="
   },
   "spotify": {
-    "clientId": "0e76963b0dce4667b238dd0dbb20b4e3",
-    "clientSecret": "dc1aa409c33e41c7bbf0656fa78aa7d2"
+    "clientId": "9764e00e74b04bf2b62fac9840a0819c",
+    "clientSecret": "704d2892d36744259e7dafef5511a9af"
   },
   "apple": {
     "clientId": "TODO"
