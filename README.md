@@ -88,7 +88,7 @@ src/
 
 The project is automatically deployed to GitHub Pages via GitHub Actions.
 
-Live: [music-stream-match.space](https://music-stream-match.space)
+Live: [music-stream-match.mobulum.com](https://music-stream-match.mobulum.com)
 
 ## 🛠️ Technologies
 

@@ -36,7 +36,7 @@ Google Analytics uses cookies to distinguish unique visitors. No personally iden
 
 ### 2.3 Cloudflare Worker Proxy (Deezer Only)
 
-Deezer API requests are routed through a Cloudflare Worker proxy (`deezer.music-stream-match.space`) to handle CORS restrictions. This proxy may log standard HTTP request metadata (IP addresses, timestamps, user agents) as part of Cloudflare's default infrastructure. We do not actively collect or store this data, but Cloudflare's infrastructure may retain logs temporarily in accordance with [Cloudflare's Privacy Policy](https://www.cloudflare.com/privacypolicy/).
+Deezer API requests are routed through a Cloudflare Worker proxy (`deezer.music-stream-match.mobulum.com`) to handle CORS restrictions. This proxy may log standard HTTP request metadata (IP addresses, timestamps, user agents) as part of Cloudflare's default infrastructure. We do not actively collect or store this data, but Cloudflare's infrastructure may retain logs temporarily in accordance with [Cloudflare's Privacy Policy](https://www.cloudflare.com/privacypolicy/).
 
 ## 3. How We Use Data
 

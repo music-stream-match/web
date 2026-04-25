@@ -1725,7 +1725,7 @@ export const trackMappingService = {
     
     try {
       const response = await fetchWithRetry(
-        `https://api.music-stream-match.space/api/providers/${provider}/tracks/${trackId}.json`,
+        `https://api.music-stream-match.mobulum.com/api/providers/${provider}/tracks/${trackId}.json`,
         {},
         { maxRetries: 2, baseDelay: 500 }
       );
