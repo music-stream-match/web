@@ -1,6 +1,6 @@
 {
   "app": {
-    "name": "Music Stream Match",
+    "name": "Musica",
     "tagline": "স্ট্রিমিং পরিষেবাগুলির মধ্যে প্লেলিস্ট স্থানান্তর করুন"
   },
   "common": {
@@ -112,7 +112,7 @@
     "previous": "আগের",
     "start": "শুরু করুন",
     "welcome": {
-      "title": "Music Stream Match-এ আপনাকে স্বাগতম!",
+      "title": "Musica-এ আপনাকে স্বাগতম!",
       "description": "মিউজিক স্ট্রিমিং সেবাগুলির মধ্যে আপনার প্রিয় প্লেলিস্ট স্থানান্তর করার সবচেয়ে সহজ উপায়।"
     },
     "transfer": {
@@ -148,14 +148,14 @@
     "discord": "Discord"
   },
   "about": {
-    "title": "About Music Stream Match",
+    "title": "About Musica",
     "what": {
       "title": "What",
-      "description": "Music Stream Match is a free, open-source web application that lets you transfer playlists between TIDAL, Spotify, Deezer, and Apple Music. Simply log in to your source and target services, pick a playlist, and transfer it — all from your browser."
+      "description": "Musica is a free, open-source web application that lets you transfer playlists between TIDAL, Spotify, Deezer, and Apple Music. Simply log in to your source and target services, pick a playlist, and transfer it — all from your browser."
     },
     "why": {
       "title": "Why",
-      "description": "Switching between music streaming services shouldn't mean losing your carefully curated playlists. Commercial playlist transfer tools are often paid, limited, or require you to hand over your credentials to a third-party server. Music Stream Match was built as a free, open-source alternative that runs entirely in your browser — your tokens never leave your device."
+      "description": "Switching between music streaming services shouldn't mean losing your carefully curated playlists. Commercial playlist transfer tools are often paid, limited, or require you to hand over your credentials to a third-party server. Musica was built as a free, open-source alternative that runs entirely in your browser — your tokens never leave your device."
     },
     "how": {
       "title": "How",
@@ -175,7 +175,7 @@
   "privacy": {
     "title": "Privacy Policy",
     "lastUpdated": "Last updated: February 8, 2026",
-    "intro": "Music Stream Match (\"the App\") is a free, open-source web application that helps users transfer playlists between streaming music services. This Privacy Policy explains what data we collect, how we use it, and your rights.",
+    "intro": "Musica (\"the App\") is a free, open-source web application that helps users transfer playlists between streaming music services. This Privacy Policy explains what data we collect, how we use it, and your rights.",
     "controller": {
       "title": "1. Data Controller",
       "email": "Email:",

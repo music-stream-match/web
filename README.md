@@ -1,12 +1,12 @@
-# Music Stream Match
+# Musica
 
 ## What
 
-Music Stream Match is a free, open-source web application that lets you transfer playlists between TIDAL, Spotify, Deezer, and Apple Music. Simply log in to your source and target services, pick a playlist, and transfer it — all from your browser, with no server storing your data.
+Musica is a free, open-source web application that lets you transfer playlists between TIDAL, Spotify, Deezer, and Apple Music. Simply log in to your source and target services, pick a playlist, and transfer it — all from your browser, with no server storing your data.
 
 ## Why
 
-Switching between music streaming services shouldn't mean losing your carefully curated playlists. Commercial playlist transfer tools are often paid, limited, or require you to hand over your credentials to a third-party server. Music Stream Match was built as a free, open-source alternative that runs entirely in your browser — your tokens never leave your device.
+Switching between music streaming services shouldn't mean losing your carefully curated playlists. Commercial playlist transfer tools are often paid, limited, or require you to hand over your credentials to a third-party server. Musica was built as a free, open-source alternative that runs entirely in your browser — your tokens never leave your device.
 
 ## How
 
@@ -88,7 +88,7 @@ src/
 
 The project is automatically deployed to GitHub Pages via GitHub Actions.
 
-Live: [music-stream-match.mobulum.com](https://music-stream-match.mobulum.com)
+Live: [musica.mobulum.com](https://musica.mobulum.com)
 
 ## 🛠️ Technologies
 

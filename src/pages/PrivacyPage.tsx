@@ -69,7 +69,7 @@ export function PrivacyPage() {
           <section>
             <h2 className="text-xl font-semibold mb-3">{t('privacy.controller.title')}</h2>
             <div className="bg-surface rounded-lg p-4 space-y-1">
-              <p>Music Stream Match</p>
+              <p>Musica</p>
               <p>{t('privacy.controller.email')} <a href="mailto:music-stream-match@mobulum.com" onClick={() => analytics.externalLinkClicked('email', 'mailto:music-stream-match@mobulum.com', 'privacy_page')} className="text-primary hover:underline">music-stream-match@mobulum.com</a></p>
               <p>{t('privacy.controller.discord')} <a href="https://discord.gg/rwJcE5Zwez" target="_blank" rel="noopener noreferrer" onClick={() => analytics.externalLinkClicked('Discord', 'https://discord.gg/rwJcE5Zwez', 'privacy_page')} className="text-primary hover:underline inline-flex items-center gap-1">discord.gg/rwJcE5Zwez <ExternalLink className="w-3 h-3" /></a></p>
             </div>

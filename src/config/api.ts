@@ -5,7 +5,7 @@ import { useAppStore } from '@/store/useAppStore';
 // Requests go through Cloudflare Worker proxy to bypass CORS
 
 export const DEEZER_CONFIG = {
-  proxyUrl: 'https://deezer.music-stream-match.mobulum.com',
+  proxyUrl: 'https://deezer.musica.mobulum.com',
 };
 
 // TIDAL API Configuration
@@ -21,7 +21,7 @@ const TIDAL_DEFAULTS = {
   clientId: '',
   clientSecret: '',
   redirectUri: import.meta.env.MODE === 'production'
-    ? 'https://music-stream-match.mobulum.com/callback/tidal'
+    ? 'https://musica.mobulum.com/callback/tidal'
     : 'https://localhost-vite.mobulum.xyz/callback/tidal',
   authUrl: 'https://login.tidal.com/authorize',
   tokenUrl: 'https://auth.tidal.com/v1/oauth2/token',
@@ -53,7 +53,7 @@ const SPOTIFY_DEFAULTS = {
   clientId: '',
   clientSecret: '',
   redirectUri: import.meta.env.MODE === 'production'
-    ? 'https://music-stream-match.mobulum.com/callback/spotify'
+    ? 'https://musica.mobulum.com/callback/spotify'
     : 'https://localhost-vite.mobulum.xyz/callback/spotify',
   authUrl: 'https://accounts.spotify.com/authorize',
   tokenUrl: 'https://accounts.spotify.com/api/token',
@@ -86,10 +86,10 @@ export const SPOTIFY_CONFIG = SPOTIFY_DEFAULTS;
 const APPLE_DEFAULTS = {
   developerToken: '', // invitation
   redirectUri: import.meta.env.MODE === 'production'
-    ? 'https://music-stream-match.mobulum.com/callback/apple'
+    ? 'https://musica.mobulum.com/callback/apple'
     : 'https://localhost-vite.mobulum.xyz/callback/apple',
   apiUrl: 'https://api.music.apple.com/v1',
-  appName: 'Music Stream Match',
+  appName: 'Musica',
   appBuild: '1.0.0',
 };
 

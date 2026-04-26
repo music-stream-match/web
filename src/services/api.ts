@@ -393,7 +393,7 @@ export const deezerService = {
         method: 'POST',
         body: JSON.stringify({
           title: name,
-          description: 'Created by Music Stream Match',
+          description: 'Created by Musica',
           status: 'private',
         }),
       }
@@ -878,7 +878,7 @@ export const tidalService = {
           type: 'playlists',
           attributes: {
             name: name,
-            description: 'Created by Music Stream Match',
+            description: 'Created by Musica',
             privacy: 'PUBLIC',
           },
         },
@@ -1619,7 +1619,7 @@ export const appleService = {
     const requestBody = {
       attributes: {
         name,
-        description: 'Created by Music Stream Match',
+        description: 'Created by Musica',
       },
     };
 
@@ -1725,7 +1725,7 @@ export const trackMappingService = {
     
     try {
       const response = await fetchWithRetry(
-        `https://api.music-stream-match.mobulum.com/api/providers/${provider}/tracks/${trackId}.json`,
+        `https://api.musica.mobulum.com/api/providers/${provider}/tracks/${trackId}.json`,
         {},
         { maxRetries: 2, baseDelay: 500 }
       );

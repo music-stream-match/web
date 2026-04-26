@@ -1,4 +1,4 @@
-# Music Stream Match - Copilot Instructions
+# Musica - Copilot Instructions
 
 ## Project Overview
 

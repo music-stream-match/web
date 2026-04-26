@@ -16,6 +16,6 @@ export default defineConfig(({mode}) => ({
         },
     },
     server: {
-        allowedHosts: ['localhost-vite.mobulum.xyz', 'music-stream-match.github.io', 'music-stream-match.mobulum.com', 'music-stream-match.space'],
+        allowedHosts: ['localhost-vite.mobulum.xyz', 'music-stream-match.github.io', 'musica.mobulum.com', 'music-stream-match.space'],
     },
 }))
