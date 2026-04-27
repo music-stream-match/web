@@ -5,7 +5,7 @@ import { useAppStore } from '@/store/useAppStore';
 // Requests go through Cloudflare Worker proxy to bypass CORS
 
 export const DEEZER_CONFIG = {
-  proxyUrl: 'https://deezer.musica.mobulum.com',
+  proxyUrl: 'https://deezer-musica.mobulum.com',
 };
 
 // TIDAL API Configuration
