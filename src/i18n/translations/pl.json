@@ -80,6 +80,9 @@
     "redirectUriLabel": "Adres Redirect URI do ustawienia w panelu deweloperskim:",
     "copy": "Kopiuj",
     "copied": "Skopiowano!",
+    "copyAll": "Kopiuj wszystkie",
+    "tidalScopesLabel": "Wymagane uprawnienia (Scopes) w panelu TIDAL:",
+    "tidalScopesDesc": "W panelu deweloperskim TIDAL upewnij się, że Twoja aplikacja ma włączone te uprawnienia:",
     "openDashboard": "Otwórz panel deweloperski {{provider}}",
     "errorMissing": "Proszę podać Client ID oraz Client Secret"
   },

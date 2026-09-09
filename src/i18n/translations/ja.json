@@ -264,6 +264,9 @@
     "copy": "Copy",
     "copied": "Copied!",
     "openDashboard": "Open {{provider}} Developer Dashboard",
-    "errorMissing": "Please provide both Client ID and Client Secret"
+    "errorMissing": "Please provide both Client ID and Client Secret",
+    "copyAll": "すべてコピー",
+    "tidalScopesLabel": "TIDALダッシュボードで必要なスコープ（Scopes）:",
+    "tidalScopesDesc": "TIDAL Developer Dashboardで、アプリに以下のスコープが有効になっていることを確認してください:"
   }
 }

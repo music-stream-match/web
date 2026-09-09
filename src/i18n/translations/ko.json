@@ -264,6 +264,9 @@
     "copy": "Copy",
     "copied": "Copied!",
     "openDashboard": "Open {{provider}} Developer Dashboard",
-    "errorMissing": "Please provide both Client ID and Client Secret"
+    "errorMissing": "Please provide both Client ID and Client Secret",
+    "copyAll": "모두 복사",
+    "tidalScopesLabel": "TIDAL 대시보드 필수 권한 (Scopes):",
+    "tidalScopesDesc": "TIDAL Developer Dashboard에서 앱에 다음 권한이 활성화되어 있는지 확인하세요:"
   }
 }

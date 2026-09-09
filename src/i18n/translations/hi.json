@@ -264,6 +264,9 @@
     "copy": "Copy",
     "copied": "Copied!",
     "openDashboard": "Open {{provider}} Developer Dashboard",
-    "errorMissing": "Please provide both Client ID and Client Secret"
+    "errorMissing": "Please provide both Client ID and Client Secret",
+    "copyAll": "सभी कॉपी करें",
+    "tidalScopesLabel": "TIDAL डैशबोर्ड में आवश्यक अनुमतियां (Scopes):",
+    "tidalScopesDesc": "TIDAL डेवलपर डैशबोर्ड में, सुनिश्चित करें कि आपके ऐप में ये अनुमतियां सक्षम हैं:"
   }
 }

@@ -264,6 +264,9 @@
     "copy": "Copy",
     "copied": "Copied!",
     "openDashboard": "Open {{provider}} Developer Dashboard",
-    "errorMissing": "Please provide both Client ID and Client Secret"
+    "errorMissing": "Please provide both Client ID and Client Secret",
+    "copyAll": "Tümünü kopyala",
+    "tidalScopesLabel": "TIDAL Panosunda Gerekli İzinler (Scopes):",
+    "tidalScopesDesc": "TIDAL Geliştirici Panosunda uygulamanızın bu izinleri etkinleştirdiğinden emin olun:"
   }
 }

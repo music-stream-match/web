@@ -264,6 +264,9 @@
     "copy": "Copy",
     "copied": "Copied!",
     "openDashboard": "Open {{provider}} Developer Dashboard",
-    "errorMissing": "Please provide both Client ID and Client Secret"
+    "errorMissing": "Please provide both Client ID and Client Secret",
+    "copyAll": "Tout copier",
+    "tidalScopesLabel": "Autorisations requises (Scopes) dans le tableau de bord TIDAL :",
+    "tidalScopesDesc": "Dans le tableau de bord développeur TIDAL, assurez-vous que votre application a activé ces autorisations :"
   }
 }

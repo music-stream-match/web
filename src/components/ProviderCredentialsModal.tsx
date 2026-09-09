@@ -5,7 +5,7 @@ import { providerService } from '@/services/api';
 import { getSpotifyConfig, getTidalConfig } from '@/config/api';
 import { analytics } from '@/lib/analytics';
 import { getProviderName } from '@/lib/utils';
-import { ShieldCheck, Copy, Check, ExternalLink, AlertCircle } from 'lucide-react';
+import { ShieldCheck, Copy, Check, ExternalLink, AlertCircle, Key } from 'lucide-react';
 import { useTranslation } from '@/i18n/useTranslation';
 
 interface ProviderCredentialsModalProps {
@@ -31,6 +31,9 @@ export function ProviderCredentialsModal({
   const [clientSecret, setClientSecret] = useState(existing?.clientSecret || '');
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [copiedScopes, setCopiedScopes] = useState(false);
+
+  const tidalScopes = ['user.read', 'playlists.read', 'playlists.write', 'collection.read', 'collection.write'];
 
   if (!provider) return null;
 
@@ -50,6 +53,16 @@ export function ProviderCredentialsModal({
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
       console.error('Failed to copy redirect URI:', err);
+    }
+  };
+
+  const handleCopyScopes = async () => {
+    try {
+      await navigator.clipboard.writeText(tidalScopes.join(' '));
+      setCopiedScopes(true);
+      setTimeout(() => setCopiedScopes(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy scopes:', err);
     }
   };
 
@@ -176,6 +189,48 @@ export function ProviderCredentialsModal({
             </a>
           </div>
         </div>
+
+        {/* TIDAL Required Scopes Box */}
+        {provider === 'tidal' && (
+          <div className="p-3 bg-surface-hover rounded-lg border border-border space-y-2 text-xs">
+            <div className="flex items-center justify-between">
+              <p className="text-text font-medium flex items-center gap-1.5">
+                <Key className="w-3.5 h-3.5 text-primary" />
+                {t('credentials.tidalScopesLabel')}
+              </p>
+              <button
+                type="button"
+                onClick={handleCopyScopes}
+                className="text-primary hover:underline inline-flex items-center gap-1 text-[11px] font-medium"
+              >
+                {copiedScopes ? (
+                  <>
+                    <Check className="w-3 h-3 text-success" />
+                    <span className="text-success">{t('credentials.copied')}</span>
+                  </>
+                ) : (
+                  <>
+                    <Copy className="w-3 h-3" />
+                    <span>{t('credentials.copyAll')}</span>
+                  </>
+                )}
+              </button>
+            </div>
+            <p className="text-text-muted text-[11px]">
+              {t('credentials.tidalScopesDesc')}
+            </p>
+            <div className="flex flex-wrap gap-1.5 pt-0.5">
+              {tidalScopes.map((scope) => (
+                <code
+                  key={scope}
+                  className="px-2 py-0.5 bg-background border border-border rounded font-mono text-[11px] text-text"
+                >
+                  {scope}
+                </code>
+              ))}
+            </div>
+          </div>
+        )}
 
         {error && (
           <div className="flex items-center gap-2 p-3 bg-error/10 border border-error/20 rounded-md text-error text-sm">

@@ -80,6 +80,9 @@
     "redirectUriLabel": "Redirect URI to register in Developer Dashboard:",
     "copy": "Copy",
     "copied": "Copied!",
+    "copyAll": "Copy all",
+    "tidalScopesLabel": "Required Scopes in TIDAL Dashboard:",
+    "tidalScopesDesc": "In the TIDAL Developer Dashboard, ensure your app has these scopes enabled:",
     "openDashboard": "Open {{provider}} Developer Dashboard",
     "errorMissing": "Please provide both Client ID and Client Secret"
   },
