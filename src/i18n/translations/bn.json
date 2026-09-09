@@ -46,11 +46,13 @@
     "playlistExists": "এই নামে একটি প্লেলিস্ট ইতিমধ্যে বিদ্যমান",
     "playlistExistsHint": "গানগুলি বিদ্যমান প্লেলিস্টে যোগ করা হবে ({{count}} গান)",
     "allowDuplicates": "ডুপ্লিকেট গানের অনুমতি দিন",
-    "startImport": "আমদানি শুরু করুন",    "loadingPlaylist": "উৎস প্লেলিস্ট লোড হচ্ছে...",
+    "startImport": "আমদানি শুরু করুন",
+    "loadingPlaylist": "উৎস প্লেলিস্ট লোড হচ্ছে...",
     "loadingPlaylistHint": "{{provider}} থেকে গান প্রাপ্ত হচ্ছে",
     "loadingTracks": "গান লোড হচ্ছে",
     "loadedTracks": "{{total}} টির মধ্যে {{count}} টি গান লোড হয়েছে",
-    "preparingImport": "আমদানির জন্য প্রস্তুত হচ্ছে...",    "importing": "প্লেলিস্ট আমদানি হচ্ছে...",
+    "preparingImport": "আমদানির জন্য প্রস্তুত হচ্ছে...",
+    "importing": "প্লেলিস্ট আমদানি হচ্ছে...",
     "transferringTracks": "লক্ষ্য পরিষেবায় গান স্থানান্তর হচ্ছে",
     "imported": "আমদানিকৃত",
     "skipped": "বাদ দেওয়া",
@@ -66,23 +68,14 @@
     "skippedTracks": "বাদ দেওয়া গান:",
     "openPlaylist": "প্লেলিস্ট খুলুন"
   },
-  "invitation": {
-    "tagline": "স্ট্রিমিং পরিষেবাগুলির মধ্যে আপনার প্লেলিস্ট স্থানান্তর করুন",
-    "title": "আমন্ত্রণ কোড",
-    "description": "অ্যাক্সেস পেতে কোড লিখুন",
-    "placeholder": "আপনার কোড লিখুন",
-    "label": "আমন্ত্রণ কোড",
-    "error": "অনুগ্রহ করে একটি আমন্ত্রণ কোড লিখুন",
-    "invalid": "অবৈধ আমন্ত্রণ কোড। কোড পরীক্ষা করে আবার চেষ্টা করুন।",
-    "noCode": "আমন্ত্রণ কোড নেই? প্রশাসকের সাথে যোগাযোগ করুন।"
-  },
   "provider": {
     "sourceService": "উৎস পরিষেবা",
     "targetService": "লক্ষ্য পরিষেবা",
     "clickToLogin": "লগইন করতে ক্লিক করুন",
     "loggedIn": "লগইন করা হয়েছে",
     "logout": "লগআউট",
-    "unsupported": "এই আমন্ত্রণে সমর্থিত নয়"
+    "unsupported": "এই আমন্ত্রণে সমর্থিত নয়",
+    "disabled": "Temporarily disabled"
   },
   "deezer": {
     "title": "Deezer-এ লগইন করুন",
@@ -134,6 +127,10 @@
     "ready": {
       "title": "শুরু করতে প্রস্তুত!",
       "description": "আপনার আমন্ত্রণ কোড দিন এবং আপনার সঙ্গীত সংগ্রহ স্থানান্তর করা শুরু করুন।"
+    },
+    "credentials": {
+      "title": "Your Credentials, Your Privacy",
+      "description": "Musica connects directly using your own API credentials or ARL cookie. Your credentials and tokens are stored exclusively in your browser and never sent to any server."
     }
   },
   "support": {
@@ -160,7 +157,7 @@
     "how": {
       "title": "How",
       "description": "All authentication happens directly with the streaming provider via OAuth. Your tokens are stored only in your browser's localStorage and are never sent to any backend server we operate.",
-      "step1": "Enter an invitation code to access the app",
+      "step1": "Select a streaming service and enter your credentials in your browser",
       "step2": "Select a source streaming service and log in",
       "step3": "Choose a playlist to transfer",
       "step4": "Select a target streaming service and log in",
@@ -191,7 +188,8 @@
         "invitation": "Invitation code and configuration — the code used to access the App.",
         "language": "Language preference — your chosen display language.",
         "profile": "Basic profile info — your username and user ID as returned by the streaming providers (used only for display purposes).",
-        "noAccess": "We do not have access to this data. It stays on your device and is never sent to any backend server."
+        "noAccess": "We do not have access to this data. It stays on your device and is never sent to any backend server.",
+        "credentials": "API credentials (Client ID, Client Secret, Deezer ARL) — entered by you when connecting services, stored exclusively in your browser and deleted upon logout."
       },
       "analytics": {
         "title": "2.2 Google Analytics",
@@ -252,5 +250,20 @@
       "github": "GitHub:"
     },
     "backToHome": "Back to home"
+  },
+  "credentials": {
+    "title": "Connect {{provider}}",
+    "description": "Enter your {{provider}} API credentials to connect.",
+    "clientId": "Client ID",
+    "clientIdPlaceholder": "Enter Client ID...",
+    "clientSecret": "Client Secret",
+    "clientSecretPlaceholder": "Enter Client Secret...",
+    "saveAndConnect": "Connect",
+    "privacyNotice": "These credentials are stored only in your browser and nowhere else.",
+    "redirectUriLabel": "Redirect URI to register in Developer Dashboard:",
+    "copy": "Copy",
+    "copied": "Copied!",
+    "openDashboard": "Open {{provider}} Developer Dashboard",
+    "errorMissing": "Please provide both Client ID and Client Secret"
   }
 }

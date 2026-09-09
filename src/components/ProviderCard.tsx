@@ -19,42 +19,28 @@ export function ProviderCard({ provider, mode, disabled, selected, onClick }: Pr
   const auth = useAppStore(state => state.getAuth(provider));
   const isLoggedIn = useAppStore(state => state.isLoggedIn(provider));
   const isSupported = useAppStore(state => state.isProviderSupported(provider));
-  const setAuth = useAppStore(state => state.setAuth);
-  const setDeezerArl = useAppStore(state => state.setDeezerArl);
+  const logout = useAppStore(state => state.logout);
 
-  const isUnsupported = !isSupported;
+  const isApple = provider === 'apple';
+  const isUnsupported = !isSupported && !isApple;
+  const isCardDisabled = disabled || isApple || isUnsupported;
 
   const handleLogout = async (e: React.MouseEvent) => {
     e.stopPropagation();
     console.log(`[ProviderCard] Logging out from ${provider}`);
     analytics.logoutClicked(provider);
-    setAuth(provider, null);
-    // Also clear Deezer ARL if logging out from Deezer
-    if (provider === 'deezer') {
-      setDeezerArl(null);
-    }
-    // Also unauthorize MusicKit if logging out from Apple Music
-    if (provider === 'apple') {
-      try {
-        const { appleService } = await import('@/services/api');
-        const music = await appleService.getMusicKitInstance();
-        await music.unauthorize();
-        console.log('[ProviderCard] MusicKit JS unauthorized successfully');
-      } catch (err) {
-        console.warn('[ProviderCard] Failed to unauthorize MusicKit:', err);
-      }
-    }
+    await logout(provider);
   };
 
   return (
     <Card
-      hover={!disabled && !isUnsupported}
-      onClick={disabled || isUnsupported ? undefined : onClick}
+      hover={!isCardDisabled}
+      onClick={isCardDisabled ? undefined : onClick}
       className={cn(
         'relative overflow-hidden transition-all duration-200',
-        (disabled || isUnsupported) && 'opacity-40 cursor-not-allowed',
+        isCardDisabled && 'opacity-40 cursor-not-allowed',
         selected && 'ring-2 ring-primary border-primary',
-        !disabled && !isUnsupported && !selected && 'hover:shadow-lg'
+        !isCardDisabled && !selected && 'hover:shadow-lg'
       )}
     >
       {/* Provider gradient background */}
@@ -99,7 +85,13 @@ export function ProviderCard({ provider, mode, disabled, selected, onClick }: Pr
         </div>
 
         {/* User info */}
-        {isUnsupported ? (
+        {isApple ? (
+          <div className="p-3 bg-surface-hover/50 rounded-md text-center border border-border/40">
+            <p className="text-sm text-text-muted font-medium">
+              {t('provider.disabled')}
+            </p>
+          </div>
+        ) : isUnsupported ? (
           <div className="flex items-center gap-2 p-3 bg-error/10 rounded-md text-center">
             <Ban className="w-4 h-4 text-error flex-shrink-0" />
             <p className="text-sm text-error">
@@ -118,12 +110,12 @@ export function ProviderCard({ provider, mode, disabled, selected, onClick }: Pr
               ) : (
                 <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
                   <span className="text-sm font-medium">
-                    {auth?.user.name?.[0] || (provider === 'deezer' ? 'D' : provider === 'apple' ? 'A' : '?')}
+                    {auth?.user.name?.[0] || (provider === 'deezer' ? 'D' : '?')}
                   </span>
                 </div>
               )}
               <span className="text-sm font-medium">
-                {auth?.user.name || (provider === 'deezer' ? 'Deezer (ARL)' : provider === 'apple' ? 'Apple Music' : t('provider.loggedIn'))}
+                {auth?.user.name || (provider === 'deezer' ? 'Deezer (ARL)' : t('provider.loggedIn'))}
               </span>
             </div>
             <button

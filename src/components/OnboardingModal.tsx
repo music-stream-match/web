@@ -4,7 +4,7 @@ import { useTranslation } from '@/i18n/useTranslation';
 import { analytics } from '@/lib/analytics';
 import { 
   Music2, 
-  KeyRound, 
+  ShieldCheck, 
   ArrowRight, 
   ArrowLeftRight, 
   Sparkles,
@@ -55,20 +55,17 @@ export function OnboardingModal({ isOpen, onClose }: OnboardingModalProps) {
           <div className="w-10 h-10 rounded-lg bg-deezer flex items-center justify-center">
             <Music2 className="w-5 h-5 text-white" />
           </div>
-          <div className="w-10 h-10 rounded-lg bg-apple flex items-center justify-center">
-            <Music2 className="w-5 h-5 text-white" />
-          </div>
         </div>
       ),
       titleKey: 'onboarding.providers.title',
       descriptionKey: 'onboarding.providers.description',
-      providers: ['TIDAL', 'Spotify', 'Deezer', 'Apple Music'],
+      providers: ['TIDAL', 'Spotify', 'Deezer'],
     },
     {
-      icon: <KeyRound className="w-12 h-12 text-primary" />,
-      titleKey: 'onboarding.invitation.title',
-      descriptionKey: 'onboarding.invitation.description',
-      highlight: 'onboarding.invitation.demo',
+      icon: <ShieldCheck className="w-12 h-12 text-primary" />,
+      titleKey: 'onboarding.credentials.title',
+      descriptionKey: 'onboarding.credentials.description',
+      noticeKey: 'credentials.privacyNotice',
     },
     {
       icon: <Sparkles className="w-12 h-12 text-primary" />,
@@ -172,11 +169,11 @@ export function OnboardingModal({ isOpen, onClose }: OnboardingModalProps) {
           </div>
         )}
 
-        {/* Demo code highlight */}
-        {step.highlight && (
-          <div className="bg-primary/10 border border-primary/20 rounded-lg p-4">
-            <p className="text-sm text-text-muted mb-2">{t(step.highlight)}</p>
-            <code className="text-2xl font-bold text-primary">demo</code>
+        {/* Privacy notice highlight */}
+        {step.noticeKey && (
+          <div className="flex items-start gap-3 bg-primary/10 border border-primary/20 rounded-lg p-4 text-left">
+            <ShieldCheck className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+            <p className="text-sm font-medium text-text">{t(step.noticeKey)}</p>
           </div>
         )}
 

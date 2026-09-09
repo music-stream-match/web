@@ -6,6 +6,7 @@ export const useAppStore = create<AppState>()(
   persist(
     (set, get) => ({
       // Initial state
+      credentials: {},
       invitationCode: null,
       invitationConfig: null,
       tidalAuth: null,
@@ -19,6 +20,72 @@ export const useAppStore = create<AppState>()(
       importProgress: null,
       importResult: null,
 
+      // Credentials actions
+      setProviderCredentials: (provider: Provider, credentials: ProviderCredentials | null) => {
+        console.log(`[Store] Setting credentials for ${provider}:`, credentials ? 'provided' : 'cleared');
+        set(state => {
+          const newCredentials = { ...state.credentials };
+          if (credentials) {
+            newCredentials[provider] = credentials;
+          } else {
+            delete newCredentials[provider];
+          }
+          return { credentials: newCredentials };
+        });
+      },
+
+      clearProviderCredentials: (provider: Provider) => {
+        console.log(`[Store] Clearing credentials for ${provider}`);
+        set(state => {
+          const newCredentials = { ...state.credentials };
+          delete newCredentials[provider];
+          return { credentials: newCredentials };
+        });
+      },
+
+      logout: async (provider: Provider) => {
+        console.log(`[Store] Logging out from ${provider} and removing saved credentials`);
+        const state = get();
+
+        // Clear provider credentials from localStorage
+        const newCredentials = { ...state.credentials };
+        delete newCredentials[provider];
+
+        const updates: Partial<AppState> = {
+          credentials: newCredentials,
+        };
+
+        if (provider === 'tidal') {
+          updates.tidalAuth = null;
+        } else if (provider === 'spotify') {
+          updates.spotifyAuth = null;
+        } else if (provider === 'deezer') {
+          updates.deezerAuth = null;
+          updates.deezerArl = null;
+        } else if (provider === 'apple') {
+          updates.appleAuth = null;
+          try {
+            const { appleService } = await import('@/services/api');
+            const music = await appleService.getMusicKitInstance();
+            await music.unauthorize();
+            console.log('[Store] Apple Music unauthorize successful');
+          } catch (err) {
+            console.warn('[Store] Could not unauthorize Apple Music:', err);
+          }
+        }
+
+        // If logged-out provider was selected as source or target, reset selection
+        if (state.sourceProvider === provider) {
+          updates.sourceProvider = null;
+          updates.selectedPlaylist = null;
+        }
+        if (state.targetProvider === provider) {
+          updates.targetProvider = null;
+        }
+
+        set(updates);
+      },
+
       // Actions
       setInvitation: (code: string, config: InvitationConfig) => {
         console.log(`[Store] Setting invitation code: ${code}, config:`, config.name);
@@ -28,6 +95,7 @@ export const useAppStore = create<AppState>()(
       clearInvitation: () => {
         console.log('[Store] Clearing invitation');
         set({ 
+          credentials: {},
           invitationCode: null, 
           invitationConfig: null,
           tidalAuth: null,
@@ -127,13 +195,9 @@ export const useAppStore = create<AppState>()(
       },
 
       isProviderSupported: (provider: Provider) => {
-        const config = get().invitationConfig;
-        if (!config) return false;
-        if (provider === 'deezer') return !!config.deezer;
-        if (provider === 'tidal') return !!config.tidal;
-        if (provider === 'spotify') return !!config.spotify;
-        if (provider === 'apple') return !!config.apple;
-        return false;
+        // Apple Music is disabled for now
+        if (provider === 'apple') return false;
+        return true;
       },
 
       getDeezerArl: () => {
@@ -141,20 +205,25 @@ export const useAppStore = create<AppState>()(
       },
 
       getProviderCredentials: (provider: Provider): ProviderCredentials | null => {
-        const config = get().invitationConfig;
-        if (!config) return null;
-        if (provider === 'tidal') return config.tidal || null;
-        if (provider === 'spotify') return config.spotify || null;
-        if (provider === 'deezer') return config.deezer || null;
-        if (provider === 'apple') return config.apple || null;
+        const state = get();
+        if (state.credentials && state.credentials[provider]) {
+          return state.credentials[provider] || null;
+        }
+        // Legacy fallback from invitation config if present
+        const config = state.invitationConfig;
+        if (config) {
+          if (provider === 'tidal') return config.tidal || null;
+          if (provider === 'spotify') return config.spotify || null;
+          if (provider === 'deezer') return config.deezer || null;
+          if (provider === 'apple') return config.apple || null;
+        }
         return null;
       },
     }),
     {
       name: 'music-stream-match-storage',
       partialize: (state) => ({
-        invitationCode: state.invitationCode,
-        invitationConfig: state.invitationConfig,
+        credentials: state.credentials,
         tidalAuth: state.tidalAuth,
         deezerAuth: state.deezerAuth,
         spotifyAuth: state.spotifyAuth,

@@ -1,16 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
 const ONBOARDING_SEEN_KEY = 'msm_onboarding_seen';
 
 export function useOnboarding() {
-  const [showOnboarding, setShowOnboarding] = useState(false);
-
-  useEffect(() => {
-    const seen = localStorage.getItem(ONBOARDING_SEEN_KEY);
-    if (!seen) {
-      setShowOnboarding(true);
-    }
-  }, []);
+  const [showOnboarding, setShowOnboarding] = useState(() => {
+    return !localStorage.getItem(ONBOARDING_SEEN_KEY);
+  });
 
   const completeOnboarding = () => {
     localStorage.setItem(ONBOARDING_SEEN_KEY, 'true');

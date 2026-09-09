@@ -2,28 +2,34 @@
 
 ## What
 
-Musica is a free, open-source web application that lets you transfer playlists between TIDAL, Spotify, Deezer, and Apple Music. Simply log in to your source and target services, pick a playlist, and transfer it — all from your browser, with no server storing your data.
+Musica is a free, open-source web application that lets you transfer playlists between TIDAL, Spotify, and Deezer (Apple Music is temporarily disabled). Simply connect your source and target services, pick a playlist, and transfer it — all from your browser, with no server storing your data.
 
 ## Why
 
-Switching between music streaming services shouldn't mean losing your carefully curated playlists. Commercial playlist transfer tools are often paid, limited, or require you to hand over your credentials to a third-party server. Musica was built as a free, open-source alternative that runs entirely in your browser — your tokens never leave your device.
+Switching between music streaming services shouldn't mean losing your carefully curated playlists. Commercial playlist transfer tools are often paid, limited, or require you to hand over your credentials to a third-party server. Musica was built as a free, open-source alternative that runs entirely in your browser — your tokens and credentials never leave your device.
 
 ## How
 
-1. Enter an invitation code to access the app
-2. Select a **source** streaming service and log in via OAuth (or ARL for Deezer)
-3. Choose a playlist to transfer
-4. Select a **target** streaming service and log in
-5. Start the import — tracks are matched across services using a local mapping database and added to a new (or existing) playlist on the target service
+1. Select a **source** streaming service and connect:
+   - For **Spotify** and **TIDAL**: enter your `Client ID` and `Client Secret` from their developer dashboards.
+   - For **Deezer**: enter your `ARL` cookie.
+   - *(Apple Music is temporarily disabled)*
+2. Choose a playlist to transfer
+3. Select a **target** streaming service and connect
+4. Start the import — tracks are matched across services using a local mapping database and added to a new (or existing) playlist on the target service
 
-All authentication happens directly with the streaming provider. Tokens are stored only in your browser's localStorage and are never sent to any backend.
+> **Security & Privacy:**
+> **These credentials and tokens are stored only in your browser and nowhere else.**
+> Logging out immediately removes all saved credentials and tokens from your browser's `localStorage`.
 
 ---
 
 ## 🎵 Features
 
-- **OAuth authentication** for TIDAL, Spotify, and Apple Music
+- **Direct API & OAuth authentication** for TIDAL and Spotify
 - **Deezer ARL Cookie** authentication
+- **Client-only security** — credentials are stored exclusively in your browser and erased upon logout
+- **Apple Music temporarily disabled**
 - **Playlist transfer** between supported streaming services
 - **Real-time progress tracking** during import
 - **Import summary** with skipped tracks list and duration
@@ -56,9 +62,30 @@ npm run dev
 
 The application will be available at `http://localhost:5173`
 
-### Demo
+### 🔑 Setting Up Credentials
 
-The application currently requires invitations - if you want to try the service, you can use the invitation code "demo".
+Musica connects directly to streaming platforms using client-side APIs. To use Spotify or TIDAL, you can create a free developer app:
+
+#### Spotify
+1. Go to the [Spotify Developer Dashboard](https://developer.spotify.com/dashboard) and log in.
+2. Create an application.
+3. In App Settings, add the Redirect URI:
+   - Production: `https://musica.mobulum.com/callback/spotify`
+   - Local development: `https://localhost-vite.mobulum.xyz/callback/spotify`
+4. Copy your **Client ID** and **Client Secret** and enter them when clicking Spotify in Musica.
+
+#### TIDAL
+1. Go to the [TIDAL Developer Portal](https://developer.tidal.com/) and log in.
+2. Create an application.
+3. Set the Redirect URI to:
+   - Production: `https://musica.mobulum.com/callback/tidal`
+   - Local development: `https://localhost-vite.mobulum.xyz/callback/tidal`
+4. Copy your **Client ID** and **Client Secret** and enter them when clicking TIDAL in Musica.
+
+#### Deezer
+1. Log in to [deezer.com](https://www.deezer.com) in your browser.
+2. Open Developer Tools (`F12`) → Application → Cookies.
+3. Copy the value of the cookie named `arl`.
 
 ### Production Build
 

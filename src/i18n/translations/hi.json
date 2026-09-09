@@ -68,23 +68,14 @@
     "skippedTracks": "छोड़े गए गाने:",
     "openPlaylist": "प्लेलिस्ट खोलें"
   },
-  "invitation": {
-    "tagline": "स्ट्रीमिंग सेवाओं के बीच अपनी प्लेलिस्ट ट्रांसफर करें",
-    "title": "आमंत्रण कोड",
-    "description": "एक्सेस पाने के लिए कोड दर्ज करें",
-    "placeholder": "अपना कोड दर्ज करें",
-    "label": "आमंत्रण कोड",
-    "error": "कृपया आमंत्रण कोड दर्ज करें",
-    "invalid": "अमान्य आमंत्रण कोड। कोड जांचें और पुनः प्रयास करें।",
-    "noCode": "आमंत्रण कोड नहीं है? व्यवस्थापक से संपर्क करें।"
-  },
   "provider": {
     "sourceService": "स्रोत सेवा",
     "targetService": "लक्ष्य सेवा",
     "clickToLogin": "लॉगिन करने के लिए क्लिक करें",
     "loggedIn": "लॉग इन",
     "logout": "लॉग आउट",
-    "unsupported": "इस आमंत्रण में समर्थित नहीं"
+    "unsupported": "इस आमंत्रण में समर्थित नहीं",
+    "disabled": "Temporarily disabled"
   },
   "deezer": {
     "title": "Deezer में लॉगिन करें",
@@ -136,6 +127,10 @@
     "ready": {
       "title": "शुरू करने के लिए तैयार!",
       "description": "अपना निमंत्रण कोड दर्ज करें और अपने संगीत संग्रह को ट्रांसफर करना शुरू करें।"
+    },
+    "credentials": {
+      "title": "Your Credentials, Your Privacy",
+      "description": "Musica connects directly using your own API credentials or ARL cookie. Your credentials and tokens are stored exclusively in your browser and never sent to any server."
     }
   },
   "support": {
@@ -162,7 +157,7 @@
     "how": {
       "title": "How",
       "description": "All authentication happens directly with the streaming provider via OAuth. Your tokens are stored only in your browser's localStorage and are never sent to any backend server we operate.",
-      "step1": "Enter an invitation code to access the app",
+      "step1": "Select a streaming service and enter your credentials in your browser",
       "step2": "Select a source streaming service and log in",
       "step3": "Choose a playlist to transfer",
       "step4": "Select a target streaming service and log in",
@@ -193,7 +188,8 @@
         "invitation": "Invitation code and configuration — the code used to access the App.",
         "language": "Language preference — your chosen display language.",
         "profile": "Basic profile info — your username and user ID as returned by the streaming providers (used only for display purposes).",
-        "noAccess": "We do not have access to this data. It stays on your device and is never sent to any backend server."
+        "noAccess": "We do not have access to this data. It stays on your device and is never sent to any backend server.",
+        "credentials": "API credentials (Client ID, Client Secret, Deezer ARL) — entered by you when connecting services, stored exclusively in your browser and deleted upon logout."
       },
       "analytics": {
         "title": "2.2 Google Analytics",
@@ -254,5 +250,20 @@
       "github": "GitHub:"
     },
     "backToHome": "Back to home"
+  },
+  "credentials": {
+    "title": "Connect {{provider}}",
+    "description": "Enter your {{provider}} API credentials to connect.",
+    "clientId": "Client ID",
+    "clientIdPlaceholder": "Enter Client ID...",
+    "clientSecret": "Client Secret",
+    "clientSecretPlaceholder": "Enter Client Secret...",
+    "saveAndConnect": "Connect",
+    "privacyNotice": "These credentials are stored only in your browser and nowhere else.",
+    "redirectUriLabel": "Redirect URI to register in Developer Dashboard:",
+    "copy": "Copy",
+    "copied": "Copied!",
+    "openDashboard": "Open {{provider}} Developer Dashboard",
+    "errorMissing": "Please provide both Client ID and Client Secret"
   }
 }

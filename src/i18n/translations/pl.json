@@ -68,15 +68,20 @@
     "skippedTracks": "Pominięte utwory:",
     "openPlaylist": "Otwórz playlistę"
   },
-  "invitation": {
-    "tagline": "Przenoś swoje playlisty między serwisami streamingowymi",
-    "title": "Kod zaproszenia",
-    "description": "Wprowadź kod, aby uzyskać dostęp",
-    "placeholder": "Wprowadź swój kod",
-    "label": "Kod zaproszenia",
-    "error": "Proszę wprowadzić kod zaproszenia",
-    "invalid": "Nieprawidłowy kod zaproszenia. Sprawdź kod i spróbuj ponownie.",
-    "noCode": "Nie masz kodu zaproszenia? Skontaktuj się z administratorem."
+  "credentials": {
+    "title": "Konfiguracja {{provider}}",
+    "description": "Podaj swoje dane API serwisu {{provider}}, aby się połączyć.",
+    "clientId": "Client ID",
+    "clientIdPlaceholder": "Wprowadź Client ID...",
+    "clientSecret": "Client Secret",
+    "clientSecretPlaceholder": "Wprowadź Client Secret...",
+    "saveAndConnect": "Połącz",
+    "privacyNotice": "Dane te są trzymane tylko w Twojej przeglądarce i nigdzie więcej nie zapisywane.",
+    "redirectUriLabel": "Adres Redirect URI do ustawienia w panelu deweloperskim:",
+    "copy": "Kopiuj",
+    "copied": "Skopiowano!",
+    "openDashboard": "Otwórz panel deweloperski {{provider}}",
+    "errorMissing": "Proszę podać Client ID oraz Client Secret"
   },
   "provider": {
     "sourceService": "Serwis źródłowy",
@@ -84,7 +89,8 @@
     "clickToLogin": "Kliknij aby się zalogować",
     "loggedIn": "Zalogowany",
     "logout": "Wyloguj",
-    "unsupported": "Niewspierany w tym zaproszeniu"
+    "unsupported": "Niewspierany w tym zaproszeniu",
+    "disabled": "Tymczasowo niedostępne"
   },
   "deezer": {
     "title": "Zaloguj się do Deezer",
@@ -115,7 +121,7 @@
     "start": "Rozpocznij",
     "welcome": {
       "title": "Witaj w Musica!",
-      "description": "Najłatwiejszy sposób na przenoszenie ulubionych playlist między serwisami streamingowymi."
+      "description": "Najprostszy sposób na przenoszenie ulubionych playlist między serwisami streamingowymi."
     },
     "transfer": {
       "title": "Jak to działa",
@@ -128,14 +134,13 @@
       "title": "Wspierane serwisy",
       "description": "Przenoś playlisty między tymi popularnymi platformami:"
     },
-    "invitation": {
-      "title": "Wymagany kod zaproszenia",
-      "description": "Aby korzystać z aplikacji, potrzebujesz kodu zaproszenia. Możesz go otrzymać od administratora lub użyć kodu demo.",
-      "demo": "Wypróbuj z kodem demo:"
+    "credentials": {
+      "title": "Twoje dane, Twoja prywatność",
+      "description": "Musica łączy się bezpośrednio przy użyciu Twoich własnych kluczy API lub ciasteczka ARL. Twoje dane logowania są trzymane wyłącznie w Twojej przeglądarce i nigdy nie trafiają na żaden serwer."
     },
     "ready": {
       "title": "Gotowy do startu!",
-      "description": "Wprowadź kod zaproszenia i zacznij przenosić swoje kolekcje muzyczne."
+      "description": "Wybierz serwis, połącz się i zacznij przenosić swoje kolekcje muzyczne."
     }
   },
   "support": {
@@ -162,7 +167,7 @@
     "how": {
       "title": "How",
       "description": "All authentication happens directly with the streaming provider via OAuth. Your tokens are stored only in your browser's localStorage and are never sent to any backend server we operate.",
-      "step1": "Enter an invitation code to access the app",
+      "step1": "Wybierz serwis streamingowy i podaj swoje dane logowania w przeglądarce",
       "step2": "Select a source streaming service and log in",
       "step3": "Choose a playlist to transfer",
       "step4": "Select a target streaming service and log in",
@@ -190,7 +195,7 @@
         "description": "When you use the App, the following data is stored exclusively in your browser's localStorage and is never transmitted to our servers:",
         "tokens": "OAuth tokens — access tokens and refresh tokens issued by the streaming services to authorize playlist operations on your behalf.",
         "arl": "Deezer ARL cookie — an authentication reference link you provide manually.",
-        "invitation": "Invitation code and configuration — the code used to access the App.",
+        "credentials": "Dane logowania API (Client ID, Client Secret, Deezer ARL) — wprowadzane przez Ciebie podczas łączenia z serwisem, przechowywane wyłącznie w Twojej przeglądarce i usuwane natychmiast po wylogowaniu.",
         "language": "Language preference — your chosen display language.",
         "profile": "Basic profile info — your username and user ID as returned by the streaming providers (used only for display purposes).",
         "noAccess": "We do not have access to this data. It stays on your device and is never sent to any backend server."

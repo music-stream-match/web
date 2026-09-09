@@ -85,7 +85,7 @@ export function PrivacyPage() {
             <ul className="list-disc list-inside space-y-1 text-text-muted mb-3 ml-2">
               <li>{t('privacy.whatWeCollect.localStorage.tokens')}</li>
               <li>{t('privacy.whatWeCollect.localStorage.arl')}</li>
-              <li>{t('privacy.whatWeCollect.localStorage.invitation')}</li>
+              <li>{t('privacy.whatWeCollect.localStorage.credentials')}</li>
               <li>{t('privacy.whatWeCollect.localStorage.language')}</li>
               <li>{t('privacy.whatWeCollect.localStorage.profile')}</li>
             </ul>

@@ -68,15 +68,20 @@
     "skippedTracks": "Skipped tracks:",
     "openPlaylist": "Open playlist"
   },
-  "invitation": {
-    "tagline": "Transfer your playlists between streaming services",
-    "title": "Invitation code",
-    "description": "Enter the code to get access",
-    "placeholder": "Enter your code",
-    "label": "Invitation code",
-    "error": "Please enter an invitation code",
-    "invalid": "Invalid invitation code. Check the code and try again.",
-    "noCode": "Don't have an invitation code? Contact the administrator."
+  "credentials": {
+    "title": "Connect {{provider}}",
+    "description": "Enter your {{provider}} API credentials to connect.",
+    "clientId": "Client ID",
+    "clientIdPlaceholder": "Enter Client ID...",
+    "clientSecret": "Client Secret",
+    "clientSecretPlaceholder": "Enter Client Secret...",
+    "saveAndConnect": "Connect",
+    "privacyNotice": "These credentials are stored only in your browser and nowhere else.",
+    "redirectUriLabel": "Redirect URI to register in Developer Dashboard:",
+    "copy": "Copy",
+    "copied": "Copied!",
+    "openDashboard": "Open {{provider}} Developer Dashboard",
+    "errorMissing": "Please provide both Client ID and Client Secret"
   },
   "provider": {
     "sourceService": "Source service",
@@ -84,7 +89,8 @@
     "clickToLogin": "Click to log in",
     "loggedIn": "Logged in",
     "logout": "Log out",
-    "unsupported": "Not supported in this invitation"
+    "unsupported": "Not supported in this invitation",
+    "disabled": "Temporarily disabled"
   },
   "deezer": {
     "title": "Log in to Deezer",
@@ -128,14 +134,13 @@
       "title": "Supported services",
       "description": "Transfer playlists between these popular streaming platforms:"
     },
-    "invitation": {
-      "title": "Invitation code required",
-      "description": "To use the app, you need an invitation code. You can get it from an administrator or use a demo code.",
-      "demo": "Try it out with the demo code:"
+    "credentials": {
+      "title": "Your Credentials, Your Privacy",
+      "description": "Musica connects directly using your own API credentials or ARL cookie. Your credentials and tokens are stored exclusively in your browser and never sent to any server."
     },
     "ready": {
       "title": "Ready to start!",
-      "description": "Enter your invitation code and start transferring your music collections."
+      "description": "Select a service to connect and start transferring your music collections."
     }
   },
   "support": {
@@ -162,7 +167,7 @@
     "how": {
       "title": "How",
       "description": "All authentication happens directly with the streaming provider via OAuth. Your tokens are stored only in your browser's localStorage and are never sent to any backend server we operate.",
-      "step1": "Enter an invitation code to access the app",
+      "step1": "Select a streaming service and enter your credentials in your browser",
       "step2": "Select a source streaming service and log in",
       "step3": "Choose a playlist to transfer",
       "step4": "Select a target streaming service and log in",
@@ -190,7 +195,7 @@
         "description": "When you use the App, the following data is stored exclusively in your browser's localStorage and is never transmitted to our servers:",
         "tokens": "OAuth tokens — access tokens and refresh tokens issued by the streaming services to authorize playlist operations on your behalf.",
         "arl": "Deezer ARL cookie — an authentication reference link you provide manually.",
-        "invitation": "Invitation code and configuration — the code used to access the App.",
+        "credentials": "API credentials (Client ID, Client Secret, Deezer ARL) — entered by you when connecting services, stored exclusively in your browser and deleted upon logout.",
         "language": "Language preference — your chosen display language.",
         "profile": "Basic profile info — your username and user ID as returned by the streaming providers (used only for display purposes).",
         "noAccess": "We do not have access to this data. It stays on your device and is never sent to any backend server."

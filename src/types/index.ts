@@ -107,9 +107,12 @@ export interface InvitationConfig {
 }
 
 export interface AppState {
-  // Invitation state
-  invitationCode: string | null;
-  invitationConfig: InvitationConfig | null;
+  // Credentials state (stored in localStorage)
+  credentials: Partial<Record<Provider, ProviderCredentials>>;
+
+  // Invitation state (legacy/deprecated)
+  invitationCode?: string | null;
+  invitationConfig?: InvitationConfig | null;
   
   // Auth state
   tidalAuth: ProviderAuth | null;
@@ -130,8 +133,11 @@ export interface AppState {
   importResult: ImportResult | null;
   
   // Actions
-  setInvitation: (code: string, config: InvitationConfig) => void;
-  clearInvitation: () => void;
+  setProviderCredentials: (provider: Provider, credentials: ProviderCredentials | null) => void;
+  clearProviderCredentials: (provider: Provider) => void;
+  logout: (provider: Provider) => Promise<void> | void;
+  setInvitation?: (code: string, config: InvitationConfig) => void;
+  clearInvitation?: () => void;
   setAuth: (provider: Provider, auth: ProviderAuth | null) => void;
   setDeezerArl: (arl: string | null) => void;
   setSourceProvider: (provider: Provider | null) => void;

@@ -17,12 +17,11 @@ Discord: [https://discord.gg/rwJcE5Zwez](https://discord.gg/rwJcE5Zwez)
 When you use the App, the following data is stored **exclusively in your browser's localStorage** and is never transmitted to our servers:
 
 - **OAuth tokens** — access tokens and refresh tokens issued by TIDAL, Spotify, and Apple Music to authorize playlist operations on your behalf.
-- **Deezer ARL cookie** — an authentication reference link you provide manually.
-- **Invitation code and configuration** — the code used to access the App.
+- **Streaming service API credentials** — Client ID and Client Secret (Spotify, TIDAL) or Deezer ARL cookie, provided directly by you when connecting services. Stored exclusively in your browser's localStorage and deleted immediately when you log out.
 - **Language preference** — your chosen display language.
 - **Basic profile info** — your username and user ID as returned by the streaming providers (used only for display purposes within the App).
 
-**We do not have access to this data.** It stays on your device and is never sent to any backend server we operate.
+**These credentials and tokens are stored only in your browser and nowhere else.** We do not have access to this data. It stays on your device and is never sent to any backend server we operate.
 
 ### 2.2 Google Analytics
 

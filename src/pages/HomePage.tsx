@@ -4,10 +4,12 @@ import type { Provider } from '@/types';
 import { useAppStore } from '@/store/useAppStore';
 import { ProviderCard } from '@/components/ProviderCard';
 import { DeezerArlModal } from '@/components/DeezerArlModal';
+import { ProviderCredentialsModal } from '@/components/ProviderCredentialsModal';
+import { OnboardingModal } from '@/components/OnboardingModal';
+import { useOnboarding } from '@/hooks/useOnboarding';
 import { Button } from '@/components/ui';
-import { providerService } from '@/services/api';
 import { analytics } from '@/lib/analytics';
-import { ArrowRight, Loader2, Music2, RefreshCw } from 'lucide-react';
+import { ArrowRight, Music2, RefreshCw } from 'lucide-react';
 import { getProviderName } from '@/lib/utils';
 import { useTranslation } from '@/i18n/useTranslation';
 import { LanguageSelector } from '@/components/LanguageSelector';
@@ -16,13 +18,13 @@ import { SupportButton } from '@/components/SupportModal';
 export function HomePage() {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const { showOnboarding, completeOnboarding } = useOnboarding();
   const {
     sourceProvider,
     targetProvider,
     selectedPlaylist,
     setSourceProvider,
     setTargetProvider,
-    setAuth,
     isLoggedIn,
     isProviderSupported,
     reset,
@@ -40,19 +42,21 @@ export function HomePage() {
   const [showDeezerArlModal, setShowDeezerArlModal] = useState(false);
   const [pendingDeezerMode, setPendingDeezerMode] = useState<'source' | 'target' | null>(null);
 
-  // Apple Music auth state
-  const [appleAuthLoading, setAppleAuthLoading] = useState(false);
+  // Provider credentials modal state (Spotify / TIDAL)
+  const [showCredentialsModal, setShowCredentialsModal] = useState(false);
+  const [pendingCredentialsProvider, setPendingCredentialsProvider] = useState<'spotify' | 'tidal' | null>(null);
+  const [pendingCredentialsMode, setPendingCredentialsMode] = useState<'source' | 'target' | null>(null);
 
   const handleProviderClick = (provider: Provider, mode: 'source' | 'target') => {
     console.log(`[HomePage] Provider ${provider} clicked for ${mode}`);
 
-    if (!isProviderSupported(provider)) {
-      console.log(`[HomePage] Provider ${provider} is not supported in current invitation`);
+    if (provider === 'apple' || !isProviderSupported(provider)) {
+      console.log(`[HomePage] Provider ${provider} is disabled`);
       return;
     }
 
     if (!isLoggedIn(provider)) {
-      // Deezer uses ARL-based auth, not OAuth
+      // Deezer uses ARL-based auth
       if (provider === 'deezer') {
         console.log('[HomePage] Showing Deezer ARL modal');
         setPendingDeezerMode(mode);
@@ -60,23 +64,14 @@ export function HomePage() {
         return;
       }
 
-      // Apple Music uses MusicKit JS inline auth
-      if (provider === 'apple') {
-        console.log('[HomePage] Starting Apple Music MusicKit JS auth');
-        handleAppleMusicAuth(mode);
+      // Spotify and TIDAL use Client ID & Client Secret
+      if (provider === 'spotify' || provider === 'tidal') {
+        console.log(`[HomePage] Showing credentials modal for ${provider}`);
+        setPendingCredentialsProvider(provider);
+        setPendingCredentialsMode(mode);
+        setShowCredentialsModal(true);
         return;
       }
-
-      // Store what we're trying to do
-      sessionStorage.setItem('auth_mode', mode);
-      sessionStorage.setItem('auth_provider', provider);
-
-      // Redirect to provider auth
-      const authUrl = providerService.getAuthUrl(provider);
-      console.log(`[HomePage] Redirecting to auth: ${authUrl}`);
-      analytics.loginAttempted(provider);
-      window.location.href = authUrl;
-      return;
     }
 
     if (mode === 'source') {
@@ -118,36 +113,10 @@ export function HomePage() {
     setPendingDeezerMode(null);
   };
 
-  const handleAppleMusicAuth = async (mode: 'source' | 'target') => {
-    setAppleAuthLoading(true);
-    analytics.loginAttempted('apple');
-    
-    try {
-      const { appleService } = await import('@/services/api');
-      const auth = await appleService.authorize();
-      
-      setAuth('apple', auth);
-      analytics.loginSuccessful('apple');
-      console.log('[HomePage] Apple Music auth successful');
-
-      if (mode === 'source') {
-        console.log('[HomePage] Source provider selected: apple');
-        analytics.sourceProviderSelected('apple');
-        setSourceProvider('apple');
-        navigate('/playlists');
-      } else {
-        console.log('[HomePage] Target provider selected: apple');
-        analytics.targetProviderSelected('apple');
-        setTargetProvider('apple');
-        setStep('ready');
-      }
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'Apple Music authentication failed';
-      console.error('[HomePage] Apple Music auth error:', message);
-      analytics.loginFailed('apple', message);
-    } finally {
-      setAppleAuthLoading(false);
-    }
+  const handleCredentialsClose = () => {
+    setShowCredentialsModal(false);
+    setPendingCredentialsProvider(null);
+    setPendingCredentialsMode(null);
   };
 
   const handleStartImport = () => {
@@ -184,17 +153,6 @@ export function HomePage() {
             {t('app.tagline')}
           </p>
         </div>
-
-        {/* Apple Music loading overlay */}
-        {appleAuthLoading && (
-          <div className="fixed inset-0 bg-background/80 flex items-center justify-center z-50">
-            <div className="text-center">
-              <Loader2 className="w-12 h-12 animate-spin text-apple mx-auto mb-4" />
-              <p className="text-lg font-medium">{t('apple.authorizing')}</p>
-              <p className="text-sm text-text-muted">{t('apple.authorizingHint')}</p>
-            </div>
-          </div>
-        )}
 
         {/* Step indicator */}
         <div className="flex items-center justify-center gap-2 mb-8">
@@ -313,11 +271,26 @@ export function HomePage() {
         )}
       </div>
 
+      {/* Provider Credentials Modal (Spotify / TIDAL) */}
+      <ProviderCredentialsModal
+        key={pendingCredentialsProvider || 'none'}
+        isOpen={showCredentialsModal}
+        provider={pendingCredentialsProvider}
+        mode={pendingCredentialsMode}
+        onClose={handleCredentialsClose}
+      />
+
       {/* Deezer ARL Modal */}
       <DeezerArlModal
         isOpen={showDeezerArlModal}
         onClose={handleDeezerArlClose}
         onSuccess={handleDeezerArlSuccess}
+      />
+
+      {/* Onboarding Modal */}
+      <OnboardingModal
+        isOpen={showOnboarding}
+        onClose={completeOnboarding}
       />
 
       {/* Footer */}

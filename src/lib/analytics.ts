@@ -22,10 +22,10 @@ export const trackEvent = (eventName: string, eventData?: Record<string, unknown
 
 // Event tracking helpers
 export const analytics = {
-  // Invitation events
-  invitationCodeSaved: (codeLength: number) => {
-    trackEvent('invitation_code_saved', {
-      code_length: codeLength,
+  // Credentials events
+  credentialsSaved: (provider: string) => {
+    trackEvent('credentials_saved', {
+      provider,
     });
   },
 

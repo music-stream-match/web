@@ -44,15 +44,13 @@ export function CallbackPage() {
     }
 
     try {
-      let auth;
-
       // TIDAL and Spotify use query params (authorization code)
       const code = searchParams.get('code');
       if (!code) {
         const errorDesc = searchParams.get('error_description');
         throw new Error(errorDesc || 'No authorization code received');
       }
-      auth = await providerService.handleCallback(provider, searchParams);
+      const auth = await providerService.handleCallback(provider, searchParams);
 
       // Save auth
       setAuth(provider as Provider, auth);

@@ -3,7 +3,7 @@ import { Modal, Button, Input } from '@/components/ui';
 import { useAppStore } from '@/store/useAppStore';
 import { deezerService } from '@/services/api';
 import { analytics } from '@/lib/analytics';
-import { AlertCircle, HelpCircle } from 'lucide-react';
+import { AlertCircle, HelpCircle, ShieldCheck } from 'lucide-react';
 import { useTranslation } from '@/i18n/useTranslation';
 
 interface DeezerArlModalProps {
@@ -67,6 +67,14 @@ export function DeezerArlModal({ isOpen, onClose, onSuccess }: DeezerArlModalPro
   return (
     <Modal isOpen={isOpen} onClose={handleClose} title={t('deezer.title')}>
       <form onSubmit={handleSubmit} className="space-y-4">
+        {/* Privacy Notice Banner */}
+        <div className="flex items-start gap-3 p-3.5 bg-primary/10 border border-primary/20 rounded-lg text-sm">
+          <ShieldCheck className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+          <p className="font-medium text-text">
+            {t('credentials.privacyNotice')}
+          </p>
+        </div>
+
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <label className="text-sm font-medium">{t('deezer.arlLabel')}</label>

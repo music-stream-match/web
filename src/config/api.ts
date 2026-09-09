@@ -84,7 +84,7 @@ export const SPOTIFY_CONFIG = SPOTIFY_DEFAULTS;
 // 5. The developer token is used server-side; on the client MusicKit JS handles user auth
 
 const APPLE_DEFAULTS = {
-  developerToken: '', // invitation
+  developerToken: '',
   redirectUri: import.meta.env.MODE === 'production'
     ? 'https://musica.mobulum.com/callback/apple'
     : 'https://localhost-vite.mobulum.xyz/callback/apple',
