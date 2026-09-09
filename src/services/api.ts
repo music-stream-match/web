@@ -473,18 +473,19 @@ export const deezerService = {
 // ============================================
 
 export const tidalService = {
-  getAuthUrl(): string {
+  async getAuthUrl(): Promise<string> {
     const config = getTidalConfig();
     const codeVerifier = generateCodeVerifier();
     sessionStorage.setItem('tidal_code_verifier', codeVerifier);
+    const codeChallenge = await generateCodeChallenge(codeVerifier);
     
     const params = new URLSearchParams({
       response_type: 'code',
       client_id: config.clientId,
       redirect_uri: config.redirectUri,
       scope: config.scopes.join(' '),
-      code_challenge: codeVerifier, // Using plain for simplicity
-      code_challenge_method: 'plain',
+      code_challenge: codeChallenge,
+      code_challenge_method: 'S256',
     });
     
     const url = `${config.authUrl}?${params.toString()}`;
@@ -501,12 +502,17 @@ export const tidalService = {
       throw new Error('No code verifier found');
     }
 
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/x-www-form-urlencoded',
+    };
+    if (config.clientSecret) {
+      headers['Authorization'] = 'Basic ' + btoa(`${config.clientId}:${config.clientSecret}`);
+    }
+
     // Exchange code for tokens
     const response = await fetch(config.tokenUrl, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
+      headers,
       body: new URLSearchParams({
         grant_type: 'authorization_code',
         client_id: config.clientId,
@@ -530,8 +536,13 @@ export const tidalService = {
 
     sessionStorage.removeItem('tidal_code_verifier');
 
-    // Extract user info from the token response or JWT
-    const user = this.extractUserFromToken(data.access_token, data.user);
+    // Fetch user info from /users/me or fallback to token extraction
+    let user: User;
+    try {
+      user = await this.getUser(data.access_token);
+    } catch {
+      user = this.extractUserFromToken(data.access_token, data.user);
+    }
 
     const auth: ProviderAuth = {
       provider: 'tidal',
@@ -549,7 +560,7 @@ export const tidalService = {
     // Try to get user data from token response
     if (userData) {
       return {
-        id: userData.userId?.toString() || userData.id?.toString() || 'unknown',
+        id: userData.userId?.toString() || userData.id?.toString() || 'me',
         name: userData.username || userData.fullName || 'TIDAL User',
         email: userData.email,
         picture: userData.picture,
@@ -563,7 +574,7 @@ export const tidalService = {
         const payload = JSON.parse(atob(parts[1]));
         console.log('[TIDAL] Token payload:', payload);
         return {
-          id: payload.uid?.toString() || payload.sub || 'unknown',
+          id: payload.uid?.toString() || payload.sub || 'me',
           name: payload.username || payload.name || 'TIDAL User',
           email: payload.email,
           picture: undefined,
@@ -573,57 +584,149 @@ export const tidalService = {
       console.log('[TIDAL] Could not decode JWT:', e);
     }
 
-    // Fallback
+    // Fallback - 'me' is the official OpenAPI keyword for authenticated user
     return {
-      id: 'tidal-user',
+      id: 'me',
       name: 'TIDAL User',
     };
   },
 
   async getUser(accessToken: string): Promise<User> {
-    // This method is kept for compatibility but we now extract from token
+    console.log('[TIDAL] Fetching user profile from /users/me...');
+    const config = getTidalConfig();
+    try {
+      const response = await fetchWithRetry(`${config.apiUrl}/users/me`, {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'Accept': 'application/vnd.api+json',
+        },
+      }, { maxRetries: 2, baseDelay: 500 });
+
+      if (response.ok) {
+        const json = await response.json();
+        const attrs = json.data?.attributes || {};
+        const name = attrs.username || [attrs.firstName, attrs.lastName].filter(Boolean).join(' ') || 'TIDAL User';
+        return {
+          id: json.data?.id ? String(json.data.id) : 'me',
+          name,
+          email: attrs.email,
+        };
+      }
+    } catch (e) {
+      console.warn('[TIDAL] Could not fetch user from /users/me:', e);
+    }
     return this.extractUserFromToken(accessToken);
   },
 
-  async getPlaylists(accessToken: string, userId: string): Promise<Playlist[]> {
-    console.log('[TIDAL] Fetching playlists for user:', userId);
+  async getPlaylists(accessToken: string, userId: string = 'me'): Promise<Playlist[]> {
+    const effectiveUserId = (!userId || userId === 'tidal-user' || userId === 'unknown') ? 'me' : userId;
+    console.log('[TIDAL] Fetching playlists for user:', effectiveUserId);
     const config = getTidalConfig();
-    
-    // Use GET /playlists?filter[owners.id]={userId} to get user's playlists
-    // This is simpler and only requires playlists.read scope
-    const response = await fetchWithRetry(
-      `${config.apiUrl}/playlists?countryCode=US&filter[owners.id]=${userId}&include=coverArt`,
-      {
-        headers: {
-          'Authorization': `Bearer ${accessToken}`,
-          'Content-Type': 'application/vnd.api+json',
-          'Accept': 'application/vnd.api+json',
-        },
-      },
-      { maxRetries: 3, baseDelay: 1000 }
-    );
+    const playlistsMap = new Map<string, Playlist>();
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('[TIDAL] Failed to fetch playlists:', response.status, errorText);
-      throw new Error(`Failed to fetch TIDAL playlists: ${response.status}`);
+    // 1. Fetch user-owned playlists (playlists created by the user)
+    try {
+      let url: string | null = `${config.apiUrl}/playlists?filter[owners.id]=${effectiveUserId}&include=coverArt`;
+      while (url) {
+        const response = await fetchWithRetry(
+          url,
+          {
+            headers: {
+              'Authorization': `Bearer ${accessToken}`,
+              'Content-Type': 'application/vnd.api+json',
+              'Accept': 'application/vnd.api+json',
+            },
+          },
+          { maxRetries: 3, baseDelay: 1000 }
+        );
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.warn('[TIDAL] Failed to fetch owned playlists:', response.status, errorText);
+          break;
+        }
+
+        const data = await response.json();
+
+        // Index artworks from included
+        const artworksMap = new Map<string, string>();
+        for (const inc of (data.included || [])) {
+          if (inc.type === 'artworks' && inc.attributes?.files?.[0]?.url) {
+            artworksMap.set(String(inc.id), inc.attributes.files[0].url);
+          }
+        }
+
+        for (const p of (data.data || [])) {
+          const coverArtId = p.relationships?.coverArt?.data?.[0]?.id;
+          const imageUrl = (coverArtId && artworksMap.get(String(coverArtId)))
+            || (p.attributes?.squareImage ? `https://resources.tidal.com/images/${p.attributes.squareImage.replace(/-/g, '/')}/320x320.jpg` : undefined);
+
+          playlistsMap.set(String(p.id), {
+            id: String(p.id),
+            name: p.attributes?.name || p.attributes?.title || 'Unknown Playlist',
+            description: p.attributes?.description,
+            imageUrl,
+            trackCount: p.attributes?.numberOfItems ?? p.attributes?.numberOfTrackItems ?? 0,
+            createdAt: p.attributes?.createdAt || '',
+            owner: p.attributes?.owner?.name,
+          });
+        }
+
+        url = data.links?.next
+          ? (data.links.next.startsWith('http') ? data.links.next : `${config.apiUrl}${data.links.next}`)
+          : null;
+      }
+    } catch (e) {
+      console.warn('[TIDAL] Error fetching owned playlists:', e);
     }
 
-    const data = await response.json();
-    console.log('[TIDAL] Playlists response:', data);
+    // 2. Fetch playlists in user collection (saved/followed playlists)
+    try {
+      let colUrl: string | null = `${config.apiUrl}/userCollectionPlaylists/me/relationships/items?include=items`;
+      while (colUrl) {
+        const response = await fetchWithRetry(
+          colUrl,
+          {
+            headers: {
+              'Authorization': `Bearer ${accessToken}`,
+              'Content-Type': 'application/vnd.api+json',
+              'Accept': 'application/vnd.api+json',
+            },
+          },
+          { maxRetries: 2, baseDelay: 1000 }
+        );
 
-    const playlists: Playlist[] = (data.data || []).map((p: any) => ({
-      id: p.id,
-      name: p.attributes?.name || p.attributes?.title || 'Unknown Playlist',
-      description: p.attributes?.description,
-      imageUrl: p.attributes?.squareImage ? 
-        `https://resources.tidal.com/images/${p.attributes.squareImage.replace(/-/g, '/')}/320x320.jpg` : 
-        undefined,
-      trackCount: p.attributes?.numberOfItems || 0,
-      createdAt: p.attributes?.createdAt,
-      owner: p.attributes?.owner?.name,
-    }));
+        if (!response.ok) {
+          console.log('[TIDAL] Collection playlists response status:', response.status);
+          break;
+        }
 
+        const data = await response.json();
+        for (const inc of (data.included || [])) {
+          if (inc.type === 'playlists' && !playlistsMap.has(String(inc.id))) {
+            playlistsMap.set(String(inc.id), {
+              id: String(inc.id),
+              name: inc.attributes?.name || inc.attributes?.title || 'Unknown Playlist',
+              description: inc.attributes?.description,
+              imageUrl: inc.attributes?.squareImage
+                ? `https://resources.tidal.com/images/${inc.attributes.squareImage.replace(/-/g, '/')}/320x320.jpg`
+                : undefined,
+              trackCount: inc.attributes?.numberOfItems ?? inc.attributes?.numberOfTrackItems ?? 0,
+              createdAt: inc.attributes?.createdAt || '',
+              owner: inc.attributes?.owner?.name,
+            });
+          }
+        }
+
+        colUrl = data.links?.next
+          ? (data.links.next.startsWith('http') ? data.links.next : `${config.apiUrl}${data.links.next}`)
+          : null;
+      }
+    } catch (e) {
+      console.warn('[TIDAL] Error fetching collection playlists:', e);
+    }
+
+    const playlists = Array.from(playlistsMap.values());
     console.log(`[TIDAL] Found ${playlists.length} playlists`);
 
     // Prepend favorites playlist
@@ -648,25 +751,30 @@ export const tidalService = {
     console.log('[TIDAL] Fetching favorite count...');
     const config = getTidalConfig();
     
-    const response = await fetchWithRetry(
-      `${config.apiUrl}/me/favorites?countryCode=US&include=tracks&limit=1`,
-      {
-        headers: {
-          'Authorization': `Bearer ${accessToken}`,
-          'Content-Type': 'application/vnd.api+json',
-          'Accept': 'application/vnd.api+json',
+    try {
+      const response = await fetchWithRetry(
+        `${config.apiUrl}/userCollectionTracks/me/relationships/items?include=items`,
+        {
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+            'Content-Type': 'application/vnd.api+json',
+            'Accept': 'application/vnd.api+json',
+          },
         },
-      },
-      { maxRetries: 3, baseDelay: 1000 }
-    );
+        { maxRetries: 2, baseDelay: 1000 }
+      );
 
-    if (!response.ok) {
-      console.warn('[TIDAL] Could not fetch favorites count');
+      if (!response.ok) {
+        console.warn('[TIDAL] Could not fetch favorites count:', response.status);
+        return 0;
+      }
+
+      const data = await response.json();
+      return data.meta?.total || (data.data || []).length || 0;
+    } catch (e) {
+      console.warn('[TIDAL] Error fetching favorite count:', e);
       return 0;
     }
-
-    const data = await response.json();
-    return data.meta?.total || 0;
   },
 
   async getFavoriteTracks(
@@ -676,15 +784,10 @@ export const tidalService = {
     console.log('[TIDAL] Fetching favorite tracks...');
     const config = getTidalConfig();
     const tracks: SourceTrack[] = [];
-    let cursor: string | null = null;
-    const limit = 100;
+    let url: string | null = `${config.apiUrl}/userCollectionTracks/me/relationships/items?include=items`;
     let estimatedTotal = 0;
 
-    while (true) {
-      const url = cursor
-        ? `${config.apiUrl}/me/favorites?countryCode=US&include=tracks&limit=${limit}&cursor=${cursor}`
-        : `${config.apiUrl}/me/favorites?countryCode=US&include=tracks&limit=${limit}`;
-
+    while (url) {
       const response = await fetchWithRetry(url, {
         headers: {
           'Authorization': `Bearer ${accessToken}`,
@@ -714,10 +817,10 @@ export const tidalService = {
 
       for (const item of (data.data || [])) {
         const trackRef = item.relationships?.item?.data || item.relationships?.track?.data;
-        if (trackRef?.type === 'tracks') {
-          const trackId = trackRef.id.toString();
-          const trackDetails = includedTracks.get(trackId);
+        const trackId = trackRef?.id ? String(trackRef.id) : (item.type === 'tracks' ? String(item.id) : null);
 
+        if (trackId) {
+          const trackDetails = includedTracks.get(trackId);
           if (trackDetails) {
             const attrs = trackDetails.attributes || {};
             const artistNames = (attrs.artists || [])
@@ -745,8 +848,9 @@ export const tidalService = {
         onProgress(tracks.length, estimatedTotal || tracks.length);
       }
 
-      cursor = data.links?.next ? new URL(data.links.next).searchParams.get('cursor') : null;
-      if (!cursor || (data.data || []).length < limit) break;
+      url = data.links?.next
+        ? (data.links.next.startsWith('http') ? data.links.next : `${config.apiUrl}${data.links.next}`)
+        : null;
     }
 
     console.log(`[TIDAL] Found ${tracks.length} favorite tracks`);
@@ -765,16 +869,10 @@ export const tidalService = {
     console.log(`[TIDAL] Fetching tracks for playlist ${playlistId}...`);
     const config = getTidalConfig();
     const tracks: SourceTrack[] = [];
-    let cursor: string | null = null;
-    const limit = 100;
+    let url: string | null = `${config.apiUrl}/playlists/${playlistId}/relationships/items?include=items`;
     let estimatedTotal = 0;
 
-    while (true) {
-      // TIDAL OpenAPI uses /playlists/{id}/items with include=items to get track details
-      const url = cursor 
-        ? `${config.apiUrl}/playlists/${playlistId}/items?countryCode=US&limit=${limit}&include=items&cursor=${cursor}`
-        : `${config.apiUrl}/playlists/${playlistId}/items?countryCode=US&limit=${limit}&include=items`;
-      
+    while (url) {
       const response = await fetchWithRetry(url, {
         headers: {
           'Authorization': `Bearer ${accessToken}`,
@@ -783,7 +881,6 @@ export const tidalService = {
         },
       }, { maxRetries: 3, baseDelay: 1000 });
 
-      // TIDAL may return 404 for empty playlists or playlists with no items endpoint
       if (response.status === 404) {
         console.log('[TIDAL] Playlist items endpoint returned 404 - treating as empty playlist');
         return [];
@@ -796,14 +893,11 @@ export const tidalService = {
       }
 
       const data = await response.json();
-      console.log('[TIDAL] Playlist items response:', data);
 
-      // Try to get total from meta on first request
       if (estimatedTotal === 0 && data.meta?.total) {
         estimatedTotal = data.meta.total;
       }
 
-      // JSON:API format - included contains full track details
       const includedTracks = new Map<string, any>();
       for (const included of (data.included || [])) {
         if (included.type === 'tracks') {
@@ -811,13 +905,12 @@ export const tidalService = {
         }
       }
 
-      // data contains playlist items with relationships to tracks
       for (const item of (data.data || [])) {
         const trackRef = item.relationships?.item?.data;
-        if (trackRef?.type === 'tracks') {
-          const trackId = trackRef.id.toString();
+        const trackId = trackRef?.id ? String(trackRef.id) : (item.type === 'tracks' ? String(item.id) : null);
+
+        if (trackId) {
           const trackDetails = includedTracks.get(trackId);
-          
           if (trackDetails) {
             const attrs = trackDetails.attributes || {};
             const artistNames = (attrs.artists || [])
@@ -832,7 +925,6 @@ export const tidalService = {
               albumTitle: attrs.album?.title,
             });
           } else {
-            // Fallback if track details not included
             tracks.push({
               id: trackId,
               title: `Unknown Track (${trackId})`,
@@ -842,31 +934,30 @@ export const tidalService = {
         }
       }
 
-      // Report progress
       if (onProgress) {
         onProgress(tracks.length, estimatedTotal || tracks.length);
       }
 
-      // Check for pagination
-      cursor = data.links?.next ? new URL(data.links.next).searchParams.get('cursor') : null;
-      if (!cursor || (data.data || []).length < limit) break;
+      url = data.links?.next
+        ? (data.links.next.startsWith('http') ? data.links.next : `${config.apiUrl}${data.links.next}`)
+        : null;
     }
 
     console.log(`[TIDAL] Found ${tracks.length} tracks in playlist`);
     return tracks;
   },
 
-  async checkPlaylistExists(name: string, accessToken: string, userId: string): Promise<Playlist | null> {
+  async checkPlaylistExists(name: string, accessToken: string, userId: string = 'me'): Promise<Playlist | null> {
     const playlists = await this.getPlaylists(accessToken, userId);
     return playlists.find(p => p.name.toLowerCase() === name.toLowerCase()) || null;
   },
 
-  async createPlaylist(name: string, accessToken: string, _userId: string): Promise<string> {
+  async createPlaylist(name: string, accessToken: string, _userId: string = 'me'): Promise<string> {
     console.log(`[TIDAL] Creating playlist: ${name}`);
     const config = getTidalConfig();
     
-    // TIDAL OpenAPI uses POST /playlists with JSON:API format
-    const response = await fetchWithRetry(`${config.apiUrl}/playlists?countryCode=US`, {
+    // TIDAL OpenAPI uses POST /playlists with JSON:API format and accessType
+    const response = await fetchWithRetry(`${config.apiUrl}/playlists`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${accessToken}`,
@@ -877,9 +968,9 @@ export const tidalService = {
         data: {
           type: 'playlists',
           attributes: {
-            name: name,
+            name,
             description: 'Created by Musica',
-            privacy: 'PUBLIC',
+            accessType: 'PUBLIC',
           },
         },
       }),
@@ -892,7 +983,6 @@ export const tidalService = {
     }
 
     const data = await response.json();
-    console.log('[TIDAL] Create playlist response:', data);
     const playlistId = data.data?.id;
     console.log(`[TIDAL] Created playlist with ID: ${playlistId}`);
     return playlistId;
@@ -907,9 +997,8 @@ export const tidalService = {
     for (let i = 0; i < trackIds.length; i += batchSize) {
       const batch = trackIds.slice(i, i + batchSize);
       
-      // TIDAL OpenAPI uses POST /playlists/{id}/relationships/items with JSON:API format
       const response = await fetchWithRetry(
-        `${config.apiUrl}/playlists/${playlistId}/relationships/items?countryCode=US`,
+        `${config.apiUrl}/playlists/${playlistId}/relationships/items`,
         {
           method: 'POST',
           headers: {
@@ -1048,13 +1137,16 @@ export const spotifyService = {
 
       const data = await response.json();
 
-      for (const p of data.items) {
+      for (const p of (data.items || [])) {
+        if (!p) continue;
+        // Support February 2026 API (items.total) and legacy API (tracks.total)
+        const trackCount = p.items?.total ?? p.tracks?.total ?? p.itemCount ?? p.total ?? 0;
         playlists.push({
           id: p.id,
-          name: p.name,
+          name: p.name || 'Unknown Playlist',
           description: p.description,
           imageUrl: p.images?.[0]?.url,
-          trackCount: p.tracks?.total || 0,
+          trackCount,
           createdAt: '', // Spotify doesn't provide creation date
           owner: p.owner?.display_name,
         });
@@ -1129,18 +1221,20 @@ export const spotifyService = {
         estimatedTotal = data.total;
       }
 
-      for (const item of data.items) {
-        if (item.track?.id) {
-          const artistNames = (item.track.artists || [])
+      for (const item of (data.items || [])) {
+        if (!item) continue;
+        const track = item.track || item.item || item;
+        if (track?.id) {
+          const artistNames = (track.artists || [])
             .map((a: any) => a.name)
             .filter(Boolean)
             .join(', ');
 
           tracks.push({
-            id: String(item.track.id),
-            title: item.track.name || `Unknown Track (${item.track.id})`,
+            id: String(track.id),
+            title: track.name || `Unknown Track (${track.id})`,
             artistName: artistNames || 'Unknown Artist',
-            albumTitle: item.track.album?.name,
+            albumTitle: track.album?.name,
           });
         }
       }
@@ -1168,10 +1262,63 @@ export const spotifyService = {
     console.log(`[Spotify] Fetching tracks for playlist ${playlistId}...`);
     const config = getSpotifyConfig();
     const tracks: SourceTrack[] = [];
-    let url: string | null = `${config.apiUrl}/playlists/${playlistId}/tracks?limit=100`;
+    let url: string | null = `${config.apiUrl}/playlists/${playlistId}/items?limit=100`;
     let estimatedTotal = 0;
 
-    while (url) {
+    // Try modern /items endpoint first, fallback to legacy /tracks if needed
+    let firstResponse = await fetchWithRetry(url, {
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+      },
+    }, { maxRetries: 2, baseDelay: 1000 });
+
+    if (!firstResponse.ok && (firstResponse.status === 404 || firstResponse.status === 400)) {
+      console.log('[Spotify] /items endpoint returned error, falling back to /tracks');
+      url = `${config.apiUrl}/playlists/${playlistId}/tracks?limit=100`;
+      firstResponse = await fetchWithRetry(url, {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+        },
+      }, { maxRetries: 3, baseDelay: 1000 });
+    }
+
+    if (!firstResponse.ok) {
+      throw new Error('Failed to fetch Spotify playlist tracks');
+    }
+
+    let data = await firstResponse.json();
+
+    while (data) {
+      if (estimatedTotal === 0 && (data.total ?? data.items?.length)) {
+        estimatedTotal = data.total ?? data.items.length;
+      }
+
+      for (const item of (data.items || [])) {
+        if (!item) continue;
+        // Support February 2026 (item.item or item.track) and legacy (item.track)
+        const track = item.item || item.track || item;
+        if (track?.id) {
+          const artistNames = (track.artists || [])
+            .map((a: any) => a.name)
+            .filter(Boolean)
+            .join(', ');
+          
+          tracks.push({
+            id: String(track.id),
+            title: track.name || `Unknown Track (${track.id})`,
+            artistName: artistNames || 'Unknown Artist',
+            albumTitle: track.album?.name,
+          });
+        }
+      }
+
+      if (onProgress) {
+        onProgress(tracks.length, estimatedTotal || tracks.length);
+      }
+
+      url = data.next;
+      if (!url) break;
+
       const response = await fetchWithRetry(url, {
         headers: {
           'Authorization': `Bearer ${accessToken}`,
@@ -1179,38 +1326,11 @@ export const spotifyService = {
       }, { maxRetries: 3, baseDelay: 1000 });
 
       if (!response.ok) {
-        throw new Error('Failed to fetch Spotify playlist tracks');
+        console.warn('[Spotify] Failed to fetch next page of playlist tracks:', response.status);
+        break;
       }
 
-      const data = await response.json();
-
-      // Get total from first response
-      if (estimatedTotal === 0 && data.total) {
-        estimatedTotal = data.total;
-      }
-
-      for (const item of data.items) {
-        if (item.track?.id) {
-          const artistNames = (item.track.artists || [])
-            .map((a: any) => a.name)
-            .filter(Boolean)
-            .join(', ');
-          
-          tracks.push({
-            id: String(item.track.id),
-            title: item.track.name || `Unknown Track (${item.track.id})`,
-            artistName: artistNames || 'Unknown Artist',
-            albumTitle: item.track.album?.name,
-          });
-        }
-      }
-
-      // Report progress
-      if (onProgress) {
-        onProgress(tracks.length, estimatedTotal || tracks.length);
-      }
-
-      url = data.next;
+      data = await response.json();
     }
 
     console.log(`[Spotify] Found ${tracks.length} tracks in playlist`);
@@ -1222,10 +1342,12 @@ export const spotifyService = {
     return playlists.find(p => p.name.toLowerCase() === name.toLowerCase()) || null;
   },
 
-  async createPlaylist(name: string, accessToken: string, userId: string): Promise<string> {
+  async createPlaylist(name: string, accessToken: string, userId?: string): Promise<string> {
     console.log(`[Spotify] Creating playlist: ${name}`);
     const config = getSpotifyConfig();
-    const response = await fetchWithRetry(`${config.apiUrl}/users/${userId}/playlists`, {
+    
+    // Modern Spotify API (Feb 2026) uses POST /me/playlists
+    let response = await fetchWithRetry(`${config.apiUrl}/me/playlists`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${accessToken}`,
@@ -1235,7 +1357,22 @@ export const spotifyService = {
         name,
         public: false,
       }),
-    }, { maxRetries: 3, baseDelay: 1000 });
+    }, { maxRetries: 2, baseDelay: 1000 });
+
+    // Fallback to legacy /users/{userId}/playlists if /me/playlists fails and userId exists
+    if (!response.ok && userId && userId !== 'spotify-user') {
+      response = await fetchWithRetry(`${config.apiUrl}/users/${userId}/playlists`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name,
+          public: false,
+        }),
+      }, { maxRetries: 2, baseDelay: 1000 });
+    }
 
     if (!response.ok) {
       throw new Error('Failed to create Spotify playlist');
@@ -1256,14 +1393,26 @@ export const spotifyService = {
       const batch = trackIds.slice(i, i + batchSize);
       const uris = batch.map(id => `spotify:track:${id}`);
       
-      const response = await fetchWithRetry(`${config.apiUrl}/playlists/${playlistId}/tracks`, {
+      // Try modern /items endpoint first, fallback to /tracks
+      let response = await fetchWithRetry(`${config.apiUrl}/playlists/${playlistId}/items`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${accessToken}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ uris }),
-      }, { maxRetries: 3, baseDelay: 1000 });
+      }, { maxRetries: 2, baseDelay: 1000 });
+
+      if (!response.ok && (response.status === 404 || response.status === 400)) {
+        response = await fetchWithRetry(`${config.apiUrl}/playlists/${playlistId}/tracks`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ uris }),
+        }, { maxRetries: 3, baseDelay: 1000 });
+      }
 
       if (!response.ok) {
         throw new Error('Failed to add tracks to Spotify playlist');
@@ -1842,7 +1991,7 @@ export const trackMappingService = {
 // ============================================
 
 export const providerService = {
-  getAuthUrl(provider: Provider): string {
+  async getAuthUrl(provider: Provider): Promise<string> {
     // Deezer uses ARL-based auth, no OAuth redirect needed
     if (provider === 'deezer') {
       throw new Error('Deezer uses ARL authentication, not OAuth');
@@ -1983,4 +2132,22 @@ function generateCodeVerifier(): string {
   const array = new Uint8Array(32);
   crypto.getRandomValues(array);
   return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
+}
+
+async function generateCodeChallenge(verifier: string): Promise<string> {
+  if (typeof window !== 'undefined' && window.crypto?.subtle) {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(verifier);
+    const digest = await window.crypto.subtle.digest('SHA-256', data);
+    const bytes = new Uint8Array(digest);
+    let binary = '';
+    for (let i = 0; i < bytes.byteLength; i++) {
+      binary += String.fromCharCode(bytes[i]);
+    }
+    return btoa(binary)
+      .replace(/\+/g, '-')
+      .replace(/\//g, '_')
+      .replace(/=+$/, '');
+  }
+  return verifier;
 }

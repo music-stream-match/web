@@ -26,7 +26,7 @@ const TIDAL_DEFAULTS = {
   authUrl: 'https://login.tidal.com/authorize',
   tokenUrl: 'https://auth.tidal.com/v1/oauth2/token',
   apiUrl: 'https://openapi.tidal.com/v2',
-  scopes: ['user.read', 'playlists.read', 'playlists.write'],
+  scopes: ['user.read', 'playlists.read', 'playlists.write', 'collection.read', 'collection.write'],
 };
 
 export const getTidalConfig = () => {
@@ -58,7 +58,7 @@ const SPOTIFY_DEFAULTS = {
   authUrl: 'https://accounts.spotify.com/authorize',
   tokenUrl: 'https://accounts.spotify.com/api/token',
   apiUrl: 'https://api.spotify.com/v1',
-  scopes: ['user-read-private', 'user-read-email', 'user-library-read', 'playlist-read-private', 'playlist-modify-public', 'playlist-modify-private'],
+  scopes: ['user-read-private', 'user-read-email', 'user-library-read', 'playlist-read-private', 'playlist-read-collaborative', 'playlist-modify-public', 'playlist-modify-private'],
 };
 
 export const getSpotifyConfig = () => {

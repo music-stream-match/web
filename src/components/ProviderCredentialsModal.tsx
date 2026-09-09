@@ -53,7 +53,7 @@ export function ProviderCredentialsModal({
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     const trimmedClientId = clientId.trim();
@@ -82,7 +82,7 @@ export function ProviderCredentialsModal({
     analytics.loginAttempted(provider);
 
     try {
-      const authUrl = providerService.getAuthUrl(provider);
+      const authUrl = await providerService.getAuthUrl(provider);
       console.log(`[ProviderCredentialsModal] Redirecting to auth: ${authUrl}`);
       window.location.href = authUrl;
     } catch (err) {
