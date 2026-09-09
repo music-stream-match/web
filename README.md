@@ -1,12 +1,35 @@
 # Musica
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Discord](https://img.shields.io/badge/Discord-Join%20Chat-5865F2?logo=discord&logoColor=white)](https://discord.gg/rwJcE5Zwez)
+[![Live](https://img.shields.io/badge/Live-musica.mobulum.com-brightgreen)](https://musica.mobulum.com)
+[![Track Mappings](https://img.shields.io/badge/Tracks-2.09M+%2B-blue)](https://api.musica.mobulum.com)
+
+> Free, open-source web application for cross-platform music streaming playlist transfer between Spotify, Apple Music, Deezer, and Tidal.
+
+---
+
 ## What
 
-Musica is a free, open-source web application that lets you transfer playlists between TIDAL, Spotify, and Deezer (Apple Music is temporarily disabled). Simply connect your source and target services, pick a playlist, and transfer it — all from your browser, with no server storing your data.
+**Musica** is a free, open-source web application that lets you transfer playlists between the most popular music streaming platforms:
+- **Spotify**
+- **Apple Music** *(temporarily disabled)*
+- **Deezer**
+- **Tidal**
+
+Simply connect your source and target services, pick a playlist, and transfer it — all directly from your browser, with no server storing your data. Track matching is powered by the [music-stream-match API](https://github.com/music-stream-match/api) with over 2M+ cross-platform track mappings.
+
+Available to everyone, free, forever.
+
+---
 
 ## Why
 
-Switching between music streaming services shouldn't mean losing your carefully curated playlists. Commercial playlist transfer tools are often paid, limited, or require you to hand over your credentials to a third-party server. Musica was built as a free, open-source alternative that runs entirely in your browser — your tokens and credentials never leave your device.
+Switching between music streaming services shouldn't mean losing your carefully curated playlists. Commercial playlist transfer tools are often paid, limited, or require you to hand over your credentials to a third-party server.
+
+**Musica** was built as a free, open-source alternative that runs entirely in your browser — your tokens and credentials never leave your device. All matching is powered by static, open track mappings from [music-stream-match](https://github.com/music-stream-match/api), ensuring fast transfers with zero server-side data retention.
+
+---
 
 ## How
 
@@ -16,10 +39,10 @@ Switching between music streaming services shouldn't mean losing your carefully 
    - *(Apple Music is temporarily disabled)*
 2. Choose a playlist to transfer
 3. Select a **target** streaming service and connect
-4. Start the import — tracks are matched across services using a local mapping database and added to a new (or existing) playlist on the target service
+4. Start the import — tracks are matched across services using the [music-stream-match API](https://github.com/music-stream-match/api) and added to a new (or existing) playlist on the target service
 
-> **Security & Privacy:**
-> **These credentials and tokens are stored only in your browser and nowhere else.**
+> **Security & Privacy:**  
+> **These credentials and tokens are stored only in your browser and nowhere else.**  
 > Logging out immediately removes all saved credentials and tokens from your browser's `localStorage`.
 
 ---
@@ -125,15 +148,27 @@ Live: [musica.mobulum.com](https://musica.mobulum.com)
 - React Router 7
 - Zustand (state management)
 
-# Free, forever
+---
 
-Feel free to use however you like but please do not sell it. It is FREE for everyone! FOREVER. You can buy me a coffee
-if you like to thank me.
+## 💬 Community
+
+Have questions, suggestions, or need help? Join our community:
+
+[![Discord](https://img.shields.io/badge/Discord-Join%20Chat-5865F2?logo=discord&logoColor=white)](https://discord.gg/rwJcE5Zwez)  
+Join on Discord: [https://discord.gg/rwJcE5Zwez](https://discord.gg/rwJcE5Zwez)
+
+---
+
+## Free, forever
+
+Feel free to use however you like, but please do not sell it. It is FREE for everyone! FOREVER. You can buy me a coffee if you like to thank me:
 
 - [PayPal](https://paypal.me/zenedithPL)
 - [Ko-Fi](https://ko-fi.com/K3K11ABGW5)
 - [Patreon](https://patreon.com/Zenedith)
 
-## 📝 License
+---
 
-MIT
+## License
+
+Musica is licensed under the [MIT License](https://opensource.org/licenses/MIT).
