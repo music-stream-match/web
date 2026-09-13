@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Privacy Policy - Music Stream Match (Android)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --color-background: oklch(15% 0.02 280);
+      --color-surface: oklch(20% 0.02 280);
+      --color-surface-hover: oklch(25% 0.02 280);
+      --color-primary: oklch(70% 0.15 280);
+      --color-text: oklch(95% 0 0);
+      --color-text-muted: oklch(70% 0 0);
+      --color-border: oklch(30% 0.02 280);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--color-background);
+      color: var(--color-text);
+      font-family: var(--font-sans);
+      line-height: 1.625;
+      font-size: 0.875rem;
+      padding: 2rem 1rem;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      max-width: 48rem;
+      margin: 0 auto;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    .icon-badge {
+      width: 4rem;
+      height: 4rem;
+      border-radius: 9999px;
+      background: color-mix(in oklab, var(--color-primary) 20%, transparent);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1rem;
+      color: var(--color-primary);
+    }
+
+    .icon-badge svg {
+      width: 2rem;
+      height: 2rem;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+    }
+
+    h1 {
+      font-size: 1.875rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      color: var(--color-text);
+    }
+
+    .last-updated {
+      color: var(--color-text-muted);
+      font-size: 0.875rem;
+    }
+
+    .content > * + * {
+      margin-top: 2rem;
+    }
+
+    h2 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+      color: var(--color-text);
+    }
+
+    h3 {
+      font-size: 1.125rem;
+      font-weight: 500;
+      margin-top: 1.5rem;
+      margin-bottom: 0.5rem;
+      color: var(--color-text);
+    }
+
+    p {
+      color: var(--color-text-muted);
+      margin-bottom: 0.75rem;
+    }
+
+    ul {
+      list-style-type: disc;
+      padding-left: 1.25rem;
+      color: var(--color-text-muted);
+      margin-bottom: 1rem;
+    }
+
+    li {
+      margin-bottom: 0.35rem;
+    }
+
+    li strong {
+      color: var(--color-text);
+    }
+
+    .card {
+      background-color: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: 0.75rem;
+      padding: 1rem 1.25rem;
+      margin: 1rem 0;
+    }
+
+    .card p {
+      margin-bottom: 0.35rem;
+      color: var(--color-text);
+    }
+
+    .card p:last-child {
+      margin-bottom: 0;
+    }
+
+    a {
+      color: var(--color-primary);
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    .table-wrapper {
+      overflow-x: auto;
+      margin-top: 0.75rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+
+    th {
+      padding: 0.5rem 1rem 0.5rem 0;
+      font-weight: 500;
+      border-bottom: 1px solid var(--color-border);
+      color: var(--color-text);
+    }
+
+    td {
+      padding: 0.6rem 1rem 0.6rem 0;
+      border-bottom: 1px solid color-mix(in oklab, var(--color-border) 50%, transparent);
+      color: var(--color-text-muted);
+    }
+
+    .footer-nav {
+      margin-top: 3rem;
+      text-align: center;
+      padding-top: 2rem;
+      border-top: 1px solid var(--color-border);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      background-color: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: 0.5rem;
+      color: var(--color-text);
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: background-color 0.2s;
+    }
+
+    .btn:hover {
+      background-color: var(--color-surface-hover);
+      text-decoration: none;
+    }
+
+    .external-icon {
+      display: inline-block;
+      width: 0.75rem;
+      height: 0.75rem;
+      margin-left: 0.25rem;
+      vertical-align: middle;
+    }
+
+    .highlight-box {
+      background-color: var(--color-surface);
+      border-radius: 0.5rem;
+      padding: 1rem;
+      margin-top: 1rem;
+      color: var(--color-text-muted);
+    }
+
+    .highlight-box p {
+      margin-bottom: 0.35rem;
+      color: var(--color-text-muted);
+    }
+
+    .highlight-box p:last-child {
+      margin-bottom: 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <div class="icon-badge">
+        <svg viewBox="0 0 24 24">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+        </svg>
+      </div>
+      <h1>Privacy Policy</h1>
+      <p class="last-updated">Music Stream Match (Android Application) • Last updated: September 13, 2026</p>
+    </header>
+
+    <main class="content">
+      <p>
+        <strong>Music Stream Match</strong> ("the App", package <code>com.mobulum.musica</code>) is a free, open-source Android application that resolves and matches songs across streaming platforms (Spotify, TIDAL, Deezer, Apple Music).
+        We believe in complete transparency and minimal data collection. This Privacy Policy explains what information the App interacts with, how it is handled, and your rights.
+      </p>
+
+      <section>
+        <h2>1. Data Controller & Developer</h2>
+        <div class="card">
+          <p><strong>App:</strong> Music Stream Match (Android)</p>
+          <p><strong>Developer:</strong> Mobulum</p>
+          <p><strong>Email:</strong> <a href="mailto:music-stream-match@mobulum.com">music-stream-match@mobulum.com</a></p>
+          <p><strong>Discord:</strong> <a href="https://discord.gg/rwJcE5Zwez" target="_blank" rel="noopener noreferrer">discord.gg/rwJcE5Zwez</a></p>
+          <p><strong>Source Code:</strong> <a href="https://github.com/music-stream-match" target="_blank" rel="noopener noreferrer">github.com/music-stream-match</a></p>
+        </div>
+      </section>
+
+      <section>
+        <h2>2. What Data We Collect & Store Locally</h2>
+
+        <h3>2.1 Data Stored Exclusively on Your Device</h3>
+        <p>The App operates locally on your device. The following data is stored exclusively in your device's private storage (Room SQLite database and DataStore Preferences):</p>
+        <ul>
+          <li><strong>Lookup & Match History:</strong> Track title, artist, album art URL, and matched URLs for queried tracks. You can view, search, or delete this history at any time.</li>
+          <li><strong>Local Offline Cache:</strong> Cached track mappings enabling fast access and offline lookups.</li>
+          <li><strong>App Preferences:</strong> Your selected theme preference (System, Light, Dark) and language settings.</li>
+        </ul>
+        <p><strong>We do not have access to your local data.</strong> It never leaves your device unless you explicitly share a song link using Android's system share sheet.</p>
+
+        <h3>2.2 Data Transmitted Over Network</h3>
+        <p>To match tracks across platforms, the App queries our public API endpoints (<code>api.musica.mobulum.com</code>):</p>
+        <ul>
+          <li><strong>Track Queries:</strong> When you search for a song or share a streaming link to the App, the track identifier and provider are transmitted to fetch cross-platform matches.</li>
+          <li><strong>Network Logs:</strong> Standard HTTP server logs (such as IP address, timestamp, user agent) may be temporarily processed by infrastructure providers (e.g., Cloudflare) strictly to ensure security, prevent abuse, and maintain service availability. No user accounts or personal profiles are created.</li>
+        </ul>
+
+        <h3>2.3 No User Accounts, Advertising, or Tracking</h3>
+        <div class="highlight-box">
+          <p>✗ <strong>No Accounts Required:</strong> You do not need to register, sign in, or provide personal details to use the App.</p>
+          <p>✗ <strong>No Advertising or Tracking:</strong> The Android app contains <strong>no third-party ad networks</strong> and <strong>no behavioral tracking SDKs</strong>.</p>
+          <p>✗ <strong>No Sale of Personal Data:</strong> We do not sell, rent, or monetize your data in any way.</p>
+        </div>
+      </section>
+
+      <section>
+        <h2>3. Permissions Requested</h2>
+        <p>The App requests only standard Android permissions necessary for its core functionality:</p>
+        <ul>
+          <li><strong><code>android.permission.INTERNET</code>:</strong> Required to query the Music Stream Match API for matching tracks across streaming services.</li>
+          <li><strong><code>android.permission.ACCESS_NETWORK_STATE</code>:</strong> Used to detect network connectivity and switch smoothly to offline cache when offline.</li>
+        </ul>
+        <p>The App does <em>not</em> request sensitive permissions such as Location, Camera, Contacts, Microphone, or Storage files.</p>
+      </section>
+
+      <section>
+        <h2>4. Third-Party Music Services & External Links</h2>
+        <p>
+          Music Stream Match enables you to open matched songs in external applications or web browsers (deep links).
+          When you tap to open or share a link to a third-party streaming service, their respective privacy policies apply:
+        </p>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Service</th>
+                <th>Purpose</th>
+                <th>Privacy Policy</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Spotify</td>
+                <td>Track matching & playback deep links</td>
+                <td><a href="https://www.spotify.com/privacy" target="_blank" rel="noopener noreferrer">spotify.com/privacy</a></td>
+              </tr>
+              <tr>
+                <td>TIDAL</td>
+                <td>Track matching & playback deep links</td>
+                <td><a href="https://tidal.com/privacy" target="_blank" rel="noopener noreferrer">tidal.com/privacy</a></td>
+              </tr>
+              <tr>
+                <td>Deezer</td>
+                <td>Track matching & playback deep links</td>
+                <td><a href="https://www.deezer.com/legal/personal-datas" target="_blank" rel="noopener noreferrer">deezer.com/legal/personal-datas</a></td>
+              </tr>
+              <tr>
+                <td>Apple Music</td>
+                <td>Track matching & playback deep links</td>
+                <td><a href="https://www.apple.com/privacy/" target="_blank" rel="noopener noreferrer">apple.com/privacy</a></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section>
+        <h2>5. Data Retention & Deletion</h2>
+        <ul>
+          <li><strong>Local Search History:</strong> Stored locally until you choose to remove individual entries or use "Clear history" in the App. Uninstalling the App permanently deletes all local data.</li>
+          <li><strong>Server Logs:</strong> Temporary HTTP server logs retained by infrastructure for diagnostic and security purposes are automatically deleted according to standard retention schedules.</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>6. Your Rights (GDPR & CCPA Compliance)</h2>
+        <p>Depending on your region, you have rights regarding your data:</p>
+        <ul>
+          <li><strong>Right to Erasure / Deletion:</strong> You can wipe all stored data at any moment via the in-app "Clear history" option or by clearing App Data in Android Settings.</li>
+          <li><strong>Right to Access:</strong> All saved track lookups are directly visible in the History tab of the application.</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>7. Children's Privacy</h2>
+        <p>
+          The App does not knowingly collect personal identifiable information from children under the age of 13 (or under 16 in the EEA).
+          If you believe that a child has provided us with personal information, please contact us so we can take immediate action.
+        </p>
+      </section>
+
+      <section>
+        <h2>8. Changes to This Policy</h2>
+        <p>
+          We may update this Privacy Policy from time to time. Any changes will be posted on this page with an updated revision date and committed to our public repository.
+        </p>
+      </section>
+
+      <section>
+        <h2>9. Contact Us</h2>
+        <p>If you have any questions or suggestions regarding this Privacy Policy, feel free to reach out:</p>
+        <div class="card">
+          <p><strong>Email:</strong> <a href="mailto:music-stream-match@mobulum.com">music-stream-match@mobulum.com</a></p>
+          <p><strong>Discord:</strong> <a href="https://discord.gg/rwJcE5Zwez" target="_blank" rel="noopener noreferrer">discord.gg/rwJcE5Zwez</a></p>
+          <p><strong>GitHub Issues:</strong> <a href="https://github.com/music-stream-match" target="_blank" rel="noopener noreferrer">github.com/music-stream-match</a></p>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer-nav">
+      <a href="/" class="btn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="19" y1="12" x2="5" y2="12"></line>
+          <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        Back to Musica Web
+      </a>
+    </footer>
+  </div>
+</body>
+</html>

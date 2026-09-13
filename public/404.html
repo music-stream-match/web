@@ -12,8 +12,8 @@
       const hash = window.location.hash;
       
       // Redirect to index.html with the path as a query parameter
-      // The main app will then handle the routing
-      if (path !== '/') {
+      // The main app will then handle the routing (except for static pages like /privacy-android)
+      if (path !== '/' && !path.startsWith('/privacy-android')) {
         sessionStorage.setItem('redirect_path', path + search + hash);
         window.location.replace('/');
       }
